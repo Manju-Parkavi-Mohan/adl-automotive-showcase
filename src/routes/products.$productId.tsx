@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ChevronRight, Heart, Minus, Plus, Share2, ShoppingCart, Star, Check,
   Truck, ShieldCheck, RotateCcw, Headphones, ZoomIn,
@@ -11,13 +11,10 @@ import { SectionHeader } from "@/components/site/CategoryShowcase";
 import { PRODUCTS, CATEGORY_META, type Product } from "@/data/products";
 
 export const Route = createFileRoute("/products/$productId")({
-  loader: ({ params }) => {
-    const product = PRODUCTS.find((p) => p.id === params.productId);
-    if (!product) throw notFound();
-    return { product };
-  },
-  head: ({ loaderData }) => {
-    const p = loaderData?.product;
+  head: ({ params }) => {
+    const p = params?.productId
+      ? PRODUCTS.find((x) => x.id === params.productId)
+      : undefined;
     return {
       meta: p
         ? [
@@ -59,7 +56,23 @@ const TABS = [
 ] as const;
 
 function ProductDetailPage() {
-  const { product } = Route.useLoaderData() as { product: Product };
+  const { productId } = Route.useParams();
+  const product = PRODUCTS.find((p) => p.id === productId);
+
+  if (!product) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-secondary px-4 text-center">
+        <div>
+          <h1 className="text-3xl font-bold">Product not found</h1>
+          <p className="mt-2 text-muted-foreground">The product you are looking for is unavailable.</p>
+          <Link to="/products" className="mt-6 inline-flex rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground">
+            Browse all products
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   const [imageIndex, setImageIndex] = useState(0);
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("description");
