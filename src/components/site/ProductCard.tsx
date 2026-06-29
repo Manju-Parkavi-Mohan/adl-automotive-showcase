@@ -1,4 +1,5 @@
 import { Heart, ShoppingCart, Star, Eye } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import type { Product } from "@/data/products";
 import { Button } from "@/components/ui/button";
 
@@ -9,7 +10,11 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <article className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-hover)]">
-      <div className="relative aspect-square overflow-hidden bg-secondary">
+      <Link
+        to="/products/$productId"
+        params={{ productId: product.id }}
+        className="relative block aspect-square overflow-hidden bg-secondary"
+      >
         <img
           src={product.image}
           alt={product.name}
@@ -41,13 +46,17 @@ export function ProductCard({ product }: { product: Product }) {
             <Eye className="h-4 w-4" />
           </button>
         </div>
-      </div>
+      </Link>
 
       <div className="flex flex-1 flex-col gap-2 p-4">
         <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{product.brand}</p>
-        <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground">
+        <Link
+          to="/products/$productId"
+          params={{ productId: product.id }}
+          className="line-clamp-2 text-sm font-semibold leading-snug text-foreground transition-colors hover:text-primary"
+        >
           {product.name}
-        </h3>
+        </Link>
 
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <div className="flex items-center gap-0.5 text-amber-500">

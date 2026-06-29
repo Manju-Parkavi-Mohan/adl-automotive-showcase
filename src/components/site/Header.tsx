@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   Search, Heart, ShoppingCart, User, Globe, ChevronDown, Menu, X,
-  Wrench, Cpu, Settings2, Sparkles, Flame, Award,
+  Cpu, Settings2, Sparkles, Flame, Award, Wrench,
 } from "lucide-react";
+import adlLogo from "@/assets/adl-logo.png.asset.json";
 
 const NAV_LINKS = [
   { label: "Home", to: "/" },
@@ -47,14 +48,8 @@ export function Header() {
       <div className="container-px mx-auto max-w-[1400px]">
         <div className="grid grid-cols-[auto_1fr_auto] items-center gap-6 py-4 lg:gap-10">
           {/* Logo */}
-          <Link to="/" className="flex shrink-0 items-center gap-2">
-            <div className="grid h-10 w-10 place-items-center rounded-md bg-primary text-primary-foreground">
-              <Wrench className="h-5 w-5" />
-            </div>
-            <div className="flex flex-col leading-tight">
-              <span className="text-lg font-extrabold tracking-tight text-primary">ADL</span>
-              <span className="-mt-0.5 text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground">Automotive</span>
-            </div>
+          <Link to="/" aria-label="ADL Automotive — home" className="flex shrink-0 items-center">
+            <img src={adlLogo.url} alt="ADL Automotive" className="h-12 w-auto md:h-14" />
           </Link>
 
           {/* Search */}
