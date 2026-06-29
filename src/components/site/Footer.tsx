@@ -50,7 +50,7 @@ export function Footer() {
         <div className="grid gap-10 lg:grid-cols-[1.2fr_repeat(4,_1fr)]">
           <div>
             <div className="inline-block rounded-md bg-white p-3">
-              <img src={adlLogo.url} alt="ADL Automotive" className="h-12 w-auto" />
+              <img src={adlLogo.url} alt="ADL Automotive" className="h-16 w-auto md:h-20 brightness-0 invert" />
             </div>
             <p className="mt-4 text-sm leading-relaxed text-white/70">
               Premium diagnostic, tuning and workshop equipment trusted by professional

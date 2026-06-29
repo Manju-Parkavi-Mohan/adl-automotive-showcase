@@ -49,7 +49,11 @@ export function Header() {
         <div className="grid grid-cols-[auto_1fr_auto] items-center gap-6 py-4 lg:gap-10">
           {/* Logo */}
           <Link to="/" aria-label="ADL Automotive — home" className="flex shrink-0 items-center">
-            <img src={adlLogo.url} alt="ADL Automotive" className="h-12 w-auto md:h-14" />
+            <img
+              src={adlLogo.url}
+              alt="ADL Automotive"
+              className="h-16 w-auto md:h-20 lg:h-24 drop-shadow-sm"
+            />
           </Link>
 
           {/* Search */}
