@@ -59,7 +59,7 @@ const TABS = [
 ] as const;
 
 function ProductDetailPage() {
-  const { product } = Route.useLoaderData();
+  const { product } = Route.useLoaderData() as { product: Product };
   const [imageIndex, setImageIndex] = useState(0);
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("description");
