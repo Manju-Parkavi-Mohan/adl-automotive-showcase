@@ -9,7 +9,7 @@ import { ProductCard } from "@/components/site/ProductCard";
 import { ProductListItem } from "@/components/site/ProductListItem";
 import { PRODUCTS, CATEGORY_META, type ProductCategory } from "@/data/products";
 
-export const Route = createFileRoute("/products")({
+export const Route = createFileRoute("/products/")({
   head: () => ({
     meta: [
       { title: "All Products — ADL Automotive" },
