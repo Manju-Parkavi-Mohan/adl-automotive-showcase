@@ -57,7 +57,36 @@ const TABS = [
 
 function ProductDetailPage() {
   const { productId } = Route.useParams();
-  const product = PRODUCTS.find((p) => p.id === productId);
+  const product = useMemo(
+    () => PRODUCTS.find((p) => p.id === productId),
+    [productId],
+  );
+
+  const [imageIndex, setImageIndex] = useState(0);
+  const [qty, setQty] = useState(1);
+  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("description");
+
+  // Build 4 gallery images by reusing the product image plus reference photos
+  const gallery = useMemo(() => {
+    if (!product) return [] as string[];
+    const extras = PRODUCTS
+      .filter((p) => p.id !== product.id && p.category === product.category)
+      .slice(0, 3)
+      .map((p) => p.image);
+    return [product.image, ...extras];
+  }, [product]);
+
+  const related = useMemo(
+    () =>
+      product
+        ? PRODUCTS.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4)
+        : [],
+    [product],
+  );
+  const recentlyViewed = useMemo(
+    () => (product ? PRODUCTS.filter((p) => p.id !== product.id).slice(0, 4) : []),
+    [product],
+  );
 
   if (!product) {
     return (
@@ -72,28 +101,6 @@ function ProductDetailPage() {
       </div>
     );
   }
-
-  const [imageIndex, setImageIndex] = useState(0);
-  const [qty, setQty] = useState(1);
-  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("description");
-
-  // Build 4 gallery images by reusing the product image plus reference photos
-  const gallery = useMemo(() => {
-    const extras = PRODUCTS
-      .filter((p) => p.id !== product.id && p.category === product.category)
-      .slice(0, 3)
-      .map((p) => p.image);
-    return [product.image, ...extras];
-  }, [product]);
-
-  const related = useMemo(
-    () => PRODUCTS.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4),
-    [product],
-  );
-  const recentlyViewed = useMemo(
-    () => PRODUCTS.filter((p) => p.id !== product.id).slice(0, 4),
-    [product],
-  );
 
   const discount = product.oldPrice
     ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
