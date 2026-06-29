@@ -1,29 +1,63 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Header } from "@/components/site/Header";
+import { Footer } from "@/components/site/Footer";
+import { HeroCarousel } from "@/components/site/HeroCarousel";
+import { BrandsMarquee } from "@/components/site/BrandsMarquee";
+import { CategoryShowcase } from "@/components/site/CategoryShowcase";
+import { FeaturedProducts, NewArrivals } from "@/components/site/FeaturedProducts";
+import { ProductSection } from "@/components/site/ProductSection";
+import { WhyChooseUs } from "@/components/site/WhyChooseUs";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "ADL Automotive — Premium Diagnostic, Tuning & Workshop Equipment" },
+      {
+        name: "description",
+        content:
+          "Shop dealer-grade diagnostic tools, ECU programmers and tuning software from Autel, Launch, Alientech, Magic Motorsport and more. Worldwide shipping.",
+      },
+      { property: "og:title", content: "ADL Automotive — Premium Workshop Equipment" },
+      { property: "og:description", content: "Diagnostic tools, ECU programmers and tuning software trusted by professional workshops worldwide." },
+      { property: "og:type", content: "website" },
     ],
   }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main>
+        <HeroCarousel />
+        <BrandsMarquee />
+        <CategoryShowcase />
+        <FeaturedProducts />
+        <ProductSection
+          category="diagnostic"
+          eyebrow="Workshop ready"
+          title="Diagnostic Tools"
+          subtitle="OBD scanners, key programmers and tablet-based diagnostic platforms."
+        />
+        <div className="bg-secondary">
+          <ProductSection
+            category="ecu-programming"
+            eyebrow="Chip tuning"
+            title="ECU Programming Tools"
+            subtitle="Bench, OBD and boot-mode programmers for cars, bikes and trucks."
+          />
+        </div>
+        <ProductSection
+          category="ecu-tuning"
+          eyebrow="Calibration"
+          title="Tuning Software for Trucks & Special Vehicles"
+          subtitle="Performance and emissions calibrations for heavy-duty and agricultural engines."
+        />
+        <NewArrivals />
+        <WhyChooseUs />
+      </main>
+      <Footer />
     </div>
   );
 }
