@@ -1,4 +1,5 @@
-import { Facebook, Instagram, Linkedin, Youtube, Mail, Phone, MapPin, Wrench } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Youtube, Mail, Phone, MapPin } from "lucide-react";
+import adlLogo from "@/assets/adl-logo.png.asset.json";
 
 const COLS = [
   {
@@ -48,14 +49,8 @@ export function Footer() {
         {/* Main grid */}
         <div className="grid gap-10 lg:grid-cols-[1.2fr_repeat(4,_1fr)]">
           <div>
-            <div className="flex items-center gap-2">
-              <div className="grid h-10 w-10 place-items-center rounded-md bg-[var(--accent-blue)] text-white">
-                <Wrench className="h-5 w-5" />
-              </div>
-              <div className="flex flex-col leading-tight">
-                <span className="text-lg font-extrabold text-white">ADL</span>
-                <span className="-mt-0.5 text-[10px] font-medium uppercase tracking-[0.2em] text-white/60">Automotive</span>
-              </div>
+            <div className="inline-block rounded-md bg-white p-3">
+              <img src={adlLogo.url} alt="ADL Automotive" className="h-12 w-auto" />
             </div>
             <p className="mt-4 text-sm leading-relaxed text-white/70">
               Premium diagnostic, tuning and workshop equipment trusted by professional
