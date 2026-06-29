@@ -1,4 +1,4 @@
-import { Heart, ShoppingCart, Star } from "lucide-react";
+import { Heart, ShoppingCart, Star, Eye } from "lucide-react";
 import type { Product } from "@/data/products";
 import { Button } from "@/components/ui/button";
 
@@ -27,12 +27,20 @@ export function ProductCard({ product }: { product: Product }) {
             <span className="rounded-full bg-destructive px-2.5 py-0.5 text-xs font-semibold text-white">-{discount}%</span>
           )}
         </div>
-        <button
-          aria-label="Add to wishlist"
-          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/95 text-foreground opacity-0 shadow-sm transition-all duration-200 hover:bg-white hover:text-primary group-hover:opacity-100"
-        >
-          <Heart className="h-4 w-4" />
-        </button>
+        <div className="absolute right-3 top-3 flex flex-col gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          <button
+            aria-label="Add to wishlist"
+            className="grid h-9 w-9 place-items-center rounded-full bg-white/95 text-foreground shadow-sm transition-colors hover:bg-white hover:text-primary"
+          >
+            <Heart className="h-4 w-4" />
+          </button>
+          <button
+            aria-label="Quick view"
+            className="grid h-9 w-9 place-items-center rounded-full bg-white/95 text-foreground shadow-sm transition-colors hover:bg-white hover:text-primary"
+          >
+            <Eye className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-4">
