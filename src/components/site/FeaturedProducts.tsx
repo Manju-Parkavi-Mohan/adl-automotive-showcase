@@ -9,7 +9,14 @@ import type { Product } from "@/data/products";
 
 type TabId = "featured" | "popular" | "best" | "rated";
 
-const TABS: { id: TabId; label: string; query: Parameters<typeof listProducts>[0]["data"]; fallback: () => Product[] }[] = [
+type ListInput = {
+  featured?: boolean;
+  perPage?: number;
+  orderby?: "date" | "popularity" | "rating" | "price" | "title" | "menu_order";
+  order?: "asc" | "desc";
+};
+
+const TABS: { id: TabId; label: string; query: ListInput; fallback: () => Product[] }[] = [
   { id: "featured", label: "Featured", query: { featured: true, perPage: 8 }, fallback: () => getFeatured(8) },
   { id: "popular", label: "Popular", query: { orderby: "popularity", perPage: 8 }, fallback: () => getBestSellers(8) },
   { id: "best", label: "Best Selling", query: { orderby: "popularity", perPage: 8 }, fallback: () => getBestSellers(8) },
