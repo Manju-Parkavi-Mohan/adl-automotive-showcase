@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import {
   ChevronRight, LayoutGrid, List, SlidersHorizontal, Star, X, ChevronDown,
 } from "lucide-react";
@@ -7,7 +8,9 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { ProductCard } from "@/components/site/ProductCard";
 import { ProductListItem } from "@/components/site/ProductListItem";
-import { PRODUCTS, CATEGORY_META, type ProductCategory } from "@/data/products";
+import { listProducts } from "@/lib/woo/products.functions";
+import { listCategories } from "@/lib/woo/categories.functions";
+import { wooToDisplay } from "@/lib/woo/adapter";
 
 export const Route = createFileRoute("/products/")({
   head: () => ({
@@ -37,18 +40,27 @@ const PRICE_RANGES = [
   { id: "0-500", label: "Under $500", min: 0, max: 500 },
   { id: "500-1500", label: "$500 – $1,500", min: 500, max: 1500 },
   { id: "1500-3000", label: "$1,500 – $3,000", min: 1500, max: 3000 },
-  { id: "3000-9999", label: "Over $3,000", min: 3000, max: Infinity },
+  { id: "3000-9999", label: "Over $3,000", min: 3000, max: 999999 },
 ];
 
-const PER_PAGE = 9;
-const ALL_BRANDS = Array.from(new Set(PRODUCTS.map((p) => p.brand))).sort();
-const ALL_CATEGORIES = Object.keys(CATEGORY_META) as ProductCategory[];
+const PER_PAGE = 12;
+
+function sortToWoo(id: (typeof SORT_OPTIONS)[number]["id"]) {
+  switch (id) {
+    case "price-asc": return { orderby: "price" as const, order: "asc" as const };
+    case "price-desc": return { orderby: "price" as const, order: "desc" as const };
+    case "rating": return { orderby: "rating" as const, order: "desc" as const };
+    case "newest": return { orderby: "date" as const, order: "desc" as const };
+    case "featured":
+    default: return { orderby: "popularity" as const, order: "desc" as const };
+  }
+}
 
 function ProductsPage() {
   const [view, setView] = useState<"grid" | "list">("grid");
   const [sort, setSort] = useState<(typeof SORT_OPTIONS)[number]["id"]>("featured");
   const [page, setPage] = useState(1);
-  const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [categorySlugs, setCategorySlugs] = useState<string[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
   const [priceIds, setPriceIds] = useState<string[]>([]);
   const [inStockOnly, setInStockOnly] = useState(false);
@@ -56,34 +68,64 @@ function ProductsPage() {
   const [minRating, setMinRating] = useState(0);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const filtered = useMemo(() => {
-    let list = PRODUCTS.slice();
-    if (categories.length) list = list.filter((p) => categories.includes(p.category));
-    if (brands.length) list = list.filter((p) => brands.includes(p.brand));
-    if (priceIds.length) {
-      const ranges = PRICE_RANGES.filter((r) => priceIds.includes(r.id));
-      list = list.filter((p) => ranges.some((r) => p.price >= r.min && p.price <= r.max));
-    }
-    if (inStockOnly) list = list.filter((p) => p.inStock);
-    if (onSaleOnly) list = list.filter((p) => p.oldPrice);
-    if (minRating > 0) list = list.filter((p) => p.rating >= minRating);
+  const wooSort = sortToWoo(sort);
+  const priceRange = useMemo(() => {
+    if (!priceIds.length) return { minPrice: undefined as number | undefined, maxPrice: undefined as number | undefined };
+    const selected = PRICE_RANGES.filter((r) => priceIds.includes(r.id));
+    if (!selected.length) return { minPrice: undefined, maxPrice: undefined };
+    return {
+      minPrice: Math.min(...selected.map((r) => r.min)),
+      maxPrice: Math.max(...selected.map((r) => r.max)),
+    };
+  }, [priceIds]);
 
-    switch (sort) {
-      case "price-asc": list.sort((a, b) => a.price - b.price); break;
-      case "price-desc": list.sort((a, b) => b.price - a.price); break;
-      case "rating": list.sort((a, b) => b.rating - a.rating); break;
-      case "newest":
-        list.sort((a, b) => (b.badge === "new" ? 1 : 0) - (a.badge === "new" ? 1 : 0)); break;
-    }
-    return list;
-  }, [categories, brands, priceIds, inStockOnly, onSaleOnly, minRating, sort]);
+  const categoriesQuery = useQuery({
+    queryKey: ["wc-categories"],
+    queryFn: () => listCategories({ data: { perPage: 50, hideEmpty: true } }),
+    staleTime: 5 * 60_000,
+  });
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
-  const safePage = Math.min(page, totalPages);
-  const pageItems = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE);
+  const productsQuery = useQuery({
+    queryKey: [
+      "wc-products",
+      { page, sort, categorySlugs, priceIds, onSaleOnly },
+    ],
+    queryFn: () =>
+      listProducts({
+        data: {
+          page,
+          perPage: PER_PAGE,
+          orderby: wooSort.orderby,
+          order: wooSort.order,
+          category: categorySlugs.length ? categorySlugs.join(",") : undefined,
+          minPrice: priceRange.minPrice,
+          maxPrice: priceRange.maxPrice === 999999 ? undefined : priceRange.maxPrice,
+          onSale: onSaleOnly || undefined,
+        },
+      }),
+    placeholderData: keepPreviousData,
+  });
+
+  const rawItems = productsQuery.data?.items ?? [];
+  const display = rawItems.map(wooToDisplay);
+
+  // Client-side fine filters (brand / inStock / minRating) over fetched page
+  const pageItems = display.filter((p) => {
+    if (brands.length && !brands.includes(p.brand)) return false;
+    if (inStockOnly && !p.inStock) return false;
+    if (minRating > 0 && p.rating < minRating) return false;
+    return true;
+  });
+
+  const totalCount = productsQuery.data?.total ?? 0;
+  const totalPages = productsQuery.data?.totalPages ?? 1;
+  const safePage = page;
+
+  const allBrands = Array.from(new Set(display.map((p) => p.brand))).sort();
+  const allCategories = (categoriesQuery.data ?? []).filter((c) => c.parent === 0);
 
   const resetAll = () => {
-    setCategories([]); setBrands([]); setPriceIds([]);
+    setCategorySlugs([]); setBrands([]); setPriceIds([]);
     setInStockOnly(false); setOnSaleOnly(false); setMinRating(0); setPage(1);
   };
 
@@ -93,7 +135,7 @@ function ProductsPage() {
   };
 
   const activeCount =
-    categories.length + brands.length + priceIds.length +
+    categorySlugs.length + brands.length + priceIds.length +
     (inStockOnly ? 1 : 0) + (onSaleOnly ? 1 : 0) + (minRating > 0 ? 1 : 0);
 
   return (
@@ -122,7 +164,7 @@ function ProductsPage() {
             </div>
             <p className="text-sm text-muted-foreground">
               Showing <span className="font-semibold text-foreground">{pageItems.length}</span> of{" "}
-              <span className="font-semibold text-foreground">{filtered.length}</span> products
+              <span className="font-semibold text-foreground">{totalCount}</span> products
             </p>
           </div>
         </div>
@@ -187,9 +229,11 @@ function ProductsPage() {
           {/* Sidebar (desktop) */}
           <aside className="hidden lg:block">
             <FiltersPanel
-              categories={categories} brands={brands} priceIds={priceIds}
+              categorySlugs={categorySlugs} brands={brands} priceIds={priceIds}
+              allCategories={allCategories.map((c) => ({ slug: c.slug, label: c.name, count: c.count }))}
+              allBrands={allBrands}
               inStockOnly={inStockOnly} onSaleOnly={onSaleOnly} minRating={minRating}
-              onToggleCategory={(c) => toggle(c, categories, setCategories)}
+              onToggleCategory={(c) => toggle(c, categorySlugs, setCategorySlugs)}
               onToggleBrand={(b) => toggle(b, brands, setBrands)}
               onTogglePrice={(p) => toggle(p, priceIds, setPriceIds)}
               setInStockOnly={(v) => { setInStockOnly(v); setPage(1); }}
@@ -211,9 +255,11 @@ function ProductsPage() {
                   </button>
                 </div>
                 <FiltersPanel
-                  categories={categories} brands={brands} priceIds={priceIds}
+                  categorySlugs={categorySlugs} brands={brands} priceIds={priceIds}
+                  allCategories={allCategories.map((c) => ({ slug: c.slug, label: c.name, count: c.count }))}
+                  allBrands={allBrands}
                   inStockOnly={inStockOnly} onSaleOnly={onSaleOnly} minRating={minRating}
-                  onToggleCategory={(c) => toggle(c, categories, setCategories)}
+                  onToggleCategory={(c) => toggle(c, categorySlugs, setCategorySlugs)}
                   onToggleBrand={(b) => toggle(b, brands, setBrands)}
                   onTogglePrice={(p) => toggle(p, priceIds, setPriceIds)}
                   setInStockOnly={(v) => { setInStockOnly(v); setPage(1); }}
@@ -227,7 +273,18 @@ function ProductsPage() {
 
           {/* Results */}
           <div>
-            {pageItems.length === 0 ? (
+            {productsQuery.isLoading ? (
+              <div className="grid place-items-center rounded-xl border border-dashed border-border bg-secondary py-24 text-center">
+                <p className="text-sm text-muted-foreground">Loading products…</p>
+              </div>
+            ) : productsQuery.isError ? (
+              <div className="grid place-items-center rounded-xl border border-dashed border-destructive/40 bg-destructive/5 py-16 text-center">
+                <p className="text-sm font-semibold text-destructive">Couldn't load products.</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {productsQuery.error instanceof Error ? productsQuery.error.message : "Unknown error"}
+                </p>
+              </div>
+            ) : pageItems.length === 0 ? (
               <div className="grid place-items-center rounded-xl border border-dashed border-border bg-secondary py-24 text-center">
                 <p className="text-base font-semibold">No products match your filters</p>
                 <button onClick={resetAll} className="mt-3 text-sm font-semibold text-primary hover:underline">
@@ -258,9 +315,11 @@ function ProductsPage() {
 }
 
 function FiltersPanel(props: {
-  categories: ProductCategory[]; brands: string[]; priceIds: string[];
+  categorySlugs: string[]; brands: string[]; priceIds: string[];
+  allCategories: Array<{ slug: string; label: string; count: number }>;
+  allBrands: string[];
   inStockOnly: boolean; onSaleOnly: boolean; minRating: number;
-  onToggleCategory: (c: ProductCategory) => void;
+  onToggleCategory: (slug: string) => void;
   onToggleBrand: (b: string) => void;
   onTogglePrice: (id: string) => void;
   setInStockOnly: (v: boolean) => void;
@@ -278,24 +337,30 @@ function FiltersPanel(props: {
       </div>
 
       <FilterGroup title="Categories">
-        {ALL_CATEGORIES.map((c) => (
-          <Checkbox
-            key={c}
-            label={CATEGORY_META[c].label}
-            count={PRODUCTS.filter((p) => p.category === c).length}
-            checked={props.categories.includes(c)}
-            onChange={() => props.onToggleCategory(c)}
-          />
-        ))}
+        {props.allCategories.length === 0 ? (
+          <p className="px-2 text-xs text-muted-foreground">Loading…</p>
+        ) : (
+          props.allCategories.map((c) => (
+            <Checkbox
+              key={c.slug}
+              label={c.label}
+              count={c.count}
+              checked={props.categorySlugs.includes(c.slug)}
+              onChange={() => props.onToggleCategory(c.slug)}
+            />
+          ))
+        )}
       </FilterGroup>
 
       <FilterGroup title="Brands">
         <div className="max-h-56 space-y-1 overflow-y-auto pr-1">
-          {ALL_BRANDS.map((b) => (
+          {props.allBrands.length === 0 && (
+            <p className="px-2 text-xs text-muted-foreground">No brands on this page</p>
+          )}
+          {props.allBrands.map((b) => (
             <Checkbox
               key={b}
               label={b}
-              count={PRODUCTS.filter((p) => p.brand === b).length}
               checked={props.brands.includes(b)}
               onChange={() => props.onToggleBrand(b)}
             />
