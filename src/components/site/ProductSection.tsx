@@ -1,12 +1,27 @@
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ProductCard } from "./ProductCard";
 import { SectionHeader } from "./CategoryShowcase";
 import { getProductsByCategory, type ProductCategory } from "@/data/products";
+import { listProducts } from "@/lib/woo/products.functions";
+import { wooToDisplay } from "@/lib/woo/adapter";
+
+const CATEGORY_SLUG: Record<ProductCategory, string> = {
+  diagnostic: "diagnostic-tools",
+  "ecu-programming": "ecu-programming-tools",
+  "ecu-tuning": "tuning-software",
+};
 
 export function ProductSection({
   category, title, eyebrow, subtitle,
 }: { category: ProductCategory; title: string; eyebrow?: string; subtitle?: string }) {
-  const all = getProductsByCategory(category);
+  const { data } = useQuery({
+    queryKey: ["wc-section", category],
+    queryFn: () => listProducts({ data: { category: CATEGORY_SLUG[category], perPage: 12 } }),
+    staleTime: 60_000,
+  });
+  const live = (data?.items ?? []).map(wooToDisplay);
+  const all = live.length > 0 ? live : getProductsByCategory(category);
   const brands = useMemo(() => ["All", ...Array.from(new Set(all.map((p) => p.brand)))], [all]);
   const [filter, setFilter] = useState("All");
 
