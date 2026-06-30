@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { useCart } from "@/components/site/CartProvider";
+import { useAuth } from "@/components/site/AuthProvider";
 import {
   Search, Heart, ShoppingCart, User, Globe, ChevronDown, Menu, X,
   Cpu, Settings2, Sparkles, Flame, Award, Wrench,
@@ -8,8 +10,8 @@ import adlLogo from "@/assets/adl-logo.png.asset.json";
 
 const NAV_LINKS = [
   { label: "Home", to: "/" },
-  { label: "Brands", to: "/" },
-  { label: "Products", to: "/" },
+  { label: "Products", to: "/products" },
+  { label: "Blog", to: "/blog" },
   { label: "About Us", to: "/" },
   { label: "Contact", to: "/" },
 ];
@@ -29,6 +31,8 @@ const PROMO_TABS = [
 export function Header() {
   const [catOpen, setCatOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { count, openCart } = useCart();
+  const { user } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-white">
@@ -79,12 +83,28 @@ export function Header() {
               <span>USD $</span>
               <ChevronDown className="h-3 w-3" />
             </button>
-            <IconButton label="Wishlist" icon={Heart} count={3} />
-            <IconButton label="Cart" icon={ShoppingCart} count={2} />
-            <button className="hidden items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium transition-colors hover:border-primary hover:text-primary sm:flex">
-              <User className="h-4 w-4" />
-              <span className="hidden md:inline">Login</span>
+            <IconButton label="Wishlist" icon={Heart} />
+            <button
+              aria-label="Open cart"
+              onClick={openCart}
+              className="relative grid h-10 w-10 place-items-center rounded-md text-foreground transition-colors hover:text-primary"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {count > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-blue)] px-1 text-[10px] font-bold text-white">
+                  {count}
+                </span>
+              )}
             </button>
+            <Link
+              to={user ? "/account" : "/account/login"}
+              className="hidden items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium transition-colors hover:border-primary hover:text-primary sm:flex"
+            >
+              <User className="h-4 w-4" />
+              <span className="hidden md:inline">
+                {user?.firstName || user?.displayName || "Login"}
+              </span>
+            </Link>
             <button
               aria-label="Open menu"
               className="grid h-10 w-10 place-items-center rounded-md border border-border lg:hidden"
