@@ -17,7 +17,6 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductsIndexRouteImport } from './routes/products.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
-import { Route as AccountIndexRouteImport } from './routes/account.index'
 import { Route as ProductsProductIdRouteImport } from './routes/products.$productId'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AccountRegisterRouteImport } from './routes/account.register'
@@ -63,11 +62,6 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   path: '/',
   getParentRoute: () => BlogRoute,
 } as any)
-const AccountIndexRoute = AccountIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AccountRoute,
-} as any)
 const ProductsProductIdRoute = ProductsProductIdRouteImport.update({
   id: '/$productId',
   path: '/$productId',
@@ -100,19 +94,18 @@ export interface FileRoutesByFullPath {
   '/account/register': typeof AccountRegisterRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/products/$productId': typeof ProductsProductIdRoute
-  '/account/': typeof AccountIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/products/': typeof ProductsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/account/login': typeof AccountLoginRoute
   '/account/register': typeof AccountRegisterRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/products/$productId': typeof ProductsProductIdRoute
-  '/account': typeof AccountIndexRoute
   '/blog': typeof BlogIndexRoute
   '/products': typeof ProductsIndexRoute
 }
@@ -128,7 +121,6 @@ export interface FileRoutesById {
   '/account/register': typeof AccountRegisterRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/products/$productId': typeof ProductsProductIdRoute
-  '/account/': typeof AccountIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/products/': typeof ProductsIndexRoute
 }
@@ -145,19 +137,18 @@ export interface FileRouteTypes {
     | '/account/register'
     | '/blog/$slug'
     | '/products/$productId'
-    | '/account/'
     | '/blog/'
     | '/products/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/account'
     | '/cart'
     | '/checkout'
     | '/account/login'
     | '/account/register'
     | '/blog/$slug'
     | '/products/$productId'
-    | '/account'
     | '/blog'
     | '/products'
   id:
@@ -172,7 +163,6 @@ export interface FileRouteTypes {
     | '/account/register'
     | '/blog/$slug'
     | '/products/$productId'
-    | '/account/'
     | '/blog/'
     | '/products/'
   fileRoutesById: FileRoutesById
@@ -244,13 +234,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof BlogRoute
     }
-    '/account/': {
-      id: '/account/'
-      path: '/'
-      fullPath: '/account/'
-      preLoaderRoute: typeof AccountIndexRouteImport
-      parentRoute: typeof AccountRoute
-    }
     '/products/$productId': {
       id: '/products/$productId'
       path: '/$productId'
@@ -285,13 +268,11 @@ declare module '@tanstack/react-router' {
 interface AccountRouteChildren {
   AccountLoginRoute: typeof AccountLoginRoute
   AccountRegisterRoute: typeof AccountRegisterRoute
-  AccountIndexRoute: typeof AccountIndexRoute
 }
 
 const AccountRouteChildren: AccountRouteChildren = {
   AccountLoginRoute: AccountLoginRoute,
   AccountRegisterRoute: AccountRegisterRoute,
-  AccountIndexRoute: AccountIndexRoute,
 }
 
 const AccountRouteWithChildren =
