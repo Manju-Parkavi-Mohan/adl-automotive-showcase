@@ -2,6 +2,8 @@ export type ProductCategory = "diagnostic" | "ecu-programming" | "ecu-tuning";
 
 export interface Product {
   id: string;
+  /** Numeric WooCommerce product ID, when item comes from live data. */
+  wcId?: number;
   sku: string;
   name: string;
   brand: string;

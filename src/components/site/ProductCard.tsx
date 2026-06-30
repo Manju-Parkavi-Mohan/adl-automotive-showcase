@@ -2,11 +2,34 @@ import { Heart, ShoppingCart, Star, Eye } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import type { Product } from "@/data/products";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/components/site/CartProvider";
+import { toast } from "sonner";
 
 export function ProductCard({ product }: { product: Product }) {
+  const { addItem } = useCart();
   const discount = product.oldPrice
     ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
     : 0;
+
+  const handleAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!product.wcId) {
+      toast.error("Live product not available yet");
+      return;
+    }
+    addItem(
+      {
+        productId: product.wcId,
+        slug: product.id,
+        name: product.name,
+        image: product.image,
+        price: product.price,
+        brand: product.brand,
+      },
+      1,
+    );
+  };
 
   return (
     <article className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-hover)]">
@@ -74,7 +97,11 @@ export function ProductCard({ product }: { product: Product }) {
             )}
             <span className="text-lg font-bold text-primary">${product.price.toLocaleString()}</span>
           </div>
-          <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button
+            size="sm"
+            onClick={handleAdd}
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+          >
             <ShoppingCart className="h-4 w-4" />
             <span className="hidden sm:inline">Add</span>
           </Button>

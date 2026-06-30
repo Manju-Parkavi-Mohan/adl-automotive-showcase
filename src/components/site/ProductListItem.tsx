@@ -1,11 +1,32 @@
 import { Heart, ShoppingCart, Star, Eye, Check } from "lucide-react";
 import type { Product } from "@/data/products";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/components/site/CartProvider";
+import { toast } from "sonner";
 
 export function ProductListItem({ product }: { product: Product }) {
+  const { addItem } = useCart();
   const discount = product.oldPrice
     ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
     : 0;
+
+  const handleAdd = () => {
+    if (!product.wcId) {
+      toast.error("Live product not available yet");
+      return;
+    }
+    addItem(
+      {
+        productId: product.wcId,
+        slug: product.id,
+        name: product.name,
+        image: product.image,
+        price: product.price,
+        brand: product.brand,
+      },
+      1,
+    );
+  };
 
   return (
     <article className="group grid grid-cols-1 gap-6 overflow-hidden rounded-xl border border-border bg-card p-5 transition-shadow hover:shadow-[var(--shadow-card)] sm:grid-cols-[220px_1fr_auto]">
@@ -66,7 +87,7 @@ export function ProductListItem({ product }: { product: Product }) {
           <div className="text-2xl font-bold text-primary">${product.price.toLocaleString()}</div>
         </div>
         <div className="flex flex-col gap-2 sm:w-44">
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button onClick={handleAdd} className="bg-primary text-primary-foreground hover:bg-primary/90">
             <ShoppingCart className="h-4 w-4" /> Add to Cart
           </Button>
           <div className="flex gap-2">
