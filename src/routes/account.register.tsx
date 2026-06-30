@@ -17,13 +17,20 @@ export const Route = createFileRoute("/account/register")({
 
 function RegisterPage() {
   const navigate = useNavigate();
-  const { refresh } = useAuth();
+  const { setUser, refresh } = useAuth();
   const [form, setForm] = useState({ firstName: "", lastName: "", email: "", password: "" });
 
   const mutation = useMutation({
     mutationFn: () => register({ data: form }),
-    onSuccess: async () => {
-      await refresh();
+    onSuccess: async (data) => {
+      setUser({
+        email: data.email,
+        displayName: data.displayName,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        customerId: data.customerId,
+      });
+      void refresh();
       toast.success("Account created");
       navigate({ to: "/account" }).catch(() => {});
     },

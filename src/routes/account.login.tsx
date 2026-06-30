@@ -17,14 +17,21 @@ export const Route = createFileRoute("/account/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { refresh } = useAuth();
+  const { setUser, refresh } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const mutation = useMutation({
     mutationFn: () => login({ data: { username, password } }),
-    onSuccess: async () => {
-      await refresh();
+    onSuccess: async (data) => {
+      setUser({
+        email: data.email,
+        displayName: data.displayName,
+        firstName: data.firstName ?? null,
+        lastName: data.lastName ?? null,
+        customerId: data.customerId,
+      });
+      void refresh();
       toast.success("Signed in");
       navigate({ to: "/account" }).catch(() => {});
     },

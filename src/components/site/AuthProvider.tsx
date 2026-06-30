@@ -14,6 +14,7 @@ interface AuthContextValue {
   user: CurrentUser | null;
   isLoading: boolean;
   refresh: () => Promise<void>;
+  setUser: (user: CurrentUser | null) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -33,6 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refresh: async () => {
         await qc.invalidateQueries({ queryKey: ["current-user"] });
       },
+      setUser: (user) => qc.setQueryData(["current-user"], user),
     }),
     [data, isLoading, qc],
   );

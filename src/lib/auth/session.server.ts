@@ -13,6 +13,9 @@ const FALLBACK = "lovable-dev-session-secret-please-rotate-via-update_secret-too
 
 export function getSessionConfig() {
   const password = process.env.SESSION_SECRET || FALLBACK;
+  // `secure: true` prevents browsers from accepting the cookie over plain
+  // http (e.g. localhost dev). Only enable it in production.
+  const isProd = process.env.NODE_ENV === "production";
   return {
     password,
     name: "adl_session",
@@ -20,7 +23,7 @@ export function getSessionConfig() {
     cookie: {
       httpOnly: true,
       sameSite: "lax" as const,
-      secure: true,
+      secure: isProd,
       path: "/",
     },
   };

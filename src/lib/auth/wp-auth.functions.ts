@@ -72,6 +72,8 @@ export const login = createServerFn({ method: "POST" })
     return {
       email: res.data.user_email,
       displayName: res.data.user_display_name,
+      firstName: customer?.first_name ?? null,
+      lastName: customer?.last_name ?? null,
       customerId: customer?.id ?? null,
     };
   });
@@ -111,7 +113,13 @@ export const register = createServerFn({ method: "POST" })
       lastName: data.lastName,
       displayName: res.data.user_display_name || `${data.firstName} ${data.lastName}`,
     });
-    return { email: data.email, customerId: customer?.id ?? null };
+    return {
+      email: data.email,
+      displayName: res.data.user_display_name || `${data.firstName} ${data.lastName}`,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      customerId: customer?.id ?? null,
+    };
   });
 
 export const logout = createServerFn({ method: "POST" }).handler(async () => {

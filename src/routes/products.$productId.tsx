@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -15,6 +15,7 @@ import { getProduct, getRelatedProducts } from "@/lib/woo/products.functions";
 import { wooToDisplay } from "@/lib/woo/adapter";
 import { CATEGORY_META } from "@/data/products";
 import type { WooProduct } from "@/lib/woo/types";
+import { pushRecentlyViewed } from "@/lib/recently-viewed";
 
 export const Route = createFileRoute("/products/$productId")({
   head: () => ({ meta: [{ title: "Product — ADL Automotive" }] }),
@@ -58,6 +59,10 @@ function ProductDetailPage() {
   });
 
   const woo = productQuery.data ?? null;
+
+  useEffect(() => {
+    if (woo?.id) pushRecentlyViewed(woo.id);
+  }, [woo?.id]);
   const product = useMemo(() => (woo ? wooToDisplay(woo) : null), [woo]);
 
   const relatedQuery = useQuery({
