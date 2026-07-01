@@ -60,8 +60,10 @@ function sortToWoo(id: (typeof SORT_OPTIONS)[number]["id"]) {
 }
 
 function ProductsPage() {
+  const { search: searchParam } = Route.useSearch();
+  const navigate = useNavigate({ from: "/products" });
   const [view, setView] = useState<"grid" | "list">("grid");
-  const [sort, setSort] = useState<(typeof SORT_OPTIONS)[number]["id"]>("featured");
+  const [sort, setSort] = useState<(typeof SORT_OPTIONS)[number]["id"]>"featured");
   const [page, setPage] = useState(1);
   const [categorySlugs, setCategorySlugs] = useState<string[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
@@ -91,7 +93,7 @@ function ProductsPage() {
   const productsQuery = useQuery({
     queryKey: [
       "wc-products",
-      { page, sort, categorySlugs, priceIds, onSaleOnly },
+      { page, sort, categorySlugs, priceIds, onSaleOnly, search: searchParam },
     ],
     queryFn: () =>
       listProducts({
@@ -100,6 +102,7 @@ function ProductsPage() {
           perPage: PER_PAGE,
           orderby: wooSort.orderby,
           order: wooSort.order,
+          search: searchParam,
           category: categorySlugs.length ? categorySlugs.join(",") : undefined,
           minPrice: priceRange.minPrice,
           maxPrice: priceRange.maxPrice === 999999 ? undefined : priceRange.maxPrice,
@@ -127,9 +130,14 @@ function ProductsPage() {
   const allBrands = Array.from(new Set(display.map((p) => p.brand))).sort();
   const allCategories = (categoriesQuery.data ?? []).filter((c) => c.parent === 0);
 
+  const clearSearch = () => {
+    navigate({ search: (prev) => ({ ...prev, search: undefined }) });
+  };
+
   const resetAll = () => {
     setCategorySlugs([]); setBrands([]); setPriceIds([]);
     setInStockOnly(false); setOnSaleOnly(false); setMinRating(0); setPage(1);
+    clearSearch();
   };
 
   const toggle = <T,>(value: T, list: T[], set: (v: T[]) => void) => {
@@ -139,7 +147,10 @@ function ProductsPage() {
 
   const activeCount =
     categorySlugs.length + brands.length + priceIds.length +
-    (inStockOnly ? 1 : 0) + (onSaleOnly ? 1 : 0) + (minRating > 0 ? 1 : 0);
+    (inStockOnly ? 1 : 0) + (onSaleOnly ? 1 : 0) + (minRating > 0 ? 1 : 0) +
+    (searchParam ? 1 : 0);
+
+  const isSearching = Boolean(searchParam);
 
   return (
     <div className="min-h-screen bg-background">
@@ -152,17 +163,24 @@ function ProductsPage() {
             <ol className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <li><Link to="/" className="hover:text-primary">Home</Link></li>
               <li><ChevronRight className="h-3.5 w-3.5" /></li>
-              <li><a href="#" className="hover:text-primary">Shop</a></li>
-              <li><ChevronRight className="h-3.5 w-3.5" /></li>
-              <li className="font-medium text-foreground">All Products</li>
+              <li><Link to="/products" className="hover:text-primary">Shop</Link></li>
+              {isSearching && (
+                <>
+                  <li><ChevronRight className="h-3.5 w-3.5" /></li>
+                  <li className="font-medium text-foreground">Search</li>
+                </>
+              )}
             </ol>
           </nav>
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
-              <h1 className="text-3xl font-bold tracking-tight md:text-4xl">All Products</h1>
+              <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
+                {isSearching ? `Search: "${searchParam}"` : "All Products"}
+              </h1>
               <p className="mt-2 text-base text-muted-foreground">
-                Dealer-grade diagnostic platforms, ECU programmers and calibration software trusted by
-                professional workshops worldwide.
+                {isSearching
+                  ? `Showing results for "${searchParam}" across our catalog.`
+                  : "Dealer-grade diagnostic platforms, ECU programmers and calibration software trusted by professional workshops worldwide."}
               </p>
             </div>
             <p className="text-sm text-muted-foreground">
@@ -184,7 +202,15 @@ function ProductsPage() {
             Filters {activeCount > 0 && <span className="rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">{activeCount}</span>}
           </button>
 
-          <div className="hidden text-sm text-muted-foreground lg:block">
+          <div className="hidden flex-wrap items-center gap-2 text-sm text-muted-foreground lg:flex">
+            {isSearching && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                Search: {searchParam}
+                <button onClick={clearSearch} aria-label="Clear search" className="hover:text-destructive">
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </span>
+            )}
             {activeCount > 0 ? (
               <button onClick={resetAll} className="font-semibold text-primary hover:underline">
                 Clear {activeCount} filter{activeCount > 1 ? "s" : ""}
@@ -232,6 +258,8 @@ function ProductsPage() {
           {/* Sidebar (desktop) */}
           <aside className="hidden lg:block">
             <FiltersPanel
+              searchParam={searchParam}
+              onClearSearch={clearSearch}
               categorySlugs={categorySlugs} brands={brands} priceIds={priceIds}
               allCategories={allCategories.map((c) => ({ slug: c.slug, label: c.name, count: c.count }))}
               allBrands={allBrands}
@@ -258,6 +286,8 @@ function ProductsPage() {
                   </button>
                 </div>
                 <FiltersPanel
+                  searchParam={searchParam}
+                  onClearSearch={clearSearch}
                   categorySlugs={categorySlugs} brands={brands} priceIds={priceIds}
                   allCategories={allCategories.map((c) => ({ slug: c.slug, label: c.name, count: c.count }))}
                   allBrands={allBrands}
@@ -282,16 +312,18 @@ function ProductsPage() {
               </div>
             ) : productsQuery.isError ? (
               <div className="grid place-items-center rounded-xl border border-dashed border-destructive/40 bg-destructive/5 py-16 text-center">
-                <p className="text-sm font-semibold text-destructive">Couldn't load products.</p>
+                <p className="text-sm font-semibold text-destructive">Couldn&apos;t load products.</p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {productsQuery.error instanceof Error ? productsQuery.error.message : "Unknown error"}
                 </p>
               </div>
             ) : pageItems.length === 0 ? (
               <div className="grid place-items-center rounded-xl border border-dashed border-border bg-secondary py-24 text-center">
-                <p className="text-base font-semibold">No products match your filters</p>
+                <p className="text-base font-semibold">
+                  {isSearching ? `No products found for "${searchParam}"` : "No products match your filters"}
+                </p>
                 <button onClick={resetAll} className="mt-3 text-sm font-semibold text-primary hover:underline">
-                  Reset filters
+                  {isSearching ? "Clear search & filters" : "Reset filters"}
                 </button>
               </div>
             ) : view === "grid" ? (
@@ -318,6 +350,8 @@ function ProductsPage() {
 }
 
 function FiltersPanel(props: {
+  searchParam?: string;
+  onClearSearch: () => void;
   categorySlugs: string[]; brands: string[]; priceIds: string[];
   allCategories: Array<{ slug: string; label: string; count: number }>;
   allBrands: string[];
@@ -338,6 +372,18 @@ function FiltersPanel(props: {
           Reset all
         </button>
       </div>
+
+      {props.searchParam && (
+        <div className="rounded-lg bg-primary/5 p-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Search</p>
+          <div className="mt-1.5 flex items-center justify-between">
+            <span className="text-sm font-medium text-foreground">{props.searchParam}</span>
+            <button onClick={props.onClearSearch} className="text-muted-foreground hover:text-destructive">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       <FilterGroup title="Categories">
         {props.allCategories.length === 0 ? (
