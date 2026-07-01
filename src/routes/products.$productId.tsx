@@ -16,9 +16,31 @@ import { wooToDisplay } from "@/lib/woo/adapter";
 import { CATEGORY_META } from "@/data/products";
 import type { WooProduct } from "@/lib/woo/types";
 import { pushRecentlyViewed } from "@/lib/recently-viewed";
+import { seoToMeta, seoToLinks } from "@/lib/seo";
 
 export const Route = createFileRoute("/products/$productId")({
-  head: () => ({ meta: [{ title: "Product — ADL Automotive" }] }),
+  loader: ({ params, context }) =>
+    context.queryClient.ensureQueryData({
+      queryKey: ["wc-product", params.productId],
+      queryFn: () => getProduct({ data: { idOrSlug: params.productId } }),
+      staleTime: 60_000,
+    }),
+  head: ({ loaderData }) => {
+    const woo = loaderData as WooProduct | null | undefined;
+    if (!woo) return { meta: [{ title: "Product — ADL Automotive" }] };
+    const fallback = {
+      title: `${woo.name} — ADL Automotive`,
+      description:
+        woo.short_description?.replace(/<[^>]+>/g, "").trim() ||
+        woo.description?.replace(/<[^>]+>/g, "").trim() ||
+        undefined,
+      image: woo.images[0]?.src,
+    };
+    return {
+      meta: seoToMeta(woo.seo, fallback),
+      links: seoToLinks(woo.seo),
+    };
+  },
   notFoundComponent: NotFoundView,
   errorComponent: ({ error }) => (
     <div className="grid min-h-screen place-items-center px-4 text-center">
