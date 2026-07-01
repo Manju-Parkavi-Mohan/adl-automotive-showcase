@@ -71,9 +71,14 @@ export const getMyOrder = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const session = await getAppSession();
     const customerId = session.data?.customerId;
-    const res = await wcFetch<OrderDetail & { customer_id: number }>(`/orders/${data.id}`);
-    if (customerId && res.data.customer_id !== customerId) {
-      throw new Error("Not authorized to view this order");
-    }
-    return res.data;
+    const email = session.data?.email?.toLowerCase();
+    if (!customerId && !email) throw new Error("Not signed in");
+    const res = await wcFetch<OrderDetail & { customer_id: number; billing: Record<string, string> }>(`/orders/${data.id}`);
+    const order = res.data;
+    const orderEmail = (order.billing?.email || "").toLowerCase();
+    const owns =
+      (customerId && order.customer_id === customerId) ||
+      (email && orderEmail && orderEmail === email);
+    if (!owns) throw new Error("Not authorized to view this order");
+    return order;
   });

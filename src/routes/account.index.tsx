@@ -12,6 +12,7 @@ import { useAuth } from "@/components/site/AuthProvider";
 import { logout } from "@/lib/auth/wp-auth.functions";
 import { listMyOrders } from "@/lib/woo/orders.functions";
 import { getMyCustomer } from "@/lib/woo/customer.functions";
+import { getMyOrder } from "@/lib/woo/customer.functions";
 import { listProducts } from "@/lib/woo/products.functions";
 import { getRecentlyViewed, clearRecentlyViewed } from "@/lib/recently-viewed";
 import { ProductCard } from "@/components/site/ProductCard";
@@ -185,7 +186,13 @@ function AccountPage() {
             />
           )}
           {tab === "orders" && <OrdersPanel orders={orders} loading={ordersQuery.isLoading} />}
-          {tab === "addresses" && <AddressesPanel customer={customer} loading={customerQuery.isLoading} />}
+          {tab === "addresses" && (
+            <AddressesPanel
+              customer={customer}
+              loading={customerQuery.isLoading}
+              latestOrderId={orders[0]?.id}
+            />
+          )}
           {tab === "viewed" && (
             <ViewedPanel
               ids={viewedIds}
@@ -258,12 +265,28 @@ function OrdersTable({ orders }: { orders: Awaited<ReturnType<typeof listMyOrder
         <tbody>
           {orders.map((o) => (
             <tr key={o.id} className="border-b border-border last:border-0">
-              <td className="py-3 pr-4 font-semibold">#{o.number}</td>
+              <td className="py-3 pr-4 font-semibold">
+                <Link
+                  to="/account/orders/$orderId"
+                  params={{ orderId: String(o.id) }}
+                  className="text-primary hover:underline"
+                >
+                  #{o.number}
+                </Link>
+              </td>
               <td className="py-3 pr-4 text-muted-foreground">
                 {new Date(o.date_created).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
               </td>
               <td className="py-3 pr-4"><StatusPill status={o.status} /></td>
-              <td className="py-3 pr-4 text-right font-semibold">{money(o.total, o.currency || "USD")}</td>
+              <td className="py-3 pr-4 text-right font-semibold">
+                <Link
+                  to="/account/orders/$orderId"
+                  params={{ orderId: String(o.id) }}
+                  className="hover:text-primary"
+                >
+                  {money(o.total, o.currency || "USD")}
+                </Link>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -344,42 +367,84 @@ function OrdersPanel({ orders, loading }: { orders: Awaited<ReturnType<typeof li
 }
 
 function AddressesPanel({
-  customer, loading,
-}: { customer: Awaited<ReturnType<typeof getMyCustomer>>; loading: boolean }) {
-  if (loading) {
+  customer, loading, latestOrderId,
+}: {
+  customer: Awaited<ReturnType<typeof getMyCustomer>>;
+  loading: boolean;
+  latestOrderId?: number;
+}) {
+  const customerHasAddress = !!customer?.billing?.address_1 || !!customer?.shipping?.address_1;
+  const shouldFallback = !loading && !customerHasAddress && !!latestOrderId;
+
+  const fallbackQuery = useQuery({
+    queryKey: ["order-addresses", latestOrderId],
+    queryFn: () => getMyOrder({ data: { id: latestOrderId! } }),
+    enabled: shouldFallback,
+  });
+
+  if (loading || (shouldFallback && fallbackQuery.isLoading)) {
     return <PanelCard title="Addresses"><p className="text-sm text-muted-foreground">Loading…</p></PanelCard>;
   }
-  if (!customer) {
+
+  const billing: AnyAddress | Record<string, string> =
+    (customer?.billing?.address_1 ? customer.billing : null) ??
+    fallbackQuery.data?.billing ??
+    null;
+  const shipping: AnyAddress | Record<string, string> =
+    (customer?.shipping?.address_1 ? customer.shipping : null) ??
+    fallbackQuery.data?.shipping ??
+    null;
+
+  if (!billing && !shipping) {
     return (
       <PanelCard title="Addresses">
-        <EmptyState icon={MapPin} title="No customer profile" body="Address details are unavailable for this account." />
+        <EmptyState
+          icon={MapPin}
+          title="No addresses on file"
+          body="Add a billing or shipping address during your next checkout and it will appear here."
+        />
       </PanelCard>
     );
   }
   return (
     <div className="grid gap-6 md:grid-cols-2">
-      <AddressCard title="Billing address" addr={customer.billing} />
-      <AddressCard title="Shipping address" addr={customer.shipping} />
+      <AddressCard title="Billing address" addr={billing} />
+      <AddressCard title="Shipping address" addr={shipping} />
     </div>
   );
 }
 
-function AddressCard({ title, addr }: { title: string; addr: Awaited<ReturnType<typeof getMyCustomer>> extends infer T ? T extends { billing: infer A } ? A : never : never }) {
-  const empty = !addr || (!addr.address_1 && !addr.city && !addr.postcode);
+type AnyAddress = {
+  first_name?: string;
+  last_name?: string;
+  company?: string;
+  address_1?: string;
+  address_2?: string;
+  city?: string;
+  state?: string;
+  postcode?: string;
+  country?: string;
+  email?: string;
+  phone?: string;
+} | null | undefined;
+
+function AddressCard({ title, addr }: { title: string; addr: AnyAddress | Record<string, string> }) {
+  const a = (addr ?? {}) as Record<string, string>;
+  const empty = !a.address_1 && !a.city && !a.postcode;
   return (
     <PanelCard title={title}>
       {empty ? (
         <p className="text-sm text-muted-foreground">No address on file. Add one during your next checkout.</p>
       ) : (
         <address className="not-italic text-sm leading-6 text-foreground">
-          <p className="font-semibold">{addr!.first_name} {addr!.last_name}</p>
-          {addr!.company && <p>{addr!.company}</p>}
-          <p>{addr!.address_1}</p>
-          {addr!.address_2 && <p>{addr!.address_2}</p>}
-          <p>{[addr!.postcode, addr!.city].filter(Boolean).join(" ")}</p>
-          <p>{[addr!.state, addr!.country].filter(Boolean).join(", ")}</p>
-          {addr!.phone && <p className="mt-2 text-muted-foreground">{addr!.phone}</p>}
-          {addr!.email && <p className="text-muted-foreground">{addr!.email}</p>}
+          <p className="font-semibold">{[a.first_name, a.last_name].filter(Boolean).join(" ")}</p>
+          {a.company && <p>{a.company}</p>}
+          {a.address_1 && <p>{a.address_1}</p>}
+          {a.address_2 && <p>{a.address_2}</p>}
+          <p>{[a.postcode, a.city].filter(Boolean).join(" ")}</p>
+          <p>{[a.state, a.country].filter(Boolean).join(", ")}</p>
+          {a.phone && <p className="mt-2 text-muted-foreground">{a.phone}</p>}
+          {a.email && <p className="text-muted-foreground">{a.email}</p>}
         </address>
       )}
     </PanelCard>
