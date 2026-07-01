@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useCart } from "@/components/site/CartProvider";
 import { useAuth } from "@/components/site/AuthProvider";
 import {
