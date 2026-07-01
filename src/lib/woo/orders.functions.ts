@@ -74,18 +74,53 @@ export const createOrder = createServerFn({ method: "POST" })
 export const listMyOrders = createServerFn({ method: "GET" }).handler(async () => {
   const session = await getAppSession();
   const customerId = session.data?.customerId;
-  if (!customerId) return [] as WooOrderSummary[];
-  const res = await wcFetch<Array<{
+  const email = session.data?.email;
+  if (!customerId && !email) return [] as WooOrderSummary[];
+
+  type RawOrder = {
     id: number;
     number: string;
     status: string;
     total: string;
     currency: string;
     date_created: string;
-  }>>("/orders", {
-    query: { customer: customerId, per_page: 25, orderby: "date", order: "desc" },
-  });
-  return (res.data ?? []).map((o) => ({
+    billing?: { email?: string };
+  };
+
+  const collected = new Map<number, RawOrder>();
+
+  if (customerId) {
+    try {
+      const res = await wcFetch<RawOrder[]>("/orders", {
+        query: { customer: customerId, per_page: 25, orderby: "date", order: "desc" },
+      });
+      for (const o of res.data ?? []) collected.set(o.id, o);
+    } catch {
+      // ignore and fall through to email search
+    }
+  }
+
+  // Fallback: guest orders or orders where customer_id != WP user id
+  if (email) {
+    try {
+      const res = await wcFetch<RawOrder[]>("/orders", {
+        query: { search: email, per_page: 25, orderby: "date", order: "desc" },
+      });
+      for (const o of res.data ?? []) {
+        if (o.billing?.email?.toLowerCase() === email.toLowerCase()) {
+          collected.set(o.id, o);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  const orders = Array.from(collected.values()).sort(
+    (a, b) => new Date(b.date_created).getTime() - new Date(a.date_created).getTime(),
+  );
+
+  return orders.map((o) => ({
     id: o.id,
     number: o.number,
     status: o.status,
