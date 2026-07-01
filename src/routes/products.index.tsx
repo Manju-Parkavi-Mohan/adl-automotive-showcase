@@ -13,6 +13,9 @@ import { listCategories } from "@/lib/woo/categories.functions";
 import { wooToDisplay } from "@/lib/woo/adapter";
 
 export const Route = createFileRoute("/products/")({
+  validateSearch: (search) => ({
+    search: typeof search.search === "string" ? search.search : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "All Products — ADL Automotive" },
