@@ -330,7 +330,7 @@ function OverviewPanel({
             icon={Package}
             title="No orders yet"
             body="When you place an order it will appear here."
-            cta={<Button asChild><Link to="/products">Browse products</Link></Button>}
+            cta={<Button asChild><Link to="/products" search={{}}>Browse products</Link></Button>}
           />
         ) : (
           <OrdersTable orders={recent} />
@@ -364,7 +364,7 @@ function OrdersPanel({ orders, loading }: { orders: Awaited<ReturnType<typeof li
           icon={Package}
           title="No orders yet"
           body="When you place an order it will appear here."
-          cta={<Button asChild><Link to="/products">Browse products</Link></Button>}
+          cta={<Button asChild><Link to="/products" search={{}}>Browse products</Link></Button>}
         />
       ) : (
         <OrdersTable orders={orders} />
@@ -468,7 +468,7 @@ function ViewedPanel({
           icon={Eye}
           title="Nothing here yet"
           body="Products you open will show up here so you can find them again easily."
-          cta={<Button asChild><Link to="/products">Browse products</Link></Button>}
+          cta={<Button asChild><Link to="/products" search={{}}>Browse products</Link></Button>}
         />
       </PanelCard>
     );

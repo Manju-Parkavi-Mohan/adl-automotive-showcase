@@ -36,7 +36,7 @@ function CartPage() {
           <div className="mt-10 grid place-items-center rounded-xl border border-dashed border-border bg-secondary py-24 text-center">
             <ShoppingBag className="mb-3 h-10 w-10 text-muted-foreground" />
             <p className="font-semibold">Your cart is empty</p>
-            <Button asChild className="mt-5"><Link to="/products">Browse products</Link></Button>
+            <Button asChild className="mt-5"><Link to="/products" search={{}}>Browse products</Link></Button>
           </div>
         ) : (
           <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">

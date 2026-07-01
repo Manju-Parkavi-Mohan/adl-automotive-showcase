@@ -85,7 +85,7 @@ function CheckoutPage() {
         <Header />
         <main className="container-px mx-auto max-w-[1400px] py-20 text-center">
           <h1 className="text-2xl font-bold">Your cart is empty</h1>
-          <Button asChild className="mt-6"><Link to="/products">Browse products</Link></Button>
+          <Button asChild className="mt-6"><Link to="/products" search={{}}>Browse products</Link></Button>
         </main>
         <Footer />
       </div>
