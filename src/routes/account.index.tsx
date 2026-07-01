@@ -48,7 +48,7 @@ function money(value: number | string, currency = "USD") {
 }
 
 function AccountPage() {
-  const { user, isLoading, refresh } = useAuth();
+  const { user, isLoading, setUser } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<TabId>("overview");
 
@@ -78,8 +78,8 @@ function AccountPage() {
 
   const logoutMutation = useMutation({
     mutationFn: () => logout(),
-    onSuccess: async () => {
-      await refresh();
+    onSuccess: () => {
+      setUser(null);
       navigate({ to: "/" }).catch(() => {});
     },
   });
@@ -95,11 +95,16 @@ function AccountPage() {
   if (!user) {
     return (
       <Shell>
-        <div className="py-20 text-center">
-          <h1 className="text-2xl font-bold">You're not signed in</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Sign in to view orders and saved details.</p>
+        <div className="mx-auto max-w-2xl rounded-xl border border-border bg-white px-6 py-14 text-center shadow-sm">
+          <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-secondary text-primary">
+            <UserIcon className="h-6 w-6" />
+          </div>
+          <h1 className="mt-5 text-2xl font-bold">Customer account access</h1>
+          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+            Sign in to review your WooCommerce orders, saved billing details, recently viewed products, and checkout preferences.
+          </p>
           <div className="mt-6 flex justify-center gap-3">
-            <Button asChild><Link to="/account/login">Login</Link></Button>
+            <Button asChild><Link to="/account/login">Sign in</Link></Button>
             <Button asChild variant="outline"><Link to="/account/register">Create account</Link></Button>
           </div>
         </div>

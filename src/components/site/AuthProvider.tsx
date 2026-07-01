@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 import { getCurrentUser } from "@/lib/auth/wp-auth.functions";
 
 export interface CurrentUser {
@@ -21,22 +21,30 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const qc = useQueryClient();
+  const [localUser, setLocalUser] = useState<CurrentUser | null | undefined>(undefined);
   const { data, isLoading } = useQuery({
     queryKey: ["current-user"],
     queryFn: () => getCurrentUser(),
     staleTime: 60_000,
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 
   const value = useMemo<AuthContextValue>(
     () => ({
-      user: data ?? null,
+      user: localUser === undefined ? data ?? null : localUser,
       isLoading,
       refresh: async () => {
+        setLocalUser(undefined);
         await qc.invalidateQueries({ queryKey: ["current-user"] });
       },
-      setUser: (user) => qc.setQueryData(["current-user"], user),
+      setUser: (user) => {
+        void qc.cancelQueries({ queryKey: ["current-user"] });
+        setLocalUser(user);
+        qc.setQueryData(["current-user"], user);
+      },
     }),
-    [data, isLoading, qc],
+    [data, isLoading, localUser, qc],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

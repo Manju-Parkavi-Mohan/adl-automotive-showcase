@@ -17,7 +17,7 @@ export const Route = createFileRoute("/account/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { setUser, refresh } = useAuth();
+  const { setUser } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -31,7 +31,6 @@ function LoginPage() {
         lastName: data.lastName ?? null,
         customerId: data.customerId,
       });
-      void refresh();
       toast.success("Signed in");
       navigate({ to: "/account" }).catch(() => {});
     },
@@ -68,7 +67,7 @@ function LoginPage() {
           </p>
         </form>
         <p className="mt-4 text-center text-xs text-muted-foreground">
-          Requires the <span className="font-mono">JWT Authentication for WP REST API</span> plugin on your WordPress site.
+          Secure access for order history, saved addresses, and faster checkout.
         </p>
       </main>
       <Footer />
