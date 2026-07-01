@@ -15,9 +15,10 @@ import { getYoastForUrl } from "@/lib/wp/yoast.functions";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
 
 export const Route = createFileRoute("/products/")({
-  validateSearch: (search) => ({
-    search: typeof search.search === "string" ? search.search : undefined,
-  }),
+  validateSearch: (search) =>
+    typeof search.search === "string" && search.search.trim()
+      ? { search: search.search }
+      : {},
   loader: ({ context }) =>
     context.queryClient.ensureQueryData({
       queryKey: ["yoast", "/shop"],
