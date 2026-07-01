@@ -4,9 +4,29 @@ import { ChevronRight } from "lucide-react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { getPostBySlug } from "@/lib/wp/posts.functions";
+import { seoToMeta, seoToLinks } from "@/lib/seo";
+import type { WPPost } from "@/lib/woo/types";
 
 export const Route = createFileRoute("/blog/$slug")({
-  head: () => ({ meta: [{ title: "Blog — ADL Automotive" }] }),
+  loader: ({ params, context }) =>
+    context.queryClient.ensureQueryData({
+      queryKey: ["wp-post", params.slug],
+      queryFn: () => getPostBySlug({ data: { slug: params.slug } }),
+    }),
+  head: ({ loaderData }) => {
+    const post = loaderData as WPPost | null | undefined;
+    if (!post) return { meta: [{ title: "Blog — ADL Automotive" }] };
+    const title = post.title?.replace(/<[^>]+>/g, "").trim() || "Blog — ADL Automotive";
+    const description = post.excerpt?.replace(/<[^>]+>/g, "").trim() || undefined;
+    return {
+      meta: seoToMeta(post.seo, {
+        title: `${title} — ADL Automotive`,
+        description,
+        image: post.featuredImage ?? undefined,
+      }),
+      links: seoToLinks(post.seo),
+    };
+  },
   component: BlogPostPage,
 });
 
