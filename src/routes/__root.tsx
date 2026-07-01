@@ -10,7 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
+import { reportAppError } from "../lib/error-reporting";
 import { CartProvider } from "@/components/site/CartProvider";
 import { CartDrawer } from "@/components/site/CartDrawer";
 import { AuthProvider } from "@/components/site/AuthProvider";
@@ -42,7 +42,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    reportAppError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
   return (
@@ -82,14 +82,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "referrer", content: "no-referrer" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "ADL Automotive — Premium Diagnostic, Tuning & Workshop Equipment" },
+      { name: "description", content: "Shop premium automotive diagnostic tools, ECU programmers, tuning software and workshop equipment. Trusted by professional technicians worldwide." },
+      { name: "author", content: "ADL Automotive" },
+      { property: "og:title", content: "ADL Automotive — Premium Automotive Equipment" },
+      { property: "og:description", content: "Premium diagnostic, tuning and workshop equipment trusted by professional technicians in 60+ countries." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:site", content: "@ADLAutomotive" },
     ],
     links: [
       {
