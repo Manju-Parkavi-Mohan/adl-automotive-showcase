@@ -71,38 +71,38 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
       </Link>
 
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{product.brand}</p>
+      <div className="flex flex-1 flex-col gap-1.5 p-2.5 sm:gap-2 sm:p-4">
+        <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground sm:text-xs">{product.brand}</p>
         <Link
           to="/products/$productId"
           params={{ productId: product.id }}
-          className="line-clamp-2 text-sm font-semibold leading-snug text-foreground transition-colors hover:text-primary"
+          className="line-clamp-2 text-xs font-semibold leading-snug text-foreground transition-colors hover:text-primary sm:text-sm"
         >
           {product.name}
         </Link>
 
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <div className="flex items-center gap-1 text-[10px] text-muted-foreground sm:text-xs">
           <div className="flex items-center gap-0.5 text-amber-500">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} className={`h-3.5 w-3.5 ${i < Math.round(product.rating) ? "fill-current" : ""}`} />
+              <Star key={i} className={`h-3 w-3 sm:h-3.5 sm:w-3.5 ${i < Math.round(product.rating) ? "fill-current" : ""}`} />
             ))}
           </div>
           <span>({product.reviewCount})</span>
         </div>
 
-        <div className="mt-auto flex items-end justify-between pt-2">
+        <div className="mt-auto flex items-end justify-between pt-1 sm:pt-2">
           <div className="flex flex-col">
             {product.oldPrice && (
-              <span className="text-xs text-muted-foreground line-through">${product.oldPrice.toLocaleString()}</span>
+              <span className="text-[10px] text-muted-foreground line-through sm:text-xs">${product.oldPrice.toLocaleString()}</span>
             )}
-            <span className="text-lg font-bold text-primary">${product.price.toLocaleString()}</span>
+            <span className="text-sm font-bold text-primary sm:text-lg">${product.price.toLocaleString()}</span>
           </div>
           <Button
             size="sm"
             onClick={handleAdd}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="h-8 bg-primary px-2 text-primary-foreground hover:bg-primary/90 sm:h-9 sm:px-3"
           >
-            <ShoppingCart className="h-4 w-4" />
+            <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">Add</span>
           </Button>
         </div>
