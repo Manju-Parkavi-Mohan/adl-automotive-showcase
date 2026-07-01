@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { wpFetch } from "@/lib/woo/client.server";
 import type { WPPost } from "@/lib/woo/types";
+import { adaptYoast } from "@/lib/woo/types";
 
 interface RawWPPost {
   id: number;
@@ -10,6 +11,7 @@ interface RawWPPost {
   title: { rendered: string };
   excerpt: { rendered: string };
   content: { rendered: string };
+  yoast_head_json?: Parameters<typeof adaptYoast>[0];
   _embedded?: {
     "wp:featuredmedia"?: Array<{ source_url: string; alt_text?: string }>;
     author?: Array<{ name: string }>;
@@ -28,6 +30,7 @@ function adapt(p: RawWPPost): WPPost {
     content: p.content?.rendered ?? "",
     featuredImage: media?.source_url ?? null,
     author: author?.name ?? null,
+    seo: adaptYoast(p.yoast_head_json),
   };
 }
 
