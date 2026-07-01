@@ -6,9 +6,11 @@ import { Footer } from "@/components/site/Footer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { login } from "@/lib/auth/wp-auth.functions";
 import { useAuth } from "@/components/site/AuthProvider";
 import { toast } from "sonner";
+import { AlertCircle } from "lucide-react";
 
 export const Route = createFileRoute("/account/login")({
   head: () => ({ meta: [{ title: "Sign in — ADL Automotive" }] }),
@@ -59,6 +61,17 @@ function LoginPage() {
             </Label>
             <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" />
           </div>
+          {mutation.isError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Sign-in failed</AlertTitle>
+              <AlertDescription>
+                We couldn't verify your credentials. Please double-check your email and password, then try again. If you continue to have trouble, you can{" "}
+                <Link to="/account/register" className="font-semibold underline">create a new account</Link>{" "}
+                or contact our support team for help.
+              </AlertDescription>
+            </Alert>
+          )}
           <Button type="submit" className="w-full" disabled={mutation.isPending}>
             {mutation.isPending ? "Signing in…" : "Sign in"}
           </Button>
