@@ -39,6 +39,7 @@ export interface WooProduct {
   images: WooImage[];
   attributes: WooAttribute[];
   permalink: string;
+  seo?: SeoMeta;
 }
 
 export interface WooCategory {
@@ -86,6 +87,61 @@ export interface WPPost {
   content: string;
   featuredImage: string | null;
   author: string | null;
+  seo?: SeoMeta;
+}
+
+export interface SeoMeta {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  ogType?: string;
+  twitterCard?: string;
+  twitterTitle?: string;
+  twitterDescription?: string;
+  twitterImage?: string;
+  robots?: string;
+  schema?: unknown;
+}
+
+export interface YoastHeadJson {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  robots?: Record<string, string | undefined>;
+  og_title?: string;
+  og_description?: string;
+  og_type?: string;
+  og_image?: Array<{ url?: string }>;
+  twitter_card?: string;
+  twitter_title?: string;
+  twitter_description?: string;
+  twitter_image?: string;
+  schema?: unknown;
+}
+
+export function adaptYoast(y?: YoastHeadJson | null): SeoMeta | undefined {
+  if (!y || typeof y !== "object") return undefined;
+  const robotsParts = y.robots
+    ? Object.values(y.robots).filter((v): v is string => typeof v === "string")
+    : [];
+  return {
+    title: y.title,
+    description: y.description,
+    canonical: y.canonical,
+    ogTitle: y.og_title,
+    ogDescription: y.og_description,
+    ogType: y.og_type,
+    ogImage: y.og_image?.[0]?.url,
+    twitterCard: y.twitter_card,
+    twitterTitle: y.twitter_title,
+    twitterDescription: y.twitter_description,
+    twitterImage: y.twitter_image,
+    robots: robotsParts.length ? robotsParts.join(", ") : undefined,
+    schema: y.schema,
+  };
 }
 
 /** Raw WC product shape we read from the API (subset of fields we use). */
@@ -112,6 +168,7 @@ export interface RawWooProduct {
   images: WooImage[];
   attributes: Array<{ id: number; name: string; options: string[] }>;
   brands?: WooCategoryRef[];
+  yoast_head_json?: YoastHeadJson;
 }
 
 export function adaptProduct(raw: RawWooProduct): WooProduct {
@@ -157,5 +214,6 @@ export function adaptProduct(raw: RawWooProduct): WooProduct {
     images: (raw.images || []).map((i) => ({ src: i.src, alt: i.alt })),
     attributes: (raw.attributes || []).map((a) => ({ id: a.id, name: a.name, options: a.options })),
     permalink: raw.permalink,
+    seo: adaptYoast(raw.yoast_head_json),
   };
 }
