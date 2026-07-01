@@ -6,9 +6,11 @@ import { Footer } from "@/components/site/Footer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { login } from "@/lib/auth/wp-auth.functions";
 import { useAuth } from "@/components/site/AuthProvider";
 import { toast } from "sonner";
+import { AlertCircle } from "lucide-react";
 
 export const Route = createFileRoute("/account/login")({
   head: () => ({ meta: [{ title: "Sign in — ADL Automotive" }] }),
