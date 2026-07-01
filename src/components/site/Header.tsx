@@ -130,14 +130,16 @@ export function Header() {
 
         {/* Mobile search */}
         <div className="pb-3 md:hidden">
-          <div className="relative">
+          <form onSubmit={handleSearch} className="relative">
             <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search products..."
               className="h-10 w-full rounded-full border border-border bg-secondary pl-11 pr-4 text-sm outline-none focus:border-primary focus:bg-white"
             />
-          </div>
+          </form>
         </div>
       </div>
 
