@@ -17,6 +17,7 @@ import { CATEGORY_META } from "@/data/products";
 import type { WooProduct } from "@/lib/woo/types";
 import { pushRecentlyViewed } from "@/lib/recently-viewed";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
+import { ProductReviews } from "@/components/site/ProductReviews";
 
 export const Route = createFileRoute("/products/$productId")({
   loader: ({ params, context }) =>
@@ -295,7 +296,9 @@ function ProductDetailPage() {
           <div className="py-8">
             {tab === "description" && <DescriptionPanel woo={woo} />}
             {tab === "specs" && <SpecsPanel woo={woo} />}
-            {tab === "reviews" && <ReviewsPanel rating={product.rating} reviewCount={product.reviewCount} />}
+            {tab === "reviews" && (
+              <ProductReviews productId={woo.id} rating={product.rating} reviewCount={product.reviewCount} />
+            )}
           </div>
         </section>
 
@@ -360,21 +363,3 @@ function SpecsPanel({ woo }: { woo: WooProduct }) {
   );
 }
 
-function ReviewsPanel({ rating, reviewCount }: { rating: number; reviewCount: number }) {
-  return (
-    <div className="grid gap-10 lg:grid-cols-[280px_1fr]">
-      <div className="h-fit rounded-xl border border-border bg-secondary p-6 text-center">
-        <p className="text-5xl font-extrabold text-primary">{rating.toFixed(1)}</p>
-        <div className="mt-2 inline-flex items-center gap-0.5 text-amber-500">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Star key={i} className={`h-5 w-5 ${i < Math.round(rating) ? "fill-current" : "text-muted-foreground/30"}`} />
-          ))}
-        </div>
-        <p className="mt-2 text-sm text-muted-foreground">Based on {reviewCount} verified reviews</p>
-      </div>
-      <div className="rounded-xl border border-dashed border-border bg-white p-8 text-center">
-        <p className="text-sm text-muted-foreground">Customer reviews from WooCommerce will display here.</p>
-      </div>
-    </div>
-  );
-}
