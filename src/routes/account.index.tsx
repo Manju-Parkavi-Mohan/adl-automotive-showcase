@@ -386,13 +386,13 @@ function AddressesPanel({
     return <PanelCard title="Addresses"><p className="text-sm text-muted-foreground">Loading…</p></PanelCard>;
   }
 
-  const billing =
+  const billing: AnyAddress | Record<string, string> =
     (customer?.billing?.address_1 ? customer.billing : null) ??
-    (fallbackQuery.data?.billing as unknown as typeof customer extends null ? never : NonNullable<typeof customer>["billing"]) ??
+    fallbackQuery.data?.billing ??
     null;
-  const shipping =
+  const shipping: AnyAddress | Record<string, string> =
     (customer?.shipping?.address_1 ? customer.shipping : null) ??
-    (fallbackQuery.data?.shipping as unknown as typeof customer extends null ? never : NonNullable<typeof customer>["shipping"]) ??
+    fallbackQuery.data?.shipping ??
     null;
 
   if (!billing && !shipping) {
