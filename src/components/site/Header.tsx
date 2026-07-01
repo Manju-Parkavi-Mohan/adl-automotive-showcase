@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useCart } from "@/components/site/CartProvider";
 import { useAuth } from "@/components/site/AuthProvider";
 import {
@@ -31,8 +31,16 @@ const PROMO_TABS = [
 export function Header() {
   const [catOpen, setCatOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
   const { count, openCart } = useCart();
   const { user } = useAuth();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    navigate({ to: "/products", search: { search: searchQuery.trim() } });
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-white">
@@ -58,18 +66,23 @@ export function Header() {
 
           {/* Search */}
           <div className="hidden min-w-0 md:block">
-            <div className="relative mx-auto max-w-2xl">
+            <form onSubmit={handleSearch} className="relative mx-auto max-w-2xl">
               <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search diagnostic tools, ECU programmers, brands..."
                 aria-label="Search products"
                 className="h-11 w-full rounded-full border border-border bg-secondary pl-11 pr-28 text-sm outline-none transition-colors focus:border-primary focus:bg-white"
               />
-              <button className="absolute right-1.5 top-1.5 h-8 rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
+              <button
+                type="submit"
+                className="absolute right-1.5 top-1.5 h-8 rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+              >
                 Search
               </button>
-            </div>
+            </form>
           </div>
 
           {/* Account icons */}
@@ -117,14 +130,16 @@ export function Header() {
 
         {/* Mobile search */}
         <div className="pb-3 md:hidden">
-          <div className="relative">
+          <form onSubmit={handleSearch} className="relative">
             <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search products..."
               className="h-10 w-full rounded-full border border-border bg-secondary pl-11 pr-4 text-sm outline-none focus:border-primary focus:bg-white"
             />
-          </div>
+          </form>
         </div>
       </div>
 
