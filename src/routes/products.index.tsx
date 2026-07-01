@@ -192,7 +192,7 @@ function ProductsPage() {
       </section>
 
       {/* Toolbar */}
-      <div className="sticky top-[112px] z-20 border-b border-border bg-white/95 backdrop-blur lg:top-[129px]">
+      <div className="sticky top-[100px] z-20 border-b border-border bg-white/95 backdrop-blur sm:top-[108px] lg:top-[160px]">
         <div className="container-px mx-auto flex max-w-[1400px] items-center justify-between gap-4 py-3">
           <button
             onClick={() => setFiltersOpen(true)}
@@ -327,7 +327,7 @@ function ProductsPage() {
                 </button>
               </div>
             ) : view === "grid" ? (
-              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
                 {pageItems.map((p) => <ProductCard key={p.id} product={p} />)}
               </div>
             ) : (

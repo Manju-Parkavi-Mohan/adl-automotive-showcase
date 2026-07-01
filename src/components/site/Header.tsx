@@ -45,9 +45,9 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-white">
       {/* Top utility bar */}
-      <div className="border-b border-border bg-primary text-primary-foreground">
+      <div className="hidden sm:block border-b border-border bg-primary text-primary-foreground">
         <div className="container-px mx-auto flex h-9 max-w-[1400px] items-center justify-between text-xs">
-          <p className="hidden sm:block">Premium automotive diagnostic & tuning equipment — shipped worldwide</p>
+          <p>Premium automotive diagnostic & tuning equipment — shipped worldwide</p>
           <div className="flex items-center gap-4">
             <a href="#" className="hover:text-white/80">Support</a>
             <a href="#" className="hover:text-white/80">Track Order</a>
@@ -58,10 +58,10 @@ export function Header() {
 
       {/* Top header */}
       <div className="container-px mx-auto max-w-[1400px]">
-        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-6 py-4 lg:gap-10">
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 py-2 sm:gap-6 sm:py-4 lg:gap-10">
           {/* Logo */}
           <Link to="/" aria-label="ADL Automotive — home" className="flex shrink-0 items-center">
-            <img src={adlLogo.url} alt="ADL Automotive" className="h-12 w-auto md:h-14" />
+            <img src={adlLogo.url} alt="ADL Automotive" className="h-10 w-auto md:h-14" />
           </Link>
 
           {/* Search */}
@@ -100,9 +100,9 @@ export function Header() {
             <button
               aria-label="Open cart"
               onClick={openCart}
-              className="relative grid h-10 w-10 place-items-center rounded-md text-foreground transition-colors hover:text-primary"
+              className="relative grid h-9 w-9 place-items-center rounded-md text-foreground transition-colors hover:text-primary sm:h-10 sm:w-10"
             >
-              <ShoppingCart className="h-5 w-5" />
+              <ShoppingCart className="h-[18px] w-[18px] sm:h-5 sm:w-5" />
               {count > 0 && (
                 <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-blue)] px-1 text-[10px] font-bold text-white">
                   {count}
@@ -120,31 +120,31 @@ export function Header() {
             </Link>
             <button
               aria-label="Open menu"
-              className="grid h-10 w-10 place-items-center rounded-md border border-border lg:hidden"
+              className="grid h-9 w-9 place-items-center rounded-md border border-border lg:hidden"
               onClick={() => setMobileOpen(true)}
             >
-              <Menu className="h-5 w-5" />
+              <Menu className="h-[18px] w-[18px]" />
             </button>
           </div>
         </div>
 
         {/* Mobile search */}
-        <div className="pb-3 md:hidden">
+        <div className="pb-2 md:hidden">
           <form onSubmit={handleSearch} className="relative">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <input
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search products..."
-              className="h-10 w-full rounded-full border border-border bg-secondary pl-11 pr-4 text-sm outline-none focus:border-primary focus:bg-white"
+              className="h-9 w-full rounded-full border border-border bg-secondary pl-9 pr-3 text-sm outline-none focus:border-primary focus:bg-white"
             />
           </form>
         </div>
       </div>
 
-      {/* Main navigation */}
-      <div className="border-t border-border bg-white">
+      {/* Main navigation — desktop only */}
+      <div className="hidden border-t border-border bg-white lg:block">
         <div className="container-px mx-auto flex h-14 max-w-[1400px] items-center gap-6">
           {/* Category dropdown */}
           <div className="relative">

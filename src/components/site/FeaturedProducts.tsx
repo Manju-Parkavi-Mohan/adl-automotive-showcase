@@ -58,7 +58,7 @@ export function FeaturedProducts() {
           </div>
         }
       />
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
         {isLoading && live.length === 0
           ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
           : products.map((p) => <ProductCard key={p.id} product={p} />)}
@@ -87,7 +87,7 @@ export function NewArrivals() {
             <a href="#" className="text-sm font-semibold text-primary hover:underline">View all →</a>
           }
         />
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
           {isLoading && live.length === 0
             ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
             : products.map((p) => <ProductCard key={p.id} product={p} />)}
