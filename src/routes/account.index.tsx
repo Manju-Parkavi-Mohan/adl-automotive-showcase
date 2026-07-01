@@ -414,22 +414,37 @@ function AddressesPanel({
   );
 }
 
-function AddressCard({ title, addr }: { title: string; addr: Awaited<ReturnType<typeof getMyCustomer>> extends infer T ? T extends { billing: infer A } ? A : never : never }) {
-  const empty = !addr || (!addr.address_1 && !addr.city && !addr.postcode);
+type AnyAddress = {
+  first_name?: string;
+  last_name?: string;
+  company?: string;
+  address_1?: string;
+  address_2?: string;
+  city?: string;
+  state?: string;
+  postcode?: string;
+  country?: string;
+  email?: string;
+  phone?: string;
+} | null | undefined;
+
+function AddressCard({ title, addr }: { title: string; addr: AnyAddress | Record<string, string> }) {
+  const a = (addr ?? {}) as Record<string, string>;
+  const empty = !a.address_1 && !a.city && !a.postcode;
   return (
     <PanelCard title={title}>
       {empty ? (
         <p className="text-sm text-muted-foreground">No address on file. Add one during your next checkout.</p>
       ) : (
         <address className="not-italic text-sm leading-6 text-foreground">
-          <p className="font-semibold">{addr!.first_name} {addr!.last_name}</p>
-          {addr!.company && <p>{addr!.company}</p>}
-          <p>{addr!.address_1}</p>
-          {addr!.address_2 && <p>{addr!.address_2}</p>}
-          <p>{[addr!.postcode, addr!.city].filter(Boolean).join(" ")}</p>
-          <p>{[addr!.state, addr!.country].filter(Boolean).join(", ")}</p>
-          {addr!.phone && <p className="mt-2 text-muted-foreground">{addr!.phone}</p>}
-          {addr!.email && <p className="text-muted-foreground">{addr!.email}</p>}
+          <p className="font-semibold">{[a.first_name, a.last_name].filter(Boolean).join(" ")}</p>
+          {a.company && <p>{a.company}</p>}
+          {a.address_1 && <p>{a.address_1}</p>}
+          {a.address_2 && <p>{a.address_2}</p>}
+          <p>{[a.postcode, a.city].filter(Boolean).join(" ")}</p>
+          <p>{[a.state, a.country].filter(Boolean).join(", ")}</p>
+          {a.phone && <p className="mt-2 text-muted-foreground">{a.phone}</p>}
+          {a.email && <p className="text-muted-foreground">{a.email}</p>}
         </address>
       )}
     </PanelCard>
