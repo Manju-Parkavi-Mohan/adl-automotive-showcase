@@ -131,7 +131,7 @@ function ProductsPage() {
   const allCategories = (categoriesQuery.data ?? []).filter((c) => c.parent === 0);
 
   const clearSearch = () => {
-    navigate({ search: (prev) => ({ ...prev, search: undefined }) });
+    navigate({ search: (prev: { search?: string }) => ({ ...prev, search: undefined }) });
   };
 
   const resetAll = () => {
