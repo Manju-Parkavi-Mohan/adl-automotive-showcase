@@ -58,7 +58,7 @@ function NotFoundView() {
       <div>
         <h1 className="text-3xl font-bold">Product not found</h1>
         <p className="mt-2 text-muted-foreground">The product you are looking for is unavailable.</p>
-        <Link to="/products" className="mt-6 inline-flex rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground">
+        <Link to="/products" search={{}} className="mt-6 inline-flex rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground">
           Browse all products
         </Link>
       </div>
@@ -147,7 +147,7 @@ function ProductDetailPage() {
             <ol className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
               <li><Link to="/" className="hover:text-primary">Home</Link></li>
               <li><ChevronRight className="h-3.5 w-3.5" /></li>
-              <li><Link to="/products" className="hover:text-primary">Products</Link></li>
+              <li><Link to="/products" search={{}} className="hover:text-primary">Products</Link></li>
               <li><ChevronRight className="h-3.5 w-3.5" /></li>
               <li><span className="text-muted-foreground">{categoryLabel}</span></li>
               <li><ChevronRight className="h-3.5 w-3.5" /></li>
@@ -304,7 +304,7 @@ function ProductDetailPage() {
 
         <section className="mt-16">
           <SectionHeader eyebrow="You may also like" title="Related Products"
-            action={<Link to="/products" className="text-sm font-semibold text-primary hover:underline">View all →</Link>} />
+            action={<Link to="/products" search={{}} className="text-sm font-semibold text-primary hover:underline">View all →</Link>} />
           {related.length === 0 ? (
             <p className="mt-6 text-sm text-muted-foreground">No related products available.</p>
           ) : (

@@ -44,19 +44,18 @@ cd <repo-folder>
 
 ### 2. Install dependencies
 
-> **Important — running outside Lovable:** the default `vite.config.ts`
-> depends on `@lovable.dev/vite-tanstack-config`, a private package only
-> available inside the Lovable build environment. When running from a plain
-> GitHub clone you must either:
->
-> 1. Remove `"@lovable.dev/vite-tanstack-config"` from `devDependencies`
->    in `package.json` before installing, **and**
-> 2. Use the standalone scripts below (`dev:standalone`, `build:standalone`,
->    `preview:standalone`) which read `vite.config.standalone.ts` instead.
+This repository is configured to run standalone from GitHub using public npm packages only.
 
 ```bash
 bun install
 # or
+npm install
+```
+
+If you previously installed before this standalone setup, reset your local install once:
+
+```bash
+rm -rf node_modules package-lock.json
 npm install
 ```
 
@@ -166,9 +165,9 @@ Make sure to configure the same environment variables in your hosting dashboard.
 | `bun run dev` | Start development server |
 | `bun run build` | Build for production |
 | `bun run preview` | Preview production build locally |
-| `bun run dev:standalone` | Start dev server outside Lovable (uses `vite.config.standalone.ts`) |
-| `bun run build:standalone` | Production build outside Lovable |
-| `bun run preview:standalone` | Preview the standalone production build |
+| `bun run dev:standalone` | Same as `dev`; kept for compatibility |
+| `bun run build:standalone` | Same as `build`; kept for compatibility |
+| `bun run preview:standalone` | Same as `preview`; kept for compatibility |
 | `bun run lint` | Run ESLint |
 | `bun run format` | Run Prettier |
 

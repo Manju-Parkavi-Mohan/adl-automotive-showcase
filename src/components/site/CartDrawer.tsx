@@ -35,7 +35,7 @@ export function CartDrawer() {
               <p className="text-sm font-medium text-foreground">Your cart is empty</p>
               <p className="mt-1 text-xs text-muted-foreground">Browse our latest equipment</p>
               <Button asChild className="mt-5" onClick={closeCart}>
-                <Link to="/products">Browse products</Link>
+                <Link to="/products" search={{}}>Browse products</Link>
               </Button>
             </div>
           ) : (
