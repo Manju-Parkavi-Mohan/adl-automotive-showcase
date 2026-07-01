@@ -1,11 +1,21 @@
 import { setResponseStatus } from "@tanstack/react-start/server";
 
-const WC_GATEWAY = "https://connector-gateway.lovable.dev/woocommerce";
-
 function requireEnv(name: string): string {
   const v = process.env[name];
   if (!v) throw new Error(`Missing required server env var ${name}`);
   return v;
+}
+
+function wcBase(): string {
+  const raw = requireEnv("WORDPRESS_SITE_URL").replace(/\/+$/, "");
+  return `${raw}/wp-json/wc/v3`;
+}
+
+function wcBasicAuthHeader(): string {
+  const key = requireEnv("WOOCOMMERCE_CONSUMER_KEY");
+  const secret = requireEnv("WOOCOMMERCE_CONSUMER_SECRET");
+  const token = Buffer.from(`${key}:${secret}`).toString("base64");
+  return `Basic ${token}`;
 }
 
 export type WcQuery = Record<string, string | number | boolean | undefined | null>;
@@ -32,15 +42,12 @@ export async function wcFetch<T>(
   path: string,
   init: { method?: string; query?: WcQuery; body?: unknown } = {},
 ): Promise<WcResponse<T>> {
-  const LOVABLE_API_KEY = requireEnv("LOVABLE_API_KEY");
-  const WOOCOMMERCE_API_KEY = requireEnv("WOOCOMMERCE_API_KEY");
-  const url = `${WC_GATEWAY}${path.startsWith("/") ? path : `/${path}`}${buildQs(init.query)}`;
+  const url = `${wcBase()}${path.startsWith("/") ? path : `/${path}`}${buildQs(init.query)}`;
 
   const res = await fetch(url, {
     method: init.method ?? "GET",
     headers: {
-      Authorization: `Bearer ${LOVABLE_API_KEY}`,
-      "X-Connection-Api-Key": WOOCOMMERCE_API_KEY,
+      Authorization: wcBasicAuthHeader(),
       "Content-Type": "application/json",
       Accept: "application/json",
     },
