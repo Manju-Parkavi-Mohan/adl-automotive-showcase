@@ -4,9 +4,17 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { useCart } from "@/components/site/CartProvider";
 import { Button } from "@/components/ui/button";
+import { seoToMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/cart")({
-  head: () => ({ meta: [{ title: "Your Cart — ADL Automotive" }] }),
+  head: () => ({
+    meta: seoToMeta(undefined, {
+      title: "Your Cart — ADL Automotive",
+      description: "Review the diagnostic and tuning equipment in your cart before checkout.",
+      keywords: "shopping cart, ADL Automotive cart, checkout",
+      url: "/cart",
+    }).concat([{ name: "robots", content: "noindex, nofollow" }]),
+  }),
   component: CartPage,
 });
 

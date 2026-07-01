@@ -4,7 +4,7 @@ import { ChevronRight } from "lucide-react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { getPostBySlug } from "@/lib/wp/posts.functions";
-import { seoToMeta, seoToLinks } from "@/lib/seo";
+import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
 import type { WPPost } from "@/lib/woo/types";
 
 export const Route = createFileRoute("/blog/$slug")({
@@ -23,8 +23,10 @@ export const Route = createFileRoute("/blog/$slug")({
         title: `${title} — ADL Automotive`,
         description,
         image: post.featuredImage ?? undefined,
+        type: "article",
       }),
       links: seoToLinks(post.seo),
+      scripts: seoToScripts(post.seo),
     };
   },
   component: BlogPostPage,

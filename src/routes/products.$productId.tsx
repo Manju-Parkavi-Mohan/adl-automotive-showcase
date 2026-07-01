@@ -16,7 +16,7 @@ import { wooToDisplay } from "@/lib/woo/adapter";
 import { CATEGORY_META } from "@/data/products";
 import type { WooProduct } from "@/lib/woo/types";
 import { pushRecentlyViewed } from "@/lib/recently-viewed";
-import { seoToMeta, seoToLinks } from "@/lib/seo";
+import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
 
 export const Route = createFileRoute("/products/$productId")({
   loader: ({ params, context }) =>
@@ -39,6 +39,7 @@ export const Route = createFileRoute("/products/$productId")({
     return {
       meta: seoToMeta(woo.seo, fallback),
       links: seoToLinks(woo.seo),
+      scripts: seoToScripts(woo.seo),
     };
   },
   notFoundComponent: NotFoundView,

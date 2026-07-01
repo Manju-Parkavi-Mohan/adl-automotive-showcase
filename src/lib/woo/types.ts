@@ -93,31 +93,59 @@ export interface WPPost {
 export interface SeoMeta {
   title?: string;
   description?: string;
+  keywords?: string;
   canonical?: string;
   ogTitle?: string;
   ogDescription?: string;
   ogImage?: string;
   ogType?: string;
+  ogUrl?: string;
+  ogLocale?: string;
+  ogSiteName?: string;
+  articlePublishedTime?: string;
+  articleModifiedTime?: string;
+  articleAuthor?: string;
+  articleSection?: string;
+  articleTags?: string[];
+  author?: string;
   twitterCard?: string;
   twitterTitle?: string;
   twitterDescription?: string;
   twitterImage?: string;
+  twitterCreator?: string;
+  twitterSite?: string;
+  twitterLabels?: Array<{ label: string; data: string }>;
   robots?: string;
+  /** Pre-serialised JSON-LD schema (@graph) that Yoast emits. */
+  schemaJson?: string;
 }
 
 export interface YoastHeadJson {
   title?: string;
   description?: string;
+  keywords?: string;
   canonical?: string;
   robots?: Record<string, string | undefined>;
   og_title?: string;
   og_description?: string;
   og_type?: string;
+  og_url?: string;
+  og_locale?: string;
+  og_site_name?: string;
   og_image?: Array<{ url?: string }>;
+  article_published_time?: string;
+  article_modified_time?: string;
+  article_author?: string;
+  article_section?: string;
+  article_tag?: string[] | string;
+  author?: string;
   twitter_card?: string;
   twitter_title?: string;
   twitter_description?: string;
   twitter_image?: string;
+  twitter_creator?: string;
+  twitter_site?: string;
+  twitter_misc?: Record<string, string>;
   schema?: unknown;
 }
 
@@ -126,20 +154,55 @@ export function adaptYoast(y?: YoastHeadJson | null): SeoMeta | undefined {
   const robotsParts = y.robots
     ? Object.values(y.robots).filter((v): v is string => typeof v === "string")
     : [];
+  const tags = Array.isArray(y.article_tag)
+    ? y.article_tag
+    : typeof y.article_tag === "string"
+      ? [y.article_tag]
+      : undefined;
+  const twitterLabels =
+    y.twitter_misc && typeof y.twitter_misc === "object"
+      ? Object.entries(y.twitter_misc).map(([label, data], i) => ({
+          label,
+          data,
+          _i: i,
+        }))
+      : undefined;
   return {
     title: y.title,
     description: y.description,
+    keywords: y.keywords,
     canonical: y.canonical,
     ogTitle: y.og_title,
     ogDescription: y.og_description,
     ogType: y.og_type,
+    ogUrl: y.og_url,
+    ogLocale: y.og_locale,
+    ogSiteName: y.og_site_name,
     ogImage: y.og_image?.[0]?.url,
+    articlePublishedTime: y.article_published_time,
+    articleModifiedTime: y.article_modified_time,
+    articleAuthor: y.article_author,
+    articleSection: y.article_section,
+    articleTags: tags,
+    author: y.author,
     twitterCard: y.twitter_card,
     twitterTitle: y.twitter_title,
     twitterDescription: y.twitter_description,
     twitterImage: y.twitter_image,
+    twitterCreator: y.twitter_creator,
+    twitterSite: y.twitter_site,
+    twitterLabels: twitterLabels?.map(({ label, data }) => ({ label, data })),
     robots: robotsParts.length ? robotsParts.join(", ") : undefined,
+    schemaJson: y.schema ? safeStringify(y.schema) : undefined,
   };
+}
+
+function safeStringify(v: unknown): string | undefined {
+  try {
+    return JSON.stringify(v);
+  } catch {
+    return undefined;
+  }
 }
 
 /** Raw WC product shape we read from the API (subset of fields we use). */

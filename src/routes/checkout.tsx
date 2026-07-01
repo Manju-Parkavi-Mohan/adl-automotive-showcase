@@ -10,9 +10,16 @@ import { useCart } from "@/components/site/CartProvider";
 import { useAuth } from "@/components/site/AuthProvider";
 import { createOrder } from "@/lib/woo/orders.functions";
 import { toast } from "sonner";
+import { seoToMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/checkout")({
-  head: () => ({ meta: [{ title: "Checkout — ADL Automotive" }] }),
+  head: () => ({
+    meta: seoToMeta(undefined, {
+      title: "Secure Checkout — ADL Automotive",
+      description: "Complete your order securely with worldwide shipping and expert support.",
+      url: "/checkout",
+    }).concat([{ name: "robots", content: "noindex, nofollow" }]),
+  }),
   component: CheckoutPage,
 });
 

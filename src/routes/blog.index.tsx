@@ -4,9 +4,27 @@ import { useState } from "react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { listPosts } from "@/lib/wp/posts.functions";
+import { getYoastForUrl } from "@/lib/wp/yoast.functions";
+import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
 
 export const Route = createFileRoute("/blog/")({
-  head: () => ({ meta: [{ title: "Blog — ADL Automotive" }] }),
+  loader: ({ context }) =>
+    context.queryClient.ensureQueryData({
+      queryKey: ["yoast", "/blog"],
+      queryFn: () => getYoastForUrl({ data: { path: "/blog" } }),
+      staleTime: 5 * 60_000,
+    }),
+  head: ({ loaderData }) => ({
+    meta: seoToMeta(loaderData ?? undefined, {
+      title: "Blog & Insights — ADL Automotive",
+      description:
+        "Diagnostic walkthroughs, ECU tuning insights and product announcements from ADL Automotive.",
+      keywords: "automotive blog, diagnostic guides, ECU tuning tips, workshop insights",
+      url: "/blog",
+    }),
+    links: seoToLinks(loaderData ?? undefined),
+    scripts: seoToScripts(loaderData ?? undefined),
+  }),
   component: BlogIndex,
 });
 

@@ -11,22 +11,30 @@ import { ProductListItem } from "@/components/site/ProductListItem";
 import { listProducts } from "@/lib/woo/products.functions";
 import { listCategories } from "@/lib/woo/categories.functions";
 import { wooToDisplay } from "@/lib/woo/adapter";
+import { getYoastForUrl } from "@/lib/wp/yoast.functions";
+import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
 
 export const Route = createFileRoute("/products/")({
   validateSearch: (search) => ({
     search: typeof search.search === "string" ? search.search : undefined,
   }),
-  head: () => ({
-    meta: [
-      { title: "All Products — ADL Automotive" },
-      {
-        name: "description",
-        content:
-          "Browse the full catalog of diagnostic tools, ECU programmers and tuning software from ADL Automotive.",
-      },
-      { property: "og:title", content: "All Products — ADL Automotive" },
-      { property: "og:description", content: "Professional automotive diagnostic and tuning equipment." },
-    ],
+  loader: ({ context }) =>
+    context.queryClient.ensureQueryData({
+      queryKey: ["yoast", "/shop"],
+      queryFn: () => getYoastForUrl({ data: { path: "/shop" } }),
+      staleTime: 5 * 60_000,
+    }),
+  head: ({ loaderData }) => ({
+    meta: seoToMeta(loaderData ?? undefined, {
+      title: "All Products — ADL Automotive",
+      description:
+        "Browse the full catalog of diagnostic tools, ECU programmers and tuning software from ADL Automotive.",
+      keywords:
+        "automotive diagnostic tools, OBD-II scanners, ECU programmers, key programming, tuning software, workshop equipment",
+      url: "/products",
+    }),
+    links: seoToLinks(loaderData ?? undefined),
+    scripts: seoToScripts(loaderData ?? undefined),
   }),
   component: ProductsPage,
 });
