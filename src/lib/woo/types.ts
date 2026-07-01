@@ -103,7 +103,6 @@ export interface SeoMeta {
   twitterDescription?: string;
   twitterImage?: string;
   robots?: string;
-  schema?: unknown;
 }
 
 export interface YoastHeadJson {
@@ -140,7 +139,6 @@ export function adaptYoast(y?: YoastHeadJson | null): SeoMeta | undefined {
     twitterDescription: y.twitter_description,
     twitterImage: y.twitter_image,
     robots: robotsParts.length ? robotsParts.join(", ") : undefined,
-    schema: y.schema,
   };
 }
 
