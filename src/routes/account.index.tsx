@@ -12,6 +12,7 @@ import { useAuth } from "@/components/site/AuthProvider";
 import { logout } from "@/lib/auth/wp-auth.functions";
 import { listMyOrders } from "@/lib/woo/orders.functions";
 import { getMyCustomer } from "@/lib/woo/customer.functions";
+import { getMyOrder } from "@/lib/woo/customer.functions";
 import { listProducts } from "@/lib/woo/products.functions";
 import { getRecentlyViewed, clearRecentlyViewed } from "@/lib/recently-viewed";
 import { ProductCard } from "@/components/site/ProductCard";
@@ -258,12 +259,28 @@ function OrdersTable({ orders }: { orders: Awaited<ReturnType<typeof listMyOrder
         <tbody>
           {orders.map((o) => (
             <tr key={o.id} className="border-b border-border last:border-0">
-              <td className="py-3 pr-4 font-semibold">#{o.number}</td>
+              <td className="py-3 pr-4 font-semibold">
+                <Link
+                  to="/account/orders/$orderId"
+                  params={{ orderId: String(o.id) }}
+                  className="text-primary hover:underline"
+                >
+                  #{o.number}
+                </Link>
+              </td>
               <td className="py-3 pr-4 text-muted-foreground">
                 {new Date(o.date_created).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
               </td>
               <td className="py-3 pr-4"><StatusPill status={o.status} /></td>
-              <td className="py-3 pr-4 text-right font-semibold">{money(o.total, o.currency || "USD")}</td>
+              <td className="py-3 pr-4 text-right font-semibold">
+                <Link
+                  to="/account/orders/$orderId"
+                  params={{ orderId: String(o.id) }}
+                  className="hover:text-primary"
+                >
+                  {money(o.total, o.currency || "USD")}
+                </Link>
+              </td>
             </tr>
           ))}
         </tbody>
