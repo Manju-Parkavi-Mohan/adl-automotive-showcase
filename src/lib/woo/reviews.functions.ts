@@ -53,11 +53,9 @@ export const createProductReview = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: true; review: WooReview } | { ok: false; error: string }> => {
     const session = await getAppSession();
     const email = data.reviewerEmail ?? session.data.email;
+    const fullName = [session.data.firstName, session.data.lastName].filter(Boolean).join(" ").trim();
     const name =
-      data.reviewerName ??
-      session.data.displayName ??
-      [session.data.firstName, session.data.lastName].filter(Boolean).join(" ").trim() ||
-      undefined;
+      data.reviewerName ?? session.data.displayName ?? (fullName.length > 0 ? fullName : undefined);
 
     if (!email || !name) {
       return { ok: false, error: "Please sign in to submit a review." };
