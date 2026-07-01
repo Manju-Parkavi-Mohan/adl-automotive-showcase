@@ -63,7 +63,7 @@ function ProductsPage() {
   const { search: searchParam } = Route.useSearch();
   const navigate = useNavigate({ from: "/products" });
   const [view, setView] = useState<"grid" | "list">("grid");
-  const [sort, setSort] = useState<(typeof SORT_OPTIONS)[number]["id"]>"featured");
+  const [sort, setSort] = useState<(typeof SORT_OPTIONS)[number]["id"]>("featured");
   const [page, setPage] = useState(1);
   const [categorySlugs, setCategorySlugs] = useState<string[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
