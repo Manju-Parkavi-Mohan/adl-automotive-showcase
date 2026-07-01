@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { ProductCard } from "./ProductCard";
 import { SectionHeader } from "./CategoryShowcase";
-import { getBestSellers, getFeatured, getNewArrivals, getOnSale } from "@/data/products";
 import { listProducts } from "@/lib/woo/products.functions";
 import { wooToDisplay } from "@/lib/woo/adapter";
-import type { Product } from "@/data/products";
 
 type TabId = "featured" | "popular" | "best" | "rated";
 
@@ -16,11 +15,11 @@ type ListInput = {
   order?: "asc" | "desc";
 };
 
-const TABS: { id: TabId; label: string; query: ListInput; fallback: () => Product[] }[] = [
-  { id: "featured", label: "Featured", query: { featured: true, perPage: 8 }, fallback: () => getFeatured(8) },
-  { id: "popular", label: "Popular", query: { orderby: "popularity", perPage: 8 }, fallback: () => getBestSellers(8) },
-  { id: "best", label: "Best Selling", query: { orderby: "popularity", perPage: 8 }, fallback: () => getBestSellers(8) },
-  { id: "rated", label: "Top Rated", query: { orderby: "rating", perPage: 8 }, fallback: () => getFeatured(8) },
+const TABS: { id: TabId; label: string; query: ListInput }[] = [
+  { id: "featured", label: "Featured", query: { featured: true, perPage: 8 } },
+  { id: "popular", label: "Popular", query: { orderby: "popularity", perPage: 8 } },
+  { id: "best", label: "Best Selling", query: { orderby: "popularity", perPage: 8 } },
+  { id: "rated", label: "Top Rated", query: { orderby: "rating", perPage: 8 } },
 ];
 
 export function FeaturedProducts() {
@@ -31,8 +30,17 @@ export function FeaturedProducts() {
     queryFn: () => listProducts({ data: tab.query }),
     staleTime: 60_000,
   });
-  const live = (data?.items ?? []).map(wooToDisplay);
-  const products = live.length > 0 ? live : tab.fallback();
+  // Fallback: if "Featured" returns nothing (no products flagged featured yet),
+  // show the latest live products so the store never looks empty.
+  const featuredEmpty = active === "featured" && !isLoading && (data?.items?.length ?? 0) === 0;
+  const { data: latest } = useQuery({
+    queryKey: ["wc-tab-latest"],
+    queryFn: () => listProducts({ data: { orderby: "date", order: "desc", perPage: 8 } }),
+    enabled: featuredEmpty,
+    staleTime: 60_000,
+  });
+  const source = featuredEmpty ? latest?.items ?? [] : data?.items ?? [];
+  const products = source.map(wooToDisplay);
 
   return (
     <section className="container-px mx-auto max-w-[1400px] py-20">
@@ -59,8 +67,10 @@ export function FeaturedProducts() {
         }
       />
       <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-        {isLoading && live.length === 0
+        {isLoading
           ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+          : products.length === 0
+          ? <EmptyState />
           : products.map((p) => <ProductCard key={p.id} product={p} />)}
       </div>
     </section>
@@ -73,9 +83,7 @@ export function NewArrivals() {
     queryFn: () => listProducts({ data: { orderby: "date", order: "desc", perPage: 4 } }),
     staleTime: 60_000,
   });
-  const live = (data?.items ?? []).map(wooToDisplay);
-  const products =
-    live.length > 0 ? live : getNewArrivals(4).concat(getOnSale(4)).slice(0, 4);
+  const products = (data?.items ?? []).map(wooToDisplay);
   return (
     <section className="bg-secondary py-20">
       <div className="container-px mx-auto max-w-[1400px]">
@@ -84,16 +92,26 @@ export function NewArrivals() {
           title="New Arrivals"
           subtitle="The latest hardware additions from our trusted manufacturers."
           action={
-            <a href="#" className="text-sm font-semibold text-primary hover:underline">View all →</a>
+            <Link to="/products" className="text-sm font-semibold text-primary hover:underline">View all →</Link>
           }
         />
         <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-          {isLoading && live.length === 0
+          {isLoading
             ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+            : products.length === 0
+            ? <EmptyState />
             : products.map((p) => <ProductCard key={p.id} product={p} />)}
         </div>
       </div>
     </section>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="col-span-full rounded-xl border border-dashed border-border bg-card py-12 text-center text-sm text-muted-foreground">
+      No products to show yet. Add products in your WooCommerce store and they'll appear here.
+    </div>
   );
 }
 
