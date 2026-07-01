@@ -17,7 +17,7 @@ type ListInput = {
 
 const TABS: { id: TabId; label: string; query: ListInput }[] = [
   { id: "featured", label: "Featured", query: { featured: true, perPage: 8 } },
-  { id: "popular", label: "Popular", query: { orderby: "popularity", perPage: 8 } },
+  // { id: "popular", label: "Popular", query: { orderby: "popularity", perPage: 8 } },
   { id: "best", label: "Best Selling", query: { orderby: "popularity", perPage: 8 } },
   { id: "rated", label: "Top Rated", query: { orderby: "rating", perPage: 8 } },
 ];
@@ -39,7 +39,7 @@ export function FeaturedProducts() {
     enabled: featuredEmpty,
     staleTime: 60_000,
   });
-  const source = featuredEmpty ? latest?.items ?? [] : data?.items ?? [];
+  const source = featuredEmpty ? (latest?.items ?? []) : (data?.items ?? []);
   const products = source.map(wooToDisplay);
 
   return (
@@ -67,11 +67,13 @@ export function FeaturedProducts() {
         }
       />
       <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-        {isLoading
-          ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
-          : products.length === 0
-          ? <EmptyState />
-          : products.map((p) => <ProductCard key={p.id} product={p} />)}
+        {isLoading ? (
+          Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+        ) : products.length === 0 ? (
+          <EmptyState />
+        ) : (
+          products.map((p) => <ProductCard key={p.id} product={p} />)
+        )}
       </div>
     </section>
   );
@@ -92,15 +94,19 @@ export function NewArrivals() {
           title="New Arrivals"
           subtitle="The latest hardware additions from our trusted manufacturers."
           action={
-            <Link to="/products" search={{}} className="text-sm font-semibold text-primary hover:underline">View all →</Link>
+            <Link to="/products" search={{}} className="text-sm font-semibold text-primary hover:underline">
+              View all →
+            </Link>
           }
         />
         <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-          {isLoading
-            ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
-            : products.length === 0
-            ? <EmptyState />
-            : products.map((p) => <ProductCard key={p.id} product={p} />)}
+          {isLoading ? (
+            Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+          ) : products.length === 0 ? (
+            <EmptyState />
+          ) : (
+            products.map((p) => <ProductCard key={p.id} product={p} />)
+          )}
         </div>
       </div>
     </section>
