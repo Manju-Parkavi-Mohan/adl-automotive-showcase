@@ -9,9 +9,17 @@ import { Button } from "@/components/ui/button";
 import { register } from "@/lib/auth/wp-auth.functions";
 import { useAuth } from "@/components/site/AuthProvider";
 import { toast } from "sonner";
+import { seoToMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/account/register")({
-  head: () => ({ meta: [{ title: "Create account — ADL Automotive" }] }),
+  head: () => ({
+    meta: seoToMeta(undefined, {
+      title: "Create account — ADL Automotive",
+      description: "Create an ADL Automotive account for faster checkout and order tracking.",
+      keywords: "ADL Automotive register, create account",
+      url: "/account/register",
+    }).concat([{ name: "robots", content: "noindex, nofollow" }]),
+  }),
   component: RegisterPage,
 });
 

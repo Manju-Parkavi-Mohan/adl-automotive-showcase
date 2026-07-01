@@ -11,9 +11,17 @@ import { login } from "@/lib/auth/wp-auth.functions";
 import { useAuth } from "@/components/site/AuthProvider";
 import { toast } from "sonner";
 import { AlertCircle } from "lucide-react";
+import { seoToMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/account/login")({
-  head: () => ({ meta: [{ title: "Sign in — ADL Automotive" }] }),
+  head: () => ({
+    meta: seoToMeta(undefined, {
+      title: "Sign in — ADL Automotive",
+      description: "Sign in to your ADL Automotive account to track orders and manage addresses.",
+      keywords: "ADL Automotive login, customer sign in",
+      url: "/account/login",
+    }).concat([{ name: "robots", content: "noindex, nofollow" }]),
+  }),
   component: LoginPage,
 });
 

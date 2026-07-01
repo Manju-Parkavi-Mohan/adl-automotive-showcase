@@ -17,9 +17,16 @@ import { listProducts } from "@/lib/woo/products.functions";
 import { getRecentlyViewed, clearRecentlyViewed } from "@/lib/recently-viewed";
 import { ProductCard } from "@/components/site/ProductCard";
 import { wooToDisplay } from "@/lib/woo/adapter";
+import { seoToMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/account/")({
-  head: () => ({ meta: [{ title: "My Account — ADL Automotive" }] }),
+  head: () => ({
+    meta: seoToMeta(undefined, {
+      title: "My Account — ADL Automotive",
+      description: "View your orders, addresses and recently viewed products.",
+      url: "/account",
+    }).concat([{ name: "robots", content: "noindex, nofollow" }]),
+  }),
   component: AccountPage,
 });
 
