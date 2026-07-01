@@ -5,7 +5,7 @@ const CATEGORIES = [
     title: "Diagnostic Tools",
     description: "OBD scanners, key programmers, dealer-grade tablets.",
     count: "120+ products",
-    image: "https://images.unsplash.com/photo-1632823469850-1b7b1e8b7e6d?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=1200&q=80",
   },
   {
     title: "Tuning Tools",

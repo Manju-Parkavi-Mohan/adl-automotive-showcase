@@ -50,11 +50,11 @@ const IMAGES = [
   "photo-1503376780353-7e6692767b70",
   "photo-1492144534655-ae79c964c9d7",
   "photo-1486006920555-c77dcf18193c",
-  "photo-1597007030739-6d2e7172ee5d",
-  "photo-1492550687567-d0f9a4dccbbb",
-  "photo-1605618826115-fb9e775cf753",
-  "photo-1530046339918-3a4ca5d33d6c",
-  "photo-1632823469850-1b7b1e8b7e6d",
+  "photo-1580274455191-1c62238fa333",
+  "photo-1553440569-bcc63803a83d",
+  "photo-1517524008697-84bbe3c3fd98",
+  "photo-1493031932521-f5eeb5b31029",
+  "photo-1568605117036-5fe5e7bab0b3",
 ];
 const pickImg = (i: number) => img(IMAGES[i % IMAGES.length]);
 
