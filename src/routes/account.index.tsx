@@ -186,7 +186,13 @@ function AccountPage() {
             />
           )}
           {tab === "orders" && <OrdersPanel orders={orders} loading={ordersQuery.isLoading} />}
-          {tab === "addresses" && <AddressesPanel customer={customer} loading={customerQuery.isLoading} />}
+          {tab === "addresses" && (
+            <AddressesPanel
+              customer={customer}
+              loading={customerQuery.isLoading}
+              latestOrderId={orders[0]?.id}
+            />
+          )}
           {tab === "viewed" && (
             <ViewedPanel
               ids={viewedIds}
@@ -361,22 +367,49 @@ function OrdersPanel({ orders, loading }: { orders: Awaited<ReturnType<typeof li
 }
 
 function AddressesPanel({
-  customer, loading,
-}: { customer: Awaited<ReturnType<typeof getMyCustomer>>; loading: boolean }) {
-  if (loading) {
+  customer, loading, latestOrderId,
+}: {
+  customer: Awaited<ReturnType<typeof getMyCustomer>>;
+  loading: boolean;
+  latestOrderId?: number;
+}) {
+  const customerHasAddress = !!customer?.billing?.address_1 || !!customer?.shipping?.address_1;
+  const shouldFallback = !loading && !customerHasAddress && !!latestOrderId;
+
+  const fallbackQuery = useQuery({
+    queryKey: ["order-addresses", latestOrderId],
+    queryFn: () => getMyOrder({ data: { id: latestOrderId! } }),
+    enabled: shouldFallback,
+  });
+
+  if (loading || (shouldFallback && fallbackQuery.isLoading)) {
     return <PanelCard title="Addresses"><p className="text-sm text-muted-foreground">Loading…</p></PanelCard>;
   }
-  if (!customer) {
+
+  const billing =
+    (customer?.billing?.address_1 ? customer.billing : null) ??
+    (fallbackQuery.data?.billing as unknown as typeof customer extends null ? never : NonNullable<typeof customer>["billing"]) ??
+    null;
+  const shipping =
+    (customer?.shipping?.address_1 ? customer.shipping : null) ??
+    (fallbackQuery.data?.shipping as unknown as typeof customer extends null ? never : NonNullable<typeof customer>["shipping"]) ??
+    null;
+
+  if (!billing && !shipping) {
     return (
       <PanelCard title="Addresses">
-        <EmptyState icon={MapPin} title="No customer profile" body="Address details are unavailable for this account." />
+        <EmptyState
+          icon={MapPin}
+          title="No addresses on file"
+          body="Add a billing or shipping address during your next checkout and it will appear here."
+        />
       </PanelCard>
     );
   }
   return (
     <div className="grid gap-6 md:grid-cols-2">
-      <AddressCard title="Billing address" addr={customer.billing} />
-      <AddressCard title="Shipping address" addr={customer.shipping} />
+      <AddressCard title="Billing address" addr={billing} />
+      <AddressCard title="Shipping address" addr={shipping} />
     </div>
   );
 }
