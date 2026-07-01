@@ -1,4 +1,4 @@
-import { useSession } from "@tanstack/react-start/server";
+import { getRequestUrl, useSession } from "@tanstack/react-start/server";
 
 export interface AppSessionData {
   jwt?: string;
@@ -13,17 +13,24 @@ const FALLBACK = "lovable-dev-session-secret-please-rotate-via-update_secret-too
 
 export function getSessionConfig() {
   const password = process.env.SESSION_SECRET || FALLBACK;
-  // `secure: true` prevents browsers from accepting the cookie over plain
-  // http (e.g. localhost dev). Only enable it in production.
-  const isProd = process.env.NODE_ENV === "production";
+  // Preview runs inside a cross-site iframe. Session cookies need
+  // SameSite=None + Secure there, while localhost still needs plain http.
+  let isHttpsRequest = false;
+  try {
+    isHttpsRequest = getRequestUrl().protocol === "https:";
+  } catch {
+    isHttpsRequest = false;
+  }
+  const secureCookie = process.env.NODE_ENV === "production" || isHttpsRequest;
   return {
     password,
     name: "adl_session",
     maxAge: 60 * 60 * 24 * 30, // 30 days
     cookie: {
       httpOnly: true,
-      sameSite: "lax" as const,
-      secure: isProd,
+      sameSite: secureCookie ? ("none" as const) : ("lax" as const),
+      secure: secureCookie,
+      ...(secureCookie ? { partitioned: true } : {}),
       path: "/",
     },
   };

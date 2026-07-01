@@ -25,6 +25,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryKey: ["current-user"],
     queryFn: () => getCurrentUser(),
     staleTime: 60_000,
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 
   const value = useMemo<AuthContextValue>(
@@ -34,7 +36,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refresh: async () => {
         await qc.invalidateQueries({ queryKey: ["current-user"] });
       },
-      setUser: (user) => qc.setQueryData(["current-user"], user),
+      setUser: (user) => {
+        void qc.cancelQueries({ queryKey: ["current-user"] });
+        qc.setQueryData(["current-user"], user);
+      },
     }),
     [data, isLoading, qc],
   );
