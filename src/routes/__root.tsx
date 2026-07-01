@@ -85,11 +85,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "ADL Automotive — Premium Diagnostic, Tuning & Workshop Equipment" },
       { name: "description", content: "Shop premium automotive diagnostic tools, ECU programmers, tuning software and workshop equipment. Trusted by professional technicians worldwide." },
       { name: "author", content: "ADL Automotive" },
-      { property: "og:title", content: "ADL Automotive — Premium Automotive Equipment" },
-      { property: "og:description", content: "Premium diagnostic, tuning and workshop equipment trusted by professional technicians in 60+ countries." },
+      { property: "og:title", content: "ADL Automotive — Premium Diagnostic, Tuning & Workshop Equipment" },
+      { property: "og:description", content: "Shop premium automotive diagnostic tools, ECU programmers, tuning software and workshop equipment. Trusted by professional technicians worldwide." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@ADLAutomotive" },
+      { name: "twitter:title", content: "ADL Automotive — Premium Diagnostic, Tuning & Workshop Equipment" },
+      { name: "twitter:description", content: "Shop premium automotive diagnostic tools, ECU programmers, tuning software and workshop equipment. Trusted by professional technicians worldwide." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/918529ed-27c2-479c-8fcc-d0dfb3c7e65a" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/918529ed-27c2-479c-8fcc-d0dfb3c7e65a" },
     ],
     links: [
       {
