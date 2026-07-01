@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { ProductCard } from "./ProductCard";
 import { SectionHeader } from "./CategoryShowcase";
-import { getProductsByCategory, type ProductCategory } from "@/data/products";
+import type { ProductCategory } from "@/data/products";
 import { listProducts } from "@/lib/woo/products.functions";
 import { wooToDisplay } from "@/lib/woo/adapter";
 
@@ -15,17 +16,19 @@ const CATEGORY_SLUG: Record<ProductCategory, string> = {
 export function ProductSection({
   category, title, eyebrow, subtitle,
 }: { category: ProductCategory; title: string; eyebrow?: string; subtitle?: string }) {
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["wc-section", category],
     queryFn: () => listProducts({ data: { category: CATEGORY_SLUG[category], perPage: 12 } }),
     staleTime: 60_000,
   });
-  const live = (data?.items ?? []).map(wooToDisplay);
-  const all = live.length > 0 ? live : getProductsByCategory(category);
+  const all = (data?.items ?? []).map(wooToDisplay);
   const brands = useMemo(() => ["All", ...Array.from(new Set(all.map((p) => p.brand)))], [all]);
   const [filter, setFilter] = useState("All");
 
   const items = (filter === "All" ? all : all.filter((p) => p.brand === filter)).slice(0, 4);
+
+  // Hide the whole section if the category has no live products yet.
+  if (!isLoading && all.length === 0) return null;
 
   return (
     <section className="container-px mx-auto max-w-[1400px] py-20">
@@ -34,9 +37,9 @@ export function ProductSection({
         title={title}
         subtitle={subtitle}
         action={
-          <a href="#" className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary">
+          <Link to="/products" className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary">
             View All
-          </a>
+          </Link>
         }
       />
 
