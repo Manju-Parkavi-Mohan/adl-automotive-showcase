@@ -1,5 +1,5 @@
 import { Facebook, Instagram, Linkedin, Youtube, Mail, Phone, MapPin } from "lucide-react";
-import adlLogo from "@/assets/adl-logo.png.asset.json";
+import adlLogo from "@/assets/adl-logo-new.png.asset.json";
 
 const COLS = [
   {

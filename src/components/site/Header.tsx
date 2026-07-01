@@ -6,7 +6,7 @@ import {
   Search, Heart, ShoppingCart, User, Globe, ChevronDown, Menu, X,
   Cpu, Settings2, Sparkles, Flame, Award, Wrench,
 } from "lucide-react";
-import adlLogo from "@/assets/adl-logo.png.asset.json";
+import adlLogo from "@/assets/adl-logo-new.png.asset.json";
 
 const NAV_LINKS = [
   { label: "Home", to: "/" },
