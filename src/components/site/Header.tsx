@@ -58,7 +58,7 @@ export function Header() {
 
       {/* Top header */}
       <div className="container-px mx-auto max-w-[1400px]">
-        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 py-2 sm:gap-6 sm:py-4 lg:gap-10">
+        <div className="grid grid-cols-[auto_auto] items-center justify-between gap-3 py-2 sm:gap-6 sm:py-4 md:grid-cols-[auto_1fr_auto] md:justify-start lg:gap-10">
           {/* Logo */}
           <Link to="/" aria-label="ADL Automotive — home" className="flex shrink-0 items-center">
             <img src={adlLogo.url} alt="ADL Automotive" className="h-10 w-auto md:h-14" />
