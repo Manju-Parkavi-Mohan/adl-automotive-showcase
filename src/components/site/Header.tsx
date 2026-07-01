@@ -66,18 +66,23 @@ export function Header() {
 
           {/* Search */}
           <div className="hidden min-w-0 md:block">
-            <div className="relative mx-auto max-w-2xl">
+            <form onSubmit={handleSearch} className="relative mx-auto max-w-2xl">
               <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search diagnostic tools, ECU programmers, brands..."
                 aria-label="Search products"
                 className="h-11 w-full rounded-full border border-border bg-secondary pl-11 pr-28 text-sm outline-none transition-colors focus:border-primary focus:bg-white"
               />
-              <button className="absolute right-1.5 top-1.5 h-8 rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
+              <button
+                type="submit"
+                className="absolute right-1.5 top-1.5 h-8 rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+              >
                 Search
               </button>
-            </div>
+            </form>
           </div>
 
           {/* Account icons */}
