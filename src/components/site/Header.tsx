@@ -31,8 +31,16 @@ const PROMO_TABS = [
 export function Header() {
   const [catOpen, setCatOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
   const { count, openCart } = useCart();
   const { user } = useAuth();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    navigate({ to: "/products", search: { search: searchQuery.trim() } });
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-white">
