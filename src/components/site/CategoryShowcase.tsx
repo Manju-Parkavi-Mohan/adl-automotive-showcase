@@ -64,14 +64,14 @@ export function CategoryShowcase() {
         >
           {isLoading
             ? Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-[170px] w-[260px] shrink-0 animate-pulse rounded-2xl bg-white" />
+                <div key={i} className="h-[1200px] w-[260px] shrink-0 animate-pulse rounded-2xl bg-white" />
               ))
             : categories.map((c) => (
                 <Link
                   key={c.id}
                   to="/products"
                   search={{}}
-                  className="group flex h-[170px] w-[260px] shrink-0 items-center justify-between gap-3 rounded-2xl bg-white px-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+                  className="group flex h-[120px] w-[260px] shrink-0 items-center justify-between gap-3 rounded-2xl bg-white px-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
                 >
                   <span className="text-[15px] font-extrabold leading-tight text-black">{c.name}</span>
                   {c.image?.src && (
