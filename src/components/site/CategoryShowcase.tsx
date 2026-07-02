@@ -60,7 +60,7 @@ export function CategoryShowcase() {
         <div
           ref={scrollerRef}
           onScroll={updateIndicator}
-          className="flex gap-5 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          className="flex justify-center gap-5 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
           {isLoading
             ? Array.from({ length: 6 }).map((_, i) => (
