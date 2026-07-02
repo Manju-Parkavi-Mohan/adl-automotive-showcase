@@ -71,11 +71,11 @@ export function CategoryShowcase() {
                   key={c.id}
                   to="/products"
                   search={{}}
-                  className="group flex h-[150px] w-[210px] shrink-0 items-center justify-between gap-3 rounded-2xl bg-white px-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+                  className="group flex h-[170px] w-[260px] shrink-0 items-center justify-between gap-3 rounded-2xl bg-white px-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
                 >
                   <span className="text-[15px] font-extrabold leading-tight text-black">{c.name}</span>
                   {c.image?.src && (
-                    <img src={c.image.src} alt={c.name} className="h-28 w-28 shrink-0 object-contain" loading="lazy" />
+                    <img src={c.image.src} alt={c.name} className="h-32 w-32 shrink-0 object-contain" loading="lazy" />
                   )}
                 </Link>
               ))}
