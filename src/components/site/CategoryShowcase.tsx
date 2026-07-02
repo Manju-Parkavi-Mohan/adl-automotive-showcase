@@ -1,60 +1,40 @@
-import { ArrowRight } from "lucide-react";
-
-const CATEGORIES = [
-  {
-    title: "Diagnostic Tools",
-    description: "OBD scanners, key programmers, dealer-grade tablets.",
-    count: "120+ products",
-    image: "https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Tuning Tools",
-    description: "Bench, OBD and boot-mode ECU programmers.",
-    count: "60+ products",
-    image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Workshop Equipment",
-    description: "Lifts, scopes, power supplies and bay essentials.",
-    count: "200+ products",
-    image: "https://images.unsplash.com/photo-1486006920555-c77dcf18193c?auto=format&fit=crop&w=1200&q=80",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { listCategories } from "@/lib/woo/categories.functions";
 
 export function CategoryShowcase() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["wc-categories-showcase"],
+    queryFn: () => listCategories({ data: { perPage: 50, hideEmpty: true } }),
+    staleTime: 5 * 60_000,
+  });
+  const categories = data ?? [];
+  if (!isLoading && categories.length === 0) return null;
+
   return (
-    <section className="container-px mx-auto max-w-[1400px] py-20">
-      <SectionHeader
-        eyebrow="Browse by category"
-        title="Shop by Category"
-        subtitle="Curated equipment for diagnostics, performance tuning and full workshop set-up."
-      />
-      <div className="mt-12 grid gap-6 md:grid-cols-3">
-        {CATEGORIES.map((c) => (
-          <a
-            key={c.title}
-            href="#"
-            className="group relative block aspect-[4/5] overflow-hidden rounded-2xl bg-secondary"
-          >
-            <img
-              src={c.image}
-              alt={c.title}
-              loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0B2742]/95 via-[#0B2742]/30 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 p-7 text-white">
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[var(--accent-blue)]">
-                {c.count}
-              </p>
-              <h3 className="mt-2 text-2xl font-bold">{c.title}</h3>
-              <p className="mt-2 text-sm text-white/80">{c.description}</p>
-              <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-white transition-transform group-hover:translate-x-1">
-                Explore <ArrowRight className="h-4 w-4" />
-              </div>
-            </div>
-          </a>
-        ))}
+    <section aria-label="Product categories" className="bg-background py-10">
+      <div className="container-px mx-auto max-w-[1400px]">
+        <div
+          className="flex gap-4 overflow-x-auto pb-3 [scrollbar-width:thin] [-ms-overflow-style:none] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-black/10"
+        >
+          {isLoading
+            ? Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-14 w-40 shrink-0 animate-pulse rounded-xl bg-card shadow-[var(--shadow-card)]"
+                />
+              ))
+            : categories.map((c) => (
+                <Link
+                  key={c.id}
+                  to="/products"
+                  search={{}}
+                  className="inline-flex h-14 shrink-0 items-center whitespace-nowrap rounded-xl bg-card px-6 text-sm font-bold text-black shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:text-primary hover:shadow-[var(--shadow-hover)]"
+                >
+                  {c.name}
+                </Link>
+              ))}
+        </div>
       </div>
     </section>
   );
