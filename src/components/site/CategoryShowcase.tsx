@@ -54,7 +54,7 @@ export function CategoryShowcase() {
   if (!isLoading && categories.length === 0) return null;
 
   return (
-    <section aria-label="Product categories" className="bg-background py-10">
+    <section aria-label="Product categories" className="bg-secondary py-10">
       <div className="container-px mx-auto max-w-[1400px]">
         {/* Scroller */}
         <div
