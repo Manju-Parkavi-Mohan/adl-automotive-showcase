@@ -58,22 +58,3 @@ export function CategoryShowcase() {
     </section>
   );
 }
-
-export function SectionHeader({
-  eyebrow, title, subtitle, action,
-}: { eyebrow?: string; title: string; subtitle?: string; action?: React.ReactNode }) {
-  return (
-    <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
-      <div className="max-w-2xl">
-        {eyebrow && (
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.25em] text-[var(--accent-blue)]">
-            {eyebrow}
-          </p>
-        )}
-        <h2 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">{title}</h2>
-        {subtitle && <p className="mt-3 text-base text-muted-foreground">{subtitle}</p>}
-      </div>
-      {action}
-    </div>
-  );
-}
