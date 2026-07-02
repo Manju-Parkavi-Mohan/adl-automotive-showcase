@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useCart } from "@/components/site/CartProvider";
 import { useAuth } from "@/components/site/AuthProvider";
 import {
   Search, Heart, ShoppingCart, User, Globe, ChevronDown, Menu, X,
-  Cpu, Settings2, Sparkles, Flame, Award, Wrench,
+  Sparkles, Flame, Award, Tag,
 } from "lucide-react";
 import adlLogo from "@/assets/adl-logo-new.png.asset.json";
+import { listCategories } from "@/lib/woo/categories.functions";
 
 const NAV_LINKS = [
   { label: "Home", to: "/" },
@@ -14,12 +16,6 @@ const NAV_LINKS = [
   { label: "Blog", to: "/blog" },
   { label: "About Us", to: "/" },
   { label: "Contact", to: "/" },
-];
-
-const CATEGORIES = [
-  { label: "Diagnostic Tools", icon: Cpu },
-  { label: "Tuning Tools", icon: Settings2 },
-  { label: "Workshop Equipment", icon: Wrench },
 ];
 
 const PROMO_TABS = [
@@ -35,6 +31,12 @@ export function Header() {
   const navigate = useNavigate();
   const { count, openCart } = useCart();
   const { user } = useAuth();
+  const { data: wcCategories } = useQuery({
+    queryKey: ["wc-categories-nav"],
+    queryFn: () => listCategories({ data: { perPage: 50, hideEmpty: true } }),
+    staleTime: 5 * 60_000,
+  });
+  const categories = wcCategories ?? [];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,18 +162,24 @@ export function Header() {
             {catOpen && (
               <div
                 onMouseLeave={() => setCatOpen(false)}
-                className="absolute left-0 top-full z-40 mt-1 w-72 overflow-hidden rounded-lg border border-border bg-white shadow-[var(--shadow-card)]"
+                className="absolute left-0 top-full z-40 mt-1 max-h-96 w-72 overflow-y-auto rounded-lg border border-border bg-white shadow-[var(--shadow-card)]"
               >
-                {CATEGORIES.map((c) => (
-                  <a
-                    key={c.label}
-                    href="#"
-                    className="flex items-center gap-3 border-b border-border px-4 py-3 text-sm font-medium text-foreground transition-colors last:border-0 hover:bg-secondary hover:text-primary"
-                  >
-                    <c.icon className="h-4 w-4 text-primary" />
-                    {c.label}
-                  </a>
-                ))}
+                {categories.length === 0 ? (
+                  <div className="px-4 py-3 text-sm text-muted-foreground">Loading…</div>
+                ) : (
+                  categories.map((c) => (
+                    <Link
+                      key={c.id}
+                      to="/products"
+                      search={{}}
+                      onClick={() => setCatOpen(false)}
+                      className="flex items-center gap-3 border-b border-border px-4 py-3 text-sm font-medium text-foreground transition-colors last:border-0 hover:bg-secondary hover:text-primary"
+                    >
+                      <Tag className="h-4 w-4 text-primary" />
+                      {c.name}
+                    </Link>
+                  ))
+                )}
               </div>
             )}
           </div>
@@ -223,10 +231,16 @@ export function Header() {
               ))}
               <div className="my-4 h-px bg-border" />
               <p className="px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categories</p>
-              {CATEGORIES.map((c) => (
-                <a key={c.label} href="#" className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm hover:bg-secondary">
-                  <c.icon className="h-4 w-4 text-primary" /> {c.label}
-                </a>
+              {categories.map((c) => (
+                <Link
+                  key={c.id}
+                  to="/products"
+                  search={{}}
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm hover:bg-secondary"
+                >
+                  <Tag className="h-4 w-4 text-primary" /> {c.name}
+                </Link>
               ))}
             </nav>
           </div>
