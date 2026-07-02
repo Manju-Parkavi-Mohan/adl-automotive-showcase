@@ -92,8 +92,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@ADLAutomotive" },
       { name: "twitter:title", content: "ADL Automotive — Premium Diagnostic, Tuning & Workshop Equipment" },
       { name: "twitter:description", content: "Shop premium automotive diagnostic tools, ECU programmers, tuning software and workshop equipment. Trusted by professional technicians worldwide." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/DWqou8l0sAVgdwTkVh0aK3gheDi2/social-images/social-1782953634643-B1BD2C5D-2FC5-49D1-8DB7-DB88F1DB7903.webp" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/DWqou8l0sAVgdwTkVh0aK3gheDi2/social-images/social-1782953634643-B1BD2C5D-2FC5-49D1-8DB7-DB88F1DB7903.webp" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/DWqou8l0sAVgdwTkVh0aK3gheDi2/social-images/social-1782955924162-C63A1113-5327-44F9-A307-FAE86BC94669.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/DWqou8l0sAVgdwTkVh0aK3gheDi2/social-images/social-1782955924162-C63A1113-5327-44F9-A307-FAE86BC94669.webp" },
     ],
     links: [
       {
