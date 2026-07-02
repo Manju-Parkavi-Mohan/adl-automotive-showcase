@@ -17,9 +17,7 @@ export function SectionHeader({
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="max-w-2xl">
-        {eyebrow && (
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">{eyebrow}</div>
-        )}
+        {eyebrow && <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">{eyebrow}</div>}
         <h2 className="text-3xl font-bold tracking-tight text-black sm:text-4xl">{title}</h2>
         {subtitle && <p className="mt-2 text-sm text-muted-foreground sm:text-base">{subtitle}</p>}
       </div>
@@ -56,7 +54,7 @@ export function CategoryShowcase() {
   if (!isLoading && categories.length === 0) return null;
 
   return (
-    <section aria-label="Product categories" className="bg-[#ececec] py-10">
+    <section aria-label="Product categories" className="bg-background py-10">
       <div className="container-px mx-auto max-w-[1400px]">
         {/* Scroller */}
         <div
