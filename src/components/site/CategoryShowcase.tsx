@@ -64,7 +64,7 @@ export function CategoryShowcase() {
         >
           {isLoading
             ? Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-[1200px] w-[260px] shrink-0 animate-pulse rounded-2xl bg-white" />
+                <div key={i} className="h-[120px] w-[260px] shrink-0 animate-pulse rounded-2xl bg-white" />
               ))
             : categories.map((c) => (
                 <Link
