@@ -41,7 +41,7 @@ function Index() {
         <BrandsMarquee />
         <CategoryShowcase />
         <FeaturedProducts />
-        <NewArrivals />
+        {/* <NewArrivals /> */}
         <CategoryProductsSections />
         <WhyChooseUs />
       </main>
