@@ -29,13 +29,13 @@ export function WhyChooseUs() {
           {FEATURES.map((f) => (
             <div
               key={f.title}
-              className="flex items-start gap-4 rounded-xl border border-border bg-white p-6 transition-shadow hover:shadow-[var(--shadow-card)]"
+              className="flex items-start gap-4 rounded-xl bg-card p-6 shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-hover)]"
             >
               <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
                 <f.icon className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="text-base font-semibold text-foreground">{f.title}</h3>
+                <h3 className="text-base font-bold text-black">{f.title}</h3>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{f.text}</p>
               </div>
             </div>
