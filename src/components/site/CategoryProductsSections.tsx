@@ -68,9 +68,7 @@ function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: bo
       <div className="container-px mx-auto max-w-[1400px]">
         {/* Mobile-only title */}
         <div className="mb-4 flex items-center justify-between md:hidden">
-          <h2 className="text-xl font-extrabold uppercase tracking-tight text-black">
-            {category.name}
-          </h2>
+          <h2 className="text-xl font-extrabold uppercase tracking-tight text-black">{category.name}</h2>
           <Link to="/products" search={{}} className="text-xs font-semibold text-primary">
             View all →
           </Link>
@@ -84,20 +82,10 @@ function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: bo
             className="relative hidden shrink-0 overflow-hidden rounded-xl bg-black shadow-[var(--shadow-card)] md:block md:w-[280px]"
             aria-label={category.name}
           >
-            {image ? (
-              <img
-                src={image}
-                alt={category.name}
-                loading="lazy"
-                className="h-full w-full object-cover opacity-80"
-              />
-            ) : (
-              <div className="h-full w-full bg-gradient-to-br from-neutral-800 to-neutral-950" />
-            )}
+            <div className="h-full w-full bg-gradient-to-br from-neutral-800 to-neutral-950" />
+
             <div className="absolute inset-0 flex items-start p-6">
-              <h2 className="text-2xl font-extrabold leading-tight text-white drop-shadow">
-                {category.name}
-              </h2>
+              <h2 className="text-2xl font-extrabold leading-tight text-white drop-shadow">{category.name}</h2>
             </div>
           </Link>
 
@@ -138,11 +126,7 @@ function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: bo
                     />
                   ))
                 : products.map((p) => (
-                    <div
-                      key={p.id}
-                      data-card
-                      className="w-[220px] shrink-0 snap-start sm:w-[260px]"
-                    >
+                    <div key={p.id} data-card className="w-[220px] shrink-0 snap-start sm:w-[260px]">
                       <ProductCard product={p} />
                     </div>
                   ))}
