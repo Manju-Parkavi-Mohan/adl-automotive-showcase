@@ -5,7 +5,7 @@ import { HeroCarousel } from "@/components/site/HeroCarousel";
 import { BrandsMarquee } from "@/components/site/BrandsMarquee";
 import { CategoryShowcase } from "@/components/site/CategoryShowcase";
 import { FeaturedProducts, NewArrivals } from "@/components/site/FeaturedProducts";
-import { ProductSection } from "@/components/site/ProductSection";
+import { CategoryProductsSections } from "@/components/site/CategoryProductsSections";
 import { WhyChooseUs } from "@/components/site/WhyChooseUs";
 import { getYoastForUrl } from "@/lib/wp/yoast.functions";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
@@ -41,27 +41,8 @@ function Index() {
         <BrandsMarquee />
         <CategoryShowcase />
         <FeaturedProducts />
-        <ProductSection
-          category="diagnostic"
-          eyebrow="Workshop ready"
-          title="Diagnostic Tools"
-          subtitle="OBD scanners, key programmers and tablet-based diagnostic platforms."
-        />
-        <div className="bg-secondary">
-          <ProductSection
-            category="ecu-programming"
-            eyebrow="Chip tuning"
-            title="ECU Programming Tools"
-            subtitle="Bench, OBD and boot-mode programmers for cars, bikes and trucks."
-          />
-        </div>
-        <ProductSection
-          category="ecu-tuning"
-          eyebrow="Calibration"
-          title="Tuning Software for Trucks & Special Vehicles"
-          subtitle="Performance and emissions calibrations for heavy-duty and agricultural engines."
-        />
         <NewArrivals />
+        <CategoryProductsSections />
         <WhyChooseUs />
       </main>
       <Footer />
