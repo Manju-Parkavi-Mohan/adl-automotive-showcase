@@ -75,7 +75,7 @@ export function CategoryShowcase() {
                 >
                   <span className="text-[15px] font-extrabold leading-tight text-black">{c.name}</span>
                   {c.image?.src && (
-                    <img src={c.image.src} alt={c.name} className="h-32 w-32 shrink-0 object-contain" loading="lazy" />
+                    <img src={c.image.src} alt={c.name} className="h-24 w-24 shrink-0 object-contain" loading="lazy" />
                   )}
                 </Link>
               ))}
