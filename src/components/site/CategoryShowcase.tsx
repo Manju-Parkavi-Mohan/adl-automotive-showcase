@@ -3,6 +3,31 @@ import { Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { listCategories } from "@/lib/woo/categories.functions";
 
+export function SectionHeader({
+  eyebrow,
+  title,
+  subtitle,
+  action,
+}: {
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="max-w-2xl">
+        {eyebrow && (
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">{eyebrow}</div>
+        )}
+        <h2 className="text-3xl font-bold tracking-tight text-black sm:text-4xl">{title}</h2>
+        {subtitle && <p className="mt-2 text-sm text-muted-foreground sm:text-base">{subtitle}</p>}
+      </div>
+      {action && <div className="shrink-0">{action}</div>}
+    </div>
+  );
+}
+
 export function CategoryShowcase() {
   const { data, isLoading } = useQuery({
     queryKey: ["wc-categories-showcase"],
