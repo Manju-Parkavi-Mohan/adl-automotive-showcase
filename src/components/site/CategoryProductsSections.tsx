@@ -105,8 +105,10 @@ function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: bo
           >
             <div className="h-full w-full bg-gradient-to-br from-neutral-800 to-neutral-950" />
 
-            <div className="absolute inset-0 flex items-start p-6">
-              <h2 className="text-2xl font-extrabold leading-tight text-white drop-shadow">{category.name}</h2>
+            <div className="absolute inset-0 flex items-center justify-center p-6">
+              <h2 className="text-2xl font-extrabold leading-tight text-center text-white drop-shadow">
+                {category.name}
+              </h2>
             </div>
           </Link>
 
