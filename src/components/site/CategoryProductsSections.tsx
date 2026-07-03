@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { listCategories } from "@/lib/woo/categories.functions";
 import { listProducts } from "@/lib/woo/products.functions";
 import { wooToDisplay } from "@/lib/woo/adapter";
@@ -32,13 +33,35 @@ function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: bo
     queryFn: () => listProducts({ data: { category: String(category.id), perPage: 12 } }),
     staleTime: 60_000,
   });
-  const all = useMemo(() => (data?.items ?? []).map(wooToDisplay), [data]);
-  const brands = useMemo(() => ["ALL", ...Array.from(new Set(all.map((p) => p.brand)))], [all]);
-  const [brand, setBrand] = useState("ALL");
-  const products = brand === "ALL" ? all : all.filter((p) => p.brand === brand);
+  const products = useMemo(() => (data?.items ?? []).map(wooToDisplay), [data]);
 
   const scrollerRef = useRef<HTMLDivElement>(null);
   const pausedRef = useRef(false);
+  const [canLeft, setCanLeft] = useState(false);
+  const [canRight, setCanRight] = useState(false);
+
+  const updateArrows = () => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    setCanLeft(el.scrollLeft > 2);
+    setCanRight(el.scrollLeft < max - 2);
+  };
+
+  useEffect(() => {
+    updateArrows();
+    const onResize = () => updateArrows();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [products.length]);
+
+  const stepScroll = (dir: 1 | -1) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const first = el.querySelector<HTMLElement>("[data-card]");
+    const step = first ? first.offsetWidth + 20 : el.clientWidth * 0.8;
+    el.scrollBy({ left: dir * step, behavior: "smooth" });
+  };
 
   // Auto-scroll every 5s by one card width; wrap to start.
   useEffect(() => {
@@ -59,9 +82,7 @@ function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: bo
     return () => window.clearInterval(id);
   }, [products.length]);
 
-  if (!isLoading && all.length === 0) return null;
-
-  const image = category.image?.src;
+  if (!isLoading && products.length === 0) return null;
 
   return (
     <section className={`py-10 ${alt ? "bg-secondary" : ""}`} aria-label={category.name}>
@@ -89,48 +110,55 @@ function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: bo
             </div>
           </Link>
 
-          {/* Right column: brand tabs + auto-scrolling products */}
-          <div className="min-w-0 flex-1">
-            {brands.length > 1 && (
-              <div className="mb-4 flex flex-wrap gap-2">
-                {brands.slice(0, 6).map((b) => (
-                  <button
-                    key={b}
-                    onClick={() => setBrand(b)}
-                    className={`rounded-full px-3.5 py-1.5 text-xs font-semibold uppercase transition-colors ${
-                      brand === b
-                        ? "bg-black text-white"
-                        : "bg-card text-foreground shadow-sm hover:bg-black hover:text-white"
-                    }`}
-                  >
-                    {b}
-                  </button>
-                ))}
-              </div>
-            )}
+          {/* Right column: auto-scrolling products with arrows */}
+          <div className="relative min-w-0 flex-1">
+            <button
+              type="button"
+              aria-label="Scroll left"
+              onClick={() => stepScroll(-1)}
+              disabled={!canLeft}
+              className="absolute left-1 top-1/2 z-10 hidden -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:grid sm:h-10 sm:w-10"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
 
             <div
               ref={scrollerRef}
+              onScroll={updateArrows}
               onMouseEnter={() => (pausedRef.current = true)}
               onMouseLeave={() => (pausedRef.current = false)}
               onTouchStart={() => (pausedRef.current = true)}
               onTouchEnd={() => (pausedRef.current = false)}
-              className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+              className="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             >
               {isLoading
                 ? Array.from({ length: 4 }).map((_, i) => (
                     <div
                       key={i}
                       data-card
-                      className="h-[360px] w-[220px] shrink-0 animate-pulse rounded-xl bg-card sm:w-[260px]"
+                      className="h-[360px] w-[calc((100%-20px)/2)] shrink-0 animate-pulse rounded-xl bg-card md:w-[calc((100%-40px)/3)] lg:w-[calc((100%-60px)/4)]"
                     />
                   ))
                 : products.map((p) => (
-                    <div key={p.id} data-card className="w-[220px] shrink-0 snap-start sm:w-[260px]">
+                    <div
+                      key={p.id}
+                      data-card
+                      className="w-[calc((100%-20px)/2)] shrink-0 snap-start md:w-[calc((100%-40px)/3)] lg:w-[calc((100%-60px)/4)]"
+                    >
                       <ProductCard product={p} />
                     </div>
                   ))}
             </div>
+
+            <button
+              type="button"
+              aria-label="Scroll right"
+              onClick={() => stepScroll(1)}
+              disabled={!canRight}
+              className="absolute right-1 top-1/2 z-10 hidden -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:grid sm:h-10 sm:w-10"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
           </div>
         </div>
       </div>
