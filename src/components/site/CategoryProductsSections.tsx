@@ -119,7 +119,7 @@ function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: bo
               aria-label="Scroll left"
               onClick={() => stepScroll(-1)}
               disabled={!canLeft}
-              className="absolute left-1 top-1/2 z-10 hidden -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:grid sm:h-10 sm:w-10"
+              className="absolute left-1 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:h-10 sm:w-10"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -157,7 +157,7 @@ function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: bo
               aria-label="Scroll right"
               onClick={() => stepScroll(1)}
               disabled={!canRight}
-              className="absolute right-1 top-1/2 z-10 hidden -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:grid sm:h-10 sm:w-10"
+              className="absolute right-1 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:h-10 sm:w-10"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
