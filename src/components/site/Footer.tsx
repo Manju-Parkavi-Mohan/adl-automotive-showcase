@@ -25,14 +25,14 @@ export function Footer() {
     <footer className="mt-24 border-t border-border bg-[#0B2742] text-white/80">
       <div className="container-px mx-auto max-w-[1400px] py-16">
         {/* Newsletter */}
-        <div className="mb-14 grid gap-8 rounded-2xl bg-white/[0.04] p-8 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div className="mb-14 grid gap-8 rounded-2xl bg-white/[0.04] p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
             <h3 className="text-2xl font-bold text-white">Stay ahead of the workshop</h3>
             <p className="mt-2 text-sm text-white/70">
               Subscribe for new product launches, firmware updates and exclusive trade offers.
             </p>
           </div>
-          <form className="flex w-full gap-2 lg:w-auto">
+          <form className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
             <input
               type="email"
               required
@@ -40,7 +40,7 @@ export function Footer() {
               aria-label="Email"
               className="h-12 min-w-0 flex-1 rounded-md border border-white/15 bg-white/5 px-4 text-sm text-white placeholder:text-white/40 outline-none focus:border-[var(--accent-blue)] lg:w-80"
             />
-            <button className="h-12 rounded-md bg-[var(--accent-blue)] px-6 text-sm font-semibold text-white transition-colors hover:bg-[var(--accent-blue)]/90">
+            <button className="h-12 w-full shrink-0 rounded-md bg-[var(--accent-blue)] px-6 text-sm font-semibold text-white transition-colors hover:bg-[var(--accent-blue)]/90 sm:w-auto">
               Subscribe
             </button>
           </form>
