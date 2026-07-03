@@ -36,8 +36,6 @@ export function CategoryShowcase() {
   const categories = data ?? [];
 
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const [scrollPct, setScrollPct] = useState(0);
-  const [thumbWidth, setThumbWidth] = useState(1);
   const [overflowing, setOverflowing] = useState(false);
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(false);
@@ -49,8 +47,6 @@ export function CategoryShowcase() {
     const over = scrollWidth > clientWidth + 1;
     setOverflowing(over);
     const maxScroll = scrollWidth - clientWidth;
-    setScrollPct(maxScroll > 0 ? scrollLeft / maxScroll : 0);
-    setThumbWidth(clientWidth / scrollWidth);
     setCanLeft(scrollLeft > 2);
     setCanRight(scrollLeft < maxScroll - 2);
   };
@@ -92,7 +88,7 @@ export function CategoryShowcase() {
           <div
             ref={scrollerRef}
             onScroll={update}
-            className="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x snap-mandatory justify-center gap-5 overflow-x-auto scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
             {isLoading
               ? Array.from({ length: 6 }).map((_, i) => (
@@ -131,18 +127,6 @@ export function CategoryShowcase() {
           )}
         </div>
 
-        {/* Horizontal scroll indicator */}
-        {overflowing && (
-          <div className="relative mt-3 h-1 w-full overflow-hidden rounded-full bg-black/10">
-            <div
-              className="absolute top-0 h-full rounded-full bg-black/60 transition-[left] duration-75"
-              style={{
-                width: `${Math.max(thumbWidth * 100, 8)}%`,
-                left: `${scrollPct * (100 - Math.max(thumbWidth * 100, 8))}%`,
-              }}
-            />
-          </div>
-        )}
       </div>
     </section>
   );
