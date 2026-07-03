@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { listCategories } from "@/lib/woo/categories.functions";
 
 export function SectionHeader({
@@ -35,20 +36,38 @@ export function CategoryShowcase() {
   const categories = data ?? [];
 
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const [scrollPct, setScrollPct] = useState(0); // 0-1 thumb position
-  const [thumbWidth, setThumbWidth] = useState(1); // 0-1 thumb width
-  const [showIndicator, setShowIndicator] = useState(false);
+  const [scrollPct, setScrollPct] = useState(0);
+  const [thumbWidth, setThumbWidth] = useState(1);
+  const [overflowing, setOverflowing] = useState(false);
+  const [canLeft, setCanLeft] = useState(false);
+  const [canRight, setCanRight] = useState(false);
 
-  const updateIndicator = () => {
+  const update = () => {
     const el = scrollerRef.current;
     if (!el) return;
     const { scrollLeft, scrollWidth, clientWidth } = el;
-    const overflowing = scrollWidth > clientWidth + 1;
-    setShowIndicator(overflowing);
-    if (!overflowing) return;
+    const over = scrollWidth > clientWidth + 1;
+    setOverflowing(over);
     const maxScroll = scrollWidth - clientWidth;
     setScrollPct(maxScroll > 0 ? scrollLeft / maxScroll : 0);
     setThumbWidth(clientWidth / scrollWidth);
+    setCanLeft(scrollLeft > 2);
+    setCanRight(scrollLeft < maxScroll - 2);
+  };
+
+  useEffect(() => {
+    update();
+    const onResize = () => update();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [categories.length]);
+
+  const scrollBy = (dir: 1 | -1) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const first = el.querySelector<HTMLElement>("[data-cat-card]");
+    const step = first ? first.offsetWidth + 20 : el.clientWidth * 0.8;
+    el.scrollBy({ left: dir * step, behavior: "smooth" });
   };
 
   if (!isLoading && categories.length === 0) return null;
@@ -56,33 +75,64 @@ export function CategoryShowcase() {
   return (
     <section aria-label="Product categories" className="bg-secondary py-10">
       <div className="container-px mx-auto max-w-[1400px]">
-        {/* Scroller */}
-        <div
-          ref={scrollerRef}
-          onScroll={updateIndicator}
-          className="flex justify-center gap-5 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {isLoading
-            ? Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-[120px] w-[260px] shrink-0 animate-pulse rounded-2xl bg-white" />
-              ))
-            : categories.map((c) => (
-                <Link
-                  key={c.id}
-                  to="/products"
-                  search={{}}
-                  className="group flex h-[120px] w-[260px] shrink-0 items-center justify-between gap-3 rounded-2xl bg-white px-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
-                >
-                  <span className="text-[15px] font-extrabold leading-tight text-black">{c.name}</span>
-                  {c.image?.src && (
-                    <img src={c.image.src} alt={c.name} className="h-24 w-24 shrink-0 object-contain" loading="lazy" />
-                  )}
-                </Link>
-              ))}
+        <div className="relative">
+          {/* Left arrow */}
+          {overflowing && (
+            <button
+              type="button"
+              aria-label="Scroll left"
+              onClick={() => scrollBy(-1)}
+              disabled={!canLeft}
+              className="absolute left-0 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+          )}
+
+          <div
+            ref={scrollerRef}
+            onScroll={update}
+            className="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {isLoading
+              ? Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={i}
+                    data-cat-card
+                    className="h-[110px] w-[calc((100%-20px)/2)] shrink-0 animate-pulse rounded-2xl bg-white sm:w-[260px]"
+                  />
+                ))
+              : categories.map((c) => (
+                  <Link
+                    key={c.id}
+                    to="/products"
+                    search={{}}
+                    data-cat-card
+                    className="group flex h-[110px] w-[calc((100%-20px)/2)] shrink-0 snap-start items-center justify-center rounded-2xl bg-white px-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md sm:h-[120px] sm:w-[260px]"
+                  >
+                    <span className="text-center text-[13px] font-extrabold leading-tight text-black sm:text-[15px]">
+                      {c.name}
+                    </span>
+                  </Link>
+                ))}
+          </div>
+
+          {/* Right arrow */}
+          {overflowing && (
+            <button
+              type="button"
+              aria-label="Scroll right"
+              onClick={() => scrollBy(1)}
+              disabled={!canRight}
+              className="absolute right-0 top-1/2 z-10 translate-x-1/2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          )}
         </div>
 
-        {/* Horizontal scroll indicator — thin, no extra vertical footprint */}
-        {showIndicator && (
+        {/* Horizontal scroll indicator */}
+        {overflowing && (
           <div className="relative mt-3 h-1 w-full overflow-hidden rounded-full bg-black/10">
             <div
               className="absolute top-0 h-full rounded-full bg-black/60 transition-[left] duration-75"
