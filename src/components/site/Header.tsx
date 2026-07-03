@@ -225,9 +225,14 @@ export function Header() {
             </div>
             <nav className="mt-6 flex flex-col gap-1">
               {NAV_LINKS.map((n) => (
-                <a key={n.label} href="#" className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-secondary">
+                <Link
+                  key={n.label}
+                  to={n.to}
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-secondary"
+                >
                   {n.label}
-                </a>
+                </Link>
               ))}
               <div className="my-4 h-px bg-border" />
               <p className="px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categories</p>
