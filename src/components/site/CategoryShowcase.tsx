@@ -69,7 +69,7 @@ export function CategoryShowcase() {
   if (!isLoading && categories.length === 0) return null;
 
   return (
-    <section aria-label="Product categories" className="bg-secondary pt-10 pb-5">
+    <section aria-label="Product categories" className="bg-secondary py-10">
       <div className="container-px mx-auto max-w-[1400px]">
         <h2 className="mb-6 text-2xl font-extrabold uppercase tracking-tight text-black sm:text-3xl">
           Shop by Category
