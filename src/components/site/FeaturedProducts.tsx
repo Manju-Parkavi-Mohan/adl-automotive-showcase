@@ -43,7 +43,7 @@ export function FeaturedProducts() {
   const products = source.map(wooToDisplay);
 
   return (
-    <section className="container-px mx-auto max-w-[1400px] py-20">
+    <section className="container-px mx-auto max-w-[1400px] py-10">
       <SectionHeader
         eyebrow="Curated selection"
         title="Featured Products"
