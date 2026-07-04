@@ -100,7 +100,7 @@ function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: bo
           <Link
             to="/products"
             search={{}}
-            className="relative hidden shrink-0 overflow-hidden rounded-xl bg-black shadow-[var(--shadow-card)] md:block md:w-[280px]"
+            className="group relative hidden shrink-0 overflow-hidden rounded-xl bg-black shadow-[var(--shadow-card)] md:block md:w-[280px]"
             aria-label={category.name}
           >
             {category.image?.src ? (
