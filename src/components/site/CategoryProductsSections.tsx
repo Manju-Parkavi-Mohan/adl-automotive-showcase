@@ -7,17 +7,10 @@ import { listProducts } from "@/lib/woo/products.functions";
 import { wooToDisplay } from "@/lib/woo/adapter";
 import { ProductCard } from "./ProductCard";
 import type { WooCategory } from "@/lib/woo/types";
-import tuningToolsAsset from "@/assets/cat-tuning-tools.png.asset.json";
+import catBgA from "@/assets/cat-bg-a.png.asset.json";
+import catBgB from "@/assets/cat-bg-b.png.asset.json";
 
-// Static, frontend-hosted tile images per category slug.
-// Add more entries as the media team provides them.
-const CATEGORY_TILE_IMAGES: Record<string, string> = {
-  "tuning-tools": tuningToolsAsset.url,
-};
-
-function isTuningTools(cat: WooCategory) {
-  return cat.slug === "tuning-tools" || /tuning/i.test(cat.name);
-}
+const ALT_TILE_IMAGES = [catBgA.url, catBgB.url];
 
 export function CategoryProductsSections() {
   const { data: categories } = useQuery({
@@ -32,36 +25,39 @@ export function CategoryProductsSections() {
   return (
     <>
       {list.map((cat, idx) => (
-        <CategoryProductsRow key={cat.id} category={cat} alt={idx % 2 === 1} />
+        <CategoryProductsRow
+          key={cat.id}
+          category={cat}
+          alt={idx % 2 === 1}
+          tileImage={ALT_TILE_IMAGES[idx % ALT_TILE_IMAGES.length]}
+        />
       ))}
     </>
   );
 }
 
-function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: boolean }) {
-  const tuning = isTuningTools(category);
-
+function CategoryProductsRow({
+  category,
+  alt,
+  tileImage,
+}: {
+  category: WooCategory;
+  alt: boolean;
+  tileImage: string;
+}) {
   const { data: subCats } = useQuery({
     queryKey: ["wc-subcats", category.id],
     queryFn: () => listCategories({ data: { perPage: 20, parent: category.id, hideEmpty: true } }),
     staleTime: 5 * 60_000,
-    enabled: tuning,
   });
-  const tabs = useMemo(() => {
-    if (!tuning) return [] as WooCategory[];
-    const list = subCats ?? [];
-    const pick = (re: RegExp) => list.find((c) => re.test(c.name) || re.test(c.slug));
-    const devices = pick(/device/i);
-    const dongles = pick(/dongle|dongel/i);
-    const ordered = [devices, dongles].filter(Boolean) as WooCategory[];
-    return ordered.length ? ordered : list.slice(0, 2);
-  }, [tuning, subCats]);
+  const tabs = useMemo(() => (subCats ?? []) as WooCategory[], [subCats]);
+  const hasTabs = tabs.length > 0;
   const [activeTabId, setActiveTabId] = useState<number | null>(null);
   useEffect(() => {
-    if (tuning && tabs.length && activeTabId === null) setActiveTabId(tabs[0].id);
-  }, [tuning, tabs, activeTabId]);
+    if (hasTabs && activeTabId === null) setActiveTabId(tabs[0].id);
+  }, [hasTabs, tabs, activeTabId]);
 
-  const productCatId = tuning && activeTabId ? activeTabId : category.id;
+  const productCatId = hasTabs && activeTabId ? activeTabId : category.id;
   const { data, isLoading } = useQuery({
     queryKey: ["wc-cat-row", productCatId],
     queryFn: () => listProducts({ data: { category: String(productCatId), perPage: 12 } }),
@@ -118,8 +114,6 @@ function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: bo
 
   if (!isLoading && products.length === 0) return null;
 
-  const tileImage = CATEGORY_TILE_IMAGES[category.slug];
-
   return (
     <section className={`py-10 ${alt ? "bg-secondary" : ""}`} aria-label={category.name}>
       <div className="container-px mx-auto max-w-[1400px]">
@@ -139,16 +133,12 @@ function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: bo
             className="group relative hidden shrink-0 overflow-hidden rounded-xl bg-black shadow-[var(--shadow-card)] md:block md:w-[280px]"
             aria-label={category.name}
           >
-            {tileImage ? (
-              <img
-                src={tileImage}
-                alt={category.name}
-                className="absolute inset-x-0 bottom-0 top-24 w-full object-contain px-4 pb-6 transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 to-neutral-950" />
-            )}
+            <img
+              src={tileImage}
+              alt={category.name}
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
+            />
             {/* Subtle top gradient behind title */}
             <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent" />
             <div className="relative flex h-full min-h-[440px] flex-col items-center p-6 text-center">
@@ -160,7 +150,7 @@ function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: bo
 
           {/* Right column: auto-scrolling products with arrows */}
           <div className="relative min-w-0 flex-1">
-            {tuning && tabs.length > 0 && (
+            {hasTabs && (
               <div className="mb-4 flex items-center justify-center gap-2">
                 {tabs.map((t) => {
                   const active = t.id === activeTabId;
