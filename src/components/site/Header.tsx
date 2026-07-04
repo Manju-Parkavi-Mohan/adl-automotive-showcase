@@ -4,8 +4,18 @@ import { useQuery } from "@tanstack/react-query";
 import { useCart } from "@/components/site/CartProvider";
 import { useAuth } from "@/components/site/AuthProvider";
 import {
-  Search, Heart, ShoppingCart, User, Globe, ChevronDown, Menu, X,
-  Tag, Download, Wrench, KeyRound,
+  Search,
+  Heart,
+  ShoppingCart,
+  User,
+  Globe,
+  ChevronDown,
+  Menu,
+  X,
+  Tag,
+  Download,
+  Wrench,
+  KeyRound,
 } from "lucide-react";
 import adlLogo from "@/assets/adl-logo-new.png.asset.json";
 import { listCategories } from "@/lib/woo/categories.functions";
@@ -51,9 +61,15 @@ export function Header() {
         <div className="container-px mx-auto flex h-9 max-w-[1400px] items-center justify-between text-xs">
           <p>Premium automotive diagnostic & tuning equipment — shipped worldwide</p>
           <div className="flex items-center gap-4">
-            <a href="#" className="hover:text-white/80">Support</a>
-            <a href="#" className="hover:text-white/80">Track Order</a>
-            <a href="#" className="hover:text-white/80">B2B Inquiry</a>
+            <a href="#" className="hover:text-white/80">
+              Support
+            </a>
+            <a href="#" className="hover:text-white/80">
+              Track Order
+            </a>
+            <a href="#" className="hover:text-white/80">
+              B2B Inquiry
+            </a>
           </div>
         </div>
       </div>
@@ -70,7 +86,11 @@ export function Header() {
             <Menu className="h-5 w-5" />
           </button>
           {/* Logo — centered on mobile, left on desktop */}
-          <Link to="/" aria-label="ADL Automotive — home" className="flex shrink-0 items-center justify-center lg:justify-start">
+          <Link
+            to="/"
+            aria-label="ADL Automotive — home"
+            className="flex shrink-0 items-center justify-center lg:justify-start"
+          >
             <img src={adlLogo.url} alt="ADL Automotive" className="h-14 w-auto sm:h-16 md:h-20" />
           </Link>
 
@@ -250,11 +270,13 @@ export function Header() {
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-2 border-b border-border px-1 py-2.5 text-sm font-bold uppercase tracking-wide text-black hover:text-primary"
                 >
-                  <p.icon className="h-4 w-4 text-primary" />
+                  {/* <p.icon className="h-4 w-4 text-primary" /> */}
                   {p.label}
                 </a>
               ))}
-              <p className="mt-5 px-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Categories</p>
+              <p className="mt-5 px-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                Categories
+              </p>
               {categories.map((c) => (
                 <Link
                   key={c.id}
@@ -322,7 +344,10 @@ function IconButton({
   label: string;
 }) {
   return (
-    <button aria-label={label} className="relative grid h-10 w-10 place-items-center rounded-md text-foreground transition-colors hover:text-primary">
+    <button
+      aria-label={label}
+      className="relative grid h-10 w-10 place-items-center rounded-md text-foreground transition-colors hover:text-primary"
+    >
       <Icon className="h-5 w-5" />
       {count != null && (
         <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-blue)] px-1 text-[10px] font-bold text-white">
