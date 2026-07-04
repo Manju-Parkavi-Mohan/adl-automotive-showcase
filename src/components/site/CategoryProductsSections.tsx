@@ -100,15 +100,28 @@ function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: bo
           <Link
             to="/products"
             search={{}}
-            className="relative hidden shrink-0 overflow-hidden rounded-xl bg-black shadow-[var(--shadow-card)] md:block md:w-[280px]"
+            className="group relative hidden shrink-0 overflow-hidden rounded-xl bg-black shadow-[var(--shadow-card)] md:block md:w-[280px]"
             aria-label={category.name}
           >
-            <div className="h-full w-full bg-gradient-to-br from-neutral-800 to-neutral-950" />
-
-            <div className="absolute inset-0 flex items-center justify-center p-6">
-              <h2 className="text-2xl font-extrabold leading-tight text-center text-white drop-shadow">
+            {category.image?.src ? (
+              <img
+                src={category.image.src}
+                alt={category.image.alt || category.name}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 to-neutral-950" />
+            )}
+            {/* Dark overlay for text legibility */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/20" />
+            <div className="relative flex h-full min-h-[360px] flex-col items-center justify-end p-6 text-center">
+              <h2 className="text-2xl font-extrabold uppercase leading-tight tracking-tight text-white drop-shadow-lg">
                 {category.name}
               </h2>
+              <span className="mt-2 text-xs font-semibold uppercase tracking-widest text-white/70">
+                Shop now →
+              </span>
             </div>
           </Link>
 

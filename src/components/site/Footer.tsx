@@ -32,15 +32,15 @@ export function Footer() {
               Subscribe for new product launches, firmware updates and exclusive trade offers.
             </p>
           </div>
-          <form className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
+          <form className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
             <input
               type="email"
               required
               placeholder="your@workshop.com"
               aria-label="Email"
-              className="h-12 min-w-0 flex-1 rounded-md border border-white/15 bg-white/5 px-4 text-sm text-white placeholder:text-white/40 outline-none focus:border-[var(--accent-blue)] lg:w-80"
+              className="h-14 min-w-0 flex-1 rounded-md border border-white/15 bg-white/5 px-4 text-base text-white placeholder:text-white/40 outline-none focus:border-[var(--accent-blue)] lg:w-96"
             />
-            <button className="h-12 w-full shrink-0 rounded-md bg-[var(--accent-blue)] px-6 text-sm font-semibold text-white transition-colors hover:bg-[var(--accent-blue)]/90 sm:w-auto">
+            <button className="h-14 w-full shrink-0 rounded-md bg-[var(--accent-blue)] px-8 text-sm font-semibold text-white transition-colors hover:bg-[var(--accent-blue)]/90 sm:w-auto">
               Subscribe
             </button>
           </form>

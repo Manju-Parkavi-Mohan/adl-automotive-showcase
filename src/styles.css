@@ -176,3 +176,6 @@
 @media (max-width: 1023px) {
   body { padding-bottom: 4rem; }
 }
+
+/* Prevent tiny horizontal overflow from scrollers/marquees on mobile */
+html, body { overflow-x: hidden; }
