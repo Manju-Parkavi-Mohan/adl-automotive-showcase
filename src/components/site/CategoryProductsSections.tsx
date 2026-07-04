@@ -7,6 +7,17 @@ import { listProducts } from "@/lib/woo/products.functions";
 import { wooToDisplay } from "@/lib/woo/adapter";
 import { ProductCard } from "./ProductCard";
 import type { WooCategory } from "@/lib/woo/types";
+import tuningToolsAsset from "@/assets/cat-tuning-tools.png.asset.json";
+
+// Static, frontend-hosted tile images per category slug.
+// Add more entries as the media team provides them.
+const CATEGORY_TILE_IMAGES: Record<string, string> = {
+  "tuning-tools": tuningToolsAsset.url,
+};
+
+function isTuningTools(cat: WooCategory) {
+  return cat.slug === "tuning-tools" || /tuning/i.test(cat.name);
+}
 
 export function CategoryProductsSections() {
   const { data: categories } = useQuery({
@@ -28,9 +39,32 @@ export function CategoryProductsSections() {
 }
 
 function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: boolean }) {
+  const tuning = isTuningTools(category);
+
+  const { data: subCats } = useQuery({
+    queryKey: ["wc-subcats", category.id],
+    queryFn: () => listCategories({ data: { perPage: 20, parent: category.id, hideEmpty: true } }),
+    staleTime: 5 * 60_000,
+    enabled: tuning,
+  });
+  const tabs = useMemo(() => {
+    if (!tuning) return [] as WooCategory[];
+    const list = subCats ?? [];
+    const pick = (re: RegExp) => list.find((c) => re.test(c.name) || re.test(c.slug));
+    const devices = pick(/device/i);
+    const dongles = pick(/dongle|dongel/i);
+    const ordered = [devices, dongles].filter(Boolean) as WooCategory[];
+    return ordered.length ? ordered : list.slice(0, 2);
+  }, [tuning, subCats]);
+  const [activeTabId, setActiveTabId] = useState<number | null>(null);
+  useEffect(() => {
+    if (tuning && tabs.length && activeTabId === null) setActiveTabId(tabs[0].id);
+  }, [tuning, tabs, activeTabId]);
+
+  const productCatId = tuning && activeTabId ? activeTabId : category.id;
   const { data, isLoading } = useQuery({
-    queryKey: ["wc-cat-row", category.id],
-    queryFn: () => listProducts({ data: { category: String(category.id), perPage: 12 } }),
+    queryKey: ["wc-cat-row", productCatId],
+    queryFn: () => listProducts({ data: { category: String(productCatId), perPage: 12 } }),
     staleTime: 60_000,
   });
   const products = useMemo(() => (data?.items ?? []).map(wooToDisplay), [data]);
@@ -84,6 +118,8 @@ function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: bo
 
   if (!isLoading && products.length === 0) return null;
 
+  const tileImage = CATEGORY_TILE_IMAGES[category.slug];
+
   return (
     <section className={`py-10 ${alt ? "bg-secondary" : ""}`} aria-label={category.name}>
       <div className="container-px mx-auto max-w-[1400px]">
@@ -103,30 +139,49 @@ function CategoryProductsRow({ category, alt }: { category: WooCategory; alt: bo
             className="group relative hidden shrink-0 overflow-hidden rounded-xl bg-black shadow-[var(--shadow-card)] md:block md:w-[280px]"
             aria-label={category.name}
           >
-            {category.image?.src ? (
+            {tileImage ? (
               <img
-                src={category.image.src}
-                alt={category.image.alt || category.name}
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                src={tileImage}
+                alt={category.name}
+                className="absolute inset-x-0 bottom-0 top-24 w-full object-contain px-4 pb-6 transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 to-neutral-950" />
             )}
-            {/* Dark overlay for text legibility */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/20" />
-            <div className="relative flex h-full min-h-[360px] flex-col items-center justify-end p-6 text-center">
+            {/* Subtle top gradient behind title */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent" />
+            <div className="relative flex h-full min-h-[440px] flex-col items-center p-6 text-center">
               <h2 className="text-2xl font-extrabold uppercase leading-tight tracking-tight text-white drop-shadow-lg">
                 {category.name}
               </h2>
-              <span className="mt-2 text-xs font-semibold uppercase tracking-widest text-white/70">
-                Shop now →
-              </span>
             </div>
           </Link>
 
           {/* Right column: auto-scrolling products with arrows */}
           <div className="relative min-w-0 flex-1">
+            {tuning && tabs.length > 0 && (
+              <div className="mb-4 flex items-center justify-center gap-2">
+                {tabs.map((t) => {
+                  const active = t.id === activeTabId;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setActiveTabId(t.id)}
+                      className={`rounded-full px-6 py-2 text-sm font-bold uppercase tracking-wide transition ${
+                        active
+                          ? "bg-black text-white shadow-md"
+                          : "bg-white text-black ring-1 ring-black/10 hover:bg-neutral-100"
+                      }`}
+                    >
+                      {t.name}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
             <button
               type="button"
               aria-label="Scroll left"
