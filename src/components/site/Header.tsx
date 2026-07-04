@@ -5,7 +5,7 @@ import { useCart } from "@/components/site/CartProvider";
 import { useAuth } from "@/components/site/AuthProvider";
 import {
   Search, Heart, ShoppingCart, User, Globe, ChevronDown, Menu, X,
-  Tag, Download, Wrench, KeyRound, DollarSign,
+  Tag, Download, Wrench, KeyRound,
 } from "lucide-react";
 import adlLogo from "@/assets/adl-logo-new.png.asset.json";
 import { listCategories } from "@/lib/woo/categories.functions";
@@ -60,14 +60,22 @@ export function Header() {
 
       {/* Top header */}
       <div className="container-px mx-auto max-w-[1400px]">
-        <div className="grid grid-cols-[auto_auto] items-center justify-between gap-3 py-1 sm:gap-6 sm:py-2 md:grid-cols-[auto_1fr_auto] md:justify-start lg:gap-10">
-          {/* Logo */}
-          <Link to="/" aria-label="ADL Automotive — home" className="flex shrink-0 items-center">
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 py-1 sm:gap-6 sm:py-2 lg:grid-cols-[auto_1fr_auto] lg:gap-10">
+          {/* Mobile menu trigger — left */}
+          <button
+            aria-label="Open menu"
+            className="grid h-10 w-10 place-items-center rounded-md border border-border lg:hidden"
+            onClick={() => setMobileOpen(true)}
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          {/* Logo — centered on mobile, left on desktop */}
+          <Link to="/" aria-label="ADL Automotive — home" className="flex shrink-0 items-center justify-center lg:justify-start">
             <img src={adlLogo.url} alt="ADL Automotive" className="h-14 w-auto sm:h-16 md:h-20" />
           </Link>
 
           {/* Search */}
-          <div className="hidden min-w-0 md:block">
+          <div className="hidden min-w-0 lg:block">
             <form onSubmit={handleSearch} className="relative mx-auto max-w-2xl">
               <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
@@ -86,6 +94,16 @@ export function Header() {
               </button>
             </form>
           </div>
+
+          {/* Mobile login — top right */}
+          <Link
+            to={user ? "/account" : "/account/login"}
+            aria-label={user ? "Account" : "Login"}
+            className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-2 text-xs font-semibold uppercase tracking-wide text-foreground transition-colors hover:border-primary hover:text-primary lg:hidden"
+          >
+            <User className="h-4 w-4" />
+            <span className="hidden xs:inline sm:inline">{user?.firstName || (user ? "Account" : "Login")}</span>
+          </Link>
 
           {/* Account icons — desktop only (mobile uses fixed bottom nav) */}
           <div className="hidden shrink-0 items-center gap-1 sm:gap-3 lg:flex">
@@ -119,18 +137,10 @@ export function Header() {
               <span>{user?.firstName || user?.displayName || "Login"}</span>
             </Link>
           </div>
-          {/* Mobile menu trigger */}
-          <button
-              aria-label="Open menu"
-              className="ml-auto grid h-10 w-10 place-items-center rounded-md border border-border lg:hidden"
-              onClick={() => setMobileOpen(true)}
-            >
-              <Menu className="h-5 w-5" />
-            </button>
         </div>
 
         {/* Mobile search */}
-        <div className="pb-2 md:hidden">
+        <div className="pb-2 lg:hidden">
           <form onSubmit={handleSearch} className="relative">
             <Search className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <input
@@ -215,20 +225,20 @@ export function Header() {
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
-          <div className="absolute left-0 top-0 h-full w-80 max-w-[85vw] overflow-y-auto bg-white p-6 shadow-xl">
+          <div className="absolute left-0 top-0 h-full w-72 max-w-[80vw] overflow-y-auto bg-white p-5 shadow-xl">
             <div className="flex items-center justify-between">
-              <span className="text-lg font-extrabold uppercase tracking-wide text-primary">Menu</span>
+              <span className="text-base font-extrabold uppercase tracking-wide text-primary">Menu</span>
               <button aria-label="Close" onClick={() => setMobileOpen(false)}>
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <nav className="mt-6 flex flex-col">
+            <nav className="mt-4 flex flex-col">
               {NAV_LINKS.map((n) => (
                 <Link
                   key={n.label}
                   to={n.to}
                   onClick={() => setMobileOpen(false)}
-                  className="border-b border-border px-1 py-4 text-base font-extrabold uppercase tracking-wide text-black hover:text-primary"
+                  className="border-b border-border px-1 py-2.5 text-sm font-bold uppercase tracking-wide text-black hover:text-primary"
                 >
                   {n.label}
                 </Link>
@@ -238,21 +248,22 @@ export function Header() {
                   key={p.label}
                   href="#"
                   onClick={() => setMobileOpen(false)}
-                  className="border-b border-border px-1 py-4 text-base font-extrabold uppercase tracking-wide text-black hover:text-primary"
+                  className="flex items-center gap-2 border-b border-border px-1 py-2.5 text-sm font-bold uppercase tracking-wide text-black hover:text-primary"
                 >
+                  <p.icon className="h-4 w-4 text-primary" />
                   {p.label}
                 </a>
               ))}
-              <p className="mt-6 px-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">Categories</p>
+              <p className="mt-5 px-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Categories</p>
               {categories.map((c) => (
                 <Link
                   key={c.id}
                   to="/products"
                   search={{}}
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3 border-b border-border px-1 py-3 text-sm font-semibold uppercase tracking-wide text-black hover:text-primary"
+                  className="flex items-center gap-2 border-b border-border px-1 py-2 text-xs font-semibold uppercase tracking-wide text-black hover:text-primary"
                 >
-                  <Tag className="h-4 w-4 text-primary" /> {c.name}
+                  <Tag className="h-3.5 w-3.5 text-primary" /> {c.name}
                 </Link>
               ))}
             </nav>
@@ -265,6 +276,17 @@ export function Header() {
         aria-label="Mobile quick actions"
         className="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-4 border-t border-border bg-white shadow-[0_-4px_16px_-4px_rgba(0,0,0,0.08)] lg:hidden"
       >
+        <button
+          aria-label="Wishlist"
+          className="flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary"
+        >
+          <Heart className="h-5 w-5" />
+          <span>Wishlist</span>
+        </button>
+        <button className="flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary">
+          <Globe className="h-5 w-5" />
+          <span>EN</span>
+        </button>
         <Link
           to={user ? "/account" : "/account/login"}
           className="flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary"
@@ -272,14 +294,6 @@ export function Header() {
           <User className="h-5 w-5" />
           <span>{user ? "Account" : "Login"}</span>
         </Link>
-        <button className="flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary">
-          <Globe className="h-5 w-5" />
-          <span>EN</span>
-        </button>
-        <button className="flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary">
-          <DollarSign className="h-5 w-5" />
-          <span>USD</span>
-        </button>
         <button
           onClick={openCart}
           aria-label="Open cart"
