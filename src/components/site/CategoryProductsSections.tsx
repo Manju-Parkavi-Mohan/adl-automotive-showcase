@@ -132,7 +132,7 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
               loading="lazy"
             />
             <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent" />
-            <div className="relative flex h-full flex-col items-center justify-center p-6 text-center">
+            <div className="relative flex h-full flex-col items-center justify-start p-6 text-center">
               <h2 className="text-2xl font-extrabold uppercase leading-tight tracking-tight text-white drop-shadow-lg">
                 {category.name}
               </h2>
