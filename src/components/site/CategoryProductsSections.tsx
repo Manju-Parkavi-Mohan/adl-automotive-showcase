@@ -36,15 +36,7 @@ export function CategoryProductsSections() {
   );
 }
 
-function CategoryProductsRow({
-  category,
-  alt,
-  tileImage,
-}: {
-  category: WooCategory;
-  alt: boolean;
-  tileImage: string;
-}) {
+function CategoryProductsRow({ category, alt, tileImage }: { category: WooCategory; alt: boolean; tileImage: string }) {
   const { data: subCats } = useQuery({
     queryKey: ["wc-subcats", category.id],
     queryFn: () => listCategories({ data: { perPage: 20, parent: category.id, hideEmpty: true } }),
@@ -130,7 +122,7 @@ function CategoryProductsRow({
           <Link
             to="/products"
             search={{}}
-            className="group relative hidden shrink-0 overflow-hidden rounded-xl bg-black shadow-[var(--shadow-card)] md:block md:w-[280px]"
+            className="group relative hidden shrink-0 overflow-hidden rounded-xl bg-black shadow-[var(--shadow-card)] md:block md:h-[400px] md:w-[280px]"
             aria-label={category.name}
           >
             <img
@@ -139,9 +131,8 @@ function CategoryProductsRow({
               className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
             />
-            {/* Subtle top gradient behind title */}
             <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent" />
-            <div className="relative flex h-full min-h-[440px] flex-col items-center p-6 text-center">
+            <div className="relative flex h-full flex-col items-center justify-center p-6 text-center">
               <h2 className="text-2xl font-extrabold uppercase leading-tight tracking-tight text-white drop-shadow-lg">
                 {category.name}
               </h2>
@@ -177,7 +168,7 @@ function CategoryProductsRow({
               aria-label="Scroll left"
               onClick={() => stepScroll(-1)}
               disabled={!canLeft}
-              className="absolute left-1 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:h-10 sm:w-10"
+              className="absolute left-1 top-[200px] z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:h-10 sm:w-10"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -196,14 +187,14 @@ function CategoryProductsRow({
                     <div
                       key={i}
                       data-card
-                      className="h-[360px] w-[calc((100%-20px)/2)] shrink-0 animate-pulse rounded-xl bg-card md:w-[calc((100%-40px)/3)] lg:w-[calc((100%-60px)/4)]"
+                      className="h-[400px] w-[calc((100%-20px)/2)] shrink-0 animate-pulse rounded-xl bg-card md:w-[calc((100%-40px)/3)] lg:w-[calc((100%-60px)/4)]"
                     />
                   ))
                 : products.map((p) => (
                     <div
                       key={p.id}
                       data-card
-                      className="w-[calc((100%-20px)/2)] shrink-0 snap-start md:w-[calc((100%-40px)/3)] lg:w-[calc((100%-60px)/4)]"
+                      className="h-[400px] w-[calc((100%-20px)/2)] shrink-0 snap-start md:w-[calc((100%-40px)/3)] lg:w-[calc((100%-60px)/4)]"
                     >
                       <ProductCard product={p} />
                     </div>
@@ -215,7 +206,7 @@ function CategoryProductsRow({
               aria-label="Scroll right"
               onClick={() => stepScroll(1)}
               disabled={!canRight}
-              className="absolute right-1 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:h-10 sm:w-10"
+              className="absolute right-1 top-[200px] z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:h-10 sm:w-10"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
