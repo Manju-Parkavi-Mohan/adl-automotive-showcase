@@ -30,7 +30,7 @@ export function ProductCard({ product }: { product: Product }) {
   };
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-card)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-hover)]">
+    <article className="group flex h-full flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-card)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-hover)]">
       <Link
         to="/products/$productId"
         params={{ productId: product.id }}
