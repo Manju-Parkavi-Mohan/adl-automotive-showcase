@@ -5,7 +5,7 @@ export function BrandsMarquee() {
   return (
     <section aria-label="Trusted brands" className="bg-[#0B2742] py-12">
       <div className="container-px mx-auto max-w-[1400px]">
-        <p className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.25em] text-white/60">
+        <p className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.25em] text-white">
           Trusted by leading automotive brands
         </p>
         <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
