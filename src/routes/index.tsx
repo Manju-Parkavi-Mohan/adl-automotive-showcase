@@ -38,9 +38,9 @@ function Index() {
       <Header />
       <main>
         <HeroCarousel />
-        <BrandsMarquee />
         <CategoryShowcase />
         <FeaturedProducts />
+        <BrandsMarquee />
         {/* <NewArrivals /> */}
         <CategoryProductsSections />
         <WhyChooseUs />

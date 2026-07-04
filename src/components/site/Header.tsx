@@ -5,7 +5,7 @@ import { useCart } from "@/components/site/CartProvider";
 import { useAuth } from "@/components/site/AuthProvider";
 import {
   Search, Heart, ShoppingCart, User, Globe, ChevronDown, Menu, X,
-  Sparkles, Flame, Award, Tag,
+  Tag, Download, Wrench, KeyRound, DollarSign,
 } from "lucide-react";
 import adlLogo from "@/assets/adl-logo-new.png.asset.json";
 import { listCategories } from "@/lib/woo/categories.functions";
@@ -18,10 +18,10 @@ const NAV_LINKS = [
   { label: "Contact", to: "/" },
 ];
 
-const PROMO_TABS = [
-  { label: "New Products", icon: Sparkles },
-  { label: "Super Deals", icon: Flame },
-  { label: "Best Sellers", icon: Award },
+const EXTRA_LINKS = [
+  { label: "Downloads", icon: Download },
+  { label: "Software Services", icon: Wrench },
+  { label: "Online Tokens", icon: KeyRound },
 ];
 
 export function Header() {
@@ -60,10 +60,10 @@ export function Header() {
 
       {/* Top header */}
       <div className="container-px mx-auto max-w-[1400px]">
-        <div className="grid grid-cols-[auto_auto] items-center justify-between gap-3 py-2 sm:gap-6 sm:py-4 md:grid-cols-[auto_1fr_auto] md:justify-start lg:gap-10">
+        <div className="grid grid-cols-[auto_auto] items-center justify-between gap-3 py-1 sm:gap-6 sm:py-2 md:grid-cols-[auto_1fr_auto] md:justify-start lg:gap-10">
           {/* Logo */}
           <Link to="/" aria-label="ADL Automotive — home" className="flex shrink-0 items-center">
-            <img src={adlLogo.url} alt="ADL Automotive" className="h-10 w-auto md:h-14" />
+            <img src={adlLogo.url} alt="ADL Automotive" className="h-14 w-auto sm:h-16 md:h-20" />
           </Link>
 
           {/* Search */}
@@ -87,8 +87,8 @@ export function Header() {
             </form>
           </div>
 
-          {/* Account icons */}
-          <div className="flex shrink-0 items-center gap-1 sm:gap-3">
+          {/* Account icons — desktop only (mobile uses fixed bottom nav) */}
+          <div className="hidden shrink-0 items-center gap-1 sm:gap-3 lg:flex">
             <button className="hidden items-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-primary lg:flex">
               <Globe className="h-4 w-4" />
               <span>EN</span>
@@ -113,21 +113,20 @@ export function Header() {
             </button>
             <Link
               to={user ? "/account" : "/account/login"}
-              className="hidden items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium transition-colors hover:border-primary hover:text-primary sm:flex"
+              className="flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium transition-colors hover:border-primary hover:text-primary"
             >
               <User className="h-4 w-4" />
-              <span className="hidden md:inline">
-                {user?.firstName || user?.displayName || "Login"}
-              </span>
+              <span>{user?.firstName || user?.displayName || "Login"}</span>
             </Link>
-            <button
+          </div>
+          {/* Mobile menu trigger */}
+          <button
               aria-label="Open menu"
-              className="grid h-9 w-9 place-items-center rounded-md border border-border lg:hidden"
+              className="ml-auto grid h-10 w-10 place-items-center rounded-md border border-border lg:hidden"
               onClick={() => setMobileOpen(true)}
             >
-              <Menu className="h-[18px] w-[18px]" />
+              <Menu className="h-5 w-5" />
             </button>
-          </div>
         </div>
 
         {/* Mobile search */}
@@ -190,7 +189,7 @@ export function Header() {
               <Link
                 key={n.label}
                 to={n.to}
-                className="rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
+                className="rounded-md px-3 py-2 text-sm font-bold uppercase tracking-wide text-foreground transition-colors hover:text-primary"
               >
                 {n.label}
               </Link>
@@ -198,13 +197,13 @@ export function Header() {
           </nav>
 
           <div className="ml-auto hidden items-center gap-1 lg:flex">
-            {PROMO_TABS.map((p) => (
+            {EXTRA_LINKS.map((p) => (
               <a
                 key={p.label}
                 href="#"
-                className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-primary"
+                className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-bold uppercase tracking-wide text-foreground transition-colors hover:bg-secondary hover:text-primary"
               >
-                <p.icon className="h-3.5 w-3.5" />
+                <p.icon className="h-4 w-4" />
                 {p.label}
               </a>
             ))}
@@ -216,33 +215,42 @@ export function Header() {
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
-          <div className="absolute right-0 top-0 h-full w-80 max-w-[85vw] overflow-y-auto bg-white p-6 shadow-xl">
+          <div className="absolute left-0 top-0 h-full w-80 max-w-[85vw] overflow-y-auto bg-white p-6 shadow-xl">
             <div className="flex items-center justify-between">
-              <span className="text-lg font-bold text-primary">Menu</span>
+              <span className="text-lg font-extrabold uppercase tracking-wide text-primary">Menu</span>
               <button aria-label="Close" onClick={() => setMobileOpen(false)}>
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <nav className="mt-6 flex flex-col gap-1">
+            <nav className="mt-6 flex flex-col">
               {NAV_LINKS.map((n) => (
                 <Link
                   key={n.label}
                   to={n.to}
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-secondary"
+                  className="border-b border-border px-1 py-4 text-base font-extrabold uppercase tracking-wide text-black hover:text-primary"
                 >
                   {n.label}
                 </Link>
               ))}
-              <div className="my-4 h-px bg-border" />
-              <p className="px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categories</p>
+              {EXTRA_LINKS.map((p) => (
+                <a
+                  key={p.label}
+                  href="#"
+                  onClick={() => setMobileOpen(false)}
+                  className="border-b border-border px-1 py-4 text-base font-extrabold uppercase tracking-wide text-black hover:text-primary"
+                >
+                  {p.label}
+                </a>
+              ))}
+              <p className="mt-6 px-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">Categories</p>
               {categories.map((c) => (
                 <Link
                   key={c.id}
                   to="/products"
                   search={{}}
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm hover:bg-secondary"
+                  className="flex items-center gap-3 border-b border-border px-1 py-3 text-sm font-semibold uppercase tracking-wide text-black hover:text-primary"
                 >
                   <Tag className="h-4 w-4 text-primary" /> {c.name}
                 </Link>
@@ -251,6 +259,41 @@ export function Header() {
           </div>
         </div>
       )}
+
+      {/* Mobile fixed bottom nav */}
+      <nav
+        aria-label="Mobile quick actions"
+        className="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-4 border-t border-border bg-white shadow-[0_-4px_16px_-4px_rgba(0,0,0,0.08)] lg:hidden"
+      >
+        <Link
+          to={user ? "/account" : "/account/login"}
+          className="flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary"
+        >
+          <User className="h-5 w-5" />
+          <span>{user ? "Account" : "Login"}</span>
+        </Link>
+        <button className="flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary">
+          <Globe className="h-5 w-5" />
+          <span>EN</span>
+        </button>
+        <button className="flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary">
+          <DollarSign className="h-5 w-5" />
+          <span>USD</span>
+        </button>
+        <button
+          onClick={openCart}
+          aria-label="Open cart"
+          className="relative flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary"
+        >
+          <ShoppingCart className="h-5 w-5" />
+          <span>Cart</span>
+          {count > 0 && (
+            <span className="absolute right-4 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-blue)] px-1 text-[10px] font-bold text-white">
+              {count}
+            </span>
+          )}
+        </button>
+      </nav>
     </header>
   );
 }

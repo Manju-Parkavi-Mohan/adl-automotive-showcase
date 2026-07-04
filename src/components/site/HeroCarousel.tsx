@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import bannerAutodome from "@/assets/banner-adl-autodome.jpg.asset.json";
+import bannerDiagnostic from "@/assets/banner-diagnostic.jpg.asset.json";
+import bannerScanner from "@/assets/banner-scanner.jpg.asset.json";
 
 const SLIDES = [
   {
@@ -7,21 +10,21 @@ const SLIDES = [
     title: "Dealer-Grade Diagnostic Equipment",
     description: "Professional scan tools and key programmers trusted by independent workshops worldwide.",
     cta: "Shop Diagnostic Tools",
-    image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=1800&q=80",
+    image: bannerAutodome.url,
   },
   {
     eyebrow: "ECU Calibration",
     title: "Performance Tuning, Engineered.",
     description: "Bench, OBD and boot-mode programmers from Alientech, Magic Motorsport, Dimsport and more.",
     cta: "Explore Tuning Tools",
-    image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1800&q=80",
+    image: bannerScanner.url,
   },
   {
     eyebrow: "Workshop Equipment",
     title: "Equip Your Bay With Confidence",
     description: "From lifts to laptops — premium hardware ready to ship from our European warehouse.",
     cta: "Browse Equipment",
-    image: "https://images.unsplash.com/photo-1486006920555-c77dcf18193c?auto=format&fit=crop&w=1800&q=80",
+    image: bannerDiagnostic.url,
   },
 ];
 
