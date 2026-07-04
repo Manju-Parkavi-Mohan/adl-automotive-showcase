@@ -171,3 +171,8 @@
 @utility animate-marquee {
   animation: marquee 40s linear infinite;
 }
+
+/* Reserve space for mobile fixed bottom nav */
+@media (max-width: 1023px) {
+  body { padding-bottom: 4rem; }
+}
