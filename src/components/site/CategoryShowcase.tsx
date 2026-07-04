@@ -71,6 +71,9 @@ export function CategoryShowcase() {
   return (
     <section aria-label="Product categories" className="bg-secondary py-10">
       <div className="container-px mx-auto max-w-[1400px]">
+        <h2 className="mb-6 text-2xl font-extrabold uppercase tracking-tight text-black sm:text-3xl">
+          Shop by Category
+        </h2>
         <div className="relative">
           {/* Left arrow */}
           {overflowing && (
@@ -88,7 +91,7 @@ export function CategoryShowcase() {
           <div
             ref={scrollerRef}
             onScroll={update}
-            className="flex snap-x snap-mandatory justify-center gap-5 overflow-x-auto scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x snap-mandatory justify-start gap-5 overflow-x-auto scroll-smooth md:justify-center [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
             {isLoading
               ? Array.from({ length: 6 }).map((_, i) => (
