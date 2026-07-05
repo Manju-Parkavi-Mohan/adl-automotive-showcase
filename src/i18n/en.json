@@ -1,0 +1,53 @@
+{
+  "common": {
+    "search": "Search",
+    "searchPlaceholder": "Search diagnostic tools, ECU programmers, brands...",
+    "loading": "Loading…",
+    "login": "Login",
+    "account": "Account",
+    "cart": "Cart",
+    "wishlist": "Wishlist",
+    "language": "Language",
+    "currency": "Currency",
+    "menu": "Menu",
+    "allCategories": "All Categories",
+    "categories": "Categories",
+    "close": "Close"
+  },
+  "topbar": {
+    "tagline": "Premium automotive diagnostic & tuning equipment — shipped worldwide",
+    "support": "Support",
+    "trackOrder": "Track Order",
+    "b2b": "B2B Inquiry"
+  },
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "blog": "Blog",
+    "about": "About Us",
+    "contact": "Contact",
+    "downloads": "Downloads",
+    "softwareServices": "Software Services",
+    "onlineTokens": "Online Tokens"
+  },
+  "product": {
+    "addToCart": "Add",
+    "quickView": "Quick view",
+    "new": "NEW",
+    "best": "BEST",
+    "reviews": "reviews"
+  },
+  "footer": {
+    "newsletterTitle": "Stay ahead of the workshop",
+    "newsletterCopy": "Subscribe for new product launches, firmware updates and exclusive trade offers.",
+    "emailPlaceholder": "your@workshop.com",
+    "subscribe": "Subscribe",
+    "companyBlurb": "Premium diagnostic, tuning and workshop equipment trusted by professional technicians in over 60 countries.",
+    "colCompany": "Company",
+    "colCategories": "Categories",
+    "colBrands": "Brands",
+    "colService": "Customer Service",
+    "weAccept": "We accept",
+    "rights": "All rights reserved."
+  }
+}
