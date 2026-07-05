@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getCookie, getRequestHeaders } from "@tanstack/react-start/server";
+import { getCookie, getRequestHeader } from "@tanstack/react-start/server";
 import {
   DEFAULT_CURRENCY,
   DEFAULT_LOCALE,
@@ -51,10 +51,9 @@ export const detectI18n = createServerFn({ method: "GET" })
     urlLocale: input?.urlLocale ?? null,
   }))
   .handler(async ({ data }): Promise<DetectedI18n> => {
-    const headers = getRequestHeaders();
     const country =
-      (headers["cf-ipcountry"] as string | undefined) ??
-      (headers["x-vercel-ip-country"] as string | undefined) ??
+      (getRequestHeader("cf-ipcountry") as string | undefined) ??
+      (getRequestHeader("x-vercel-ip-country") as string | undefined) ??
       null;
 
     // Locale resolution
@@ -70,7 +69,9 @@ export const detectI18n = createServerFn({ method: "GET" })
         locale = cookieLocale;
         localeSource = "cookie";
       } else {
-        const headerLocale = parseAcceptLanguage(headers["accept-language"] as string | undefined);
+        const headerLocale = parseAcceptLanguage(
+          getRequestHeader("accept-language") as string | undefined,
+        );
         if (headerLocale) {
           locale = headerLocale;
           localeSource = "header";
