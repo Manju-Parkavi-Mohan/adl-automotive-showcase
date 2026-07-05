@@ -1,0 +1,53 @@
+{
+  "common": {
+    "search": "بحث",
+    "searchPlaceholder": "ابحث عن أدوات التشخيص، برمجة ECU، العلامات التجارية...",
+    "loading": "جارٍ التحميل…",
+    "login": "تسجيل الدخول",
+    "account": "الحساب",
+    "cart": "السلة",
+    "wishlist": "المفضلة",
+    "language": "اللغة",
+    "currency": "العملة",
+    "menu": "القائمة",
+    "allCategories": "جميع الفئات",
+    "categories": "الفئات",
+    "close": "إغلاق"
+  },
+  "topbar": {
+    "tagline": "معدات تشخيص وضبط السيارات المتميزة — شحن لجميع أنحاء العالم",
+    "support": "الدعم",
+    "trackOrder": "تتبع الطلب",
+    "b2b": "استفسار الجملة"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "products": "المنتجات",
+    "blog": "المدونة",
+    "about": "من نحن",
+    "contact": "تواصل معنا",
+    "downloads": "التنزيلات",
+    "softwareServices": "خدمات البرمجيات",
+    "onlineTokens": "الرموز عبر الإنترنت"
+  },
+  "product": {
+    "addToCart": "أضف",
+    "quickView": "معاينة سريعة",
+    "new": "جديد",
+    "best": "الأفضل",
+    "reviews": "تقييم"
+  },
+  "footer": {
+    "newsletterTitle": "كن دائمًا في المقدمة",
+    "newsletterCopy": "اشترك ليصلك جديد المنتجات، تحديثات البرامج، وعروض حصرية للتجار.",
+    "emailPlaceholder": "your@workshop.com",
+    "subscribe": "اشتراك",
+    "companyBlurb": "معدات التشخيص والضبط والورش الاحترافية الموثوقة لدى الفنيين في أكثر من 60 دولة.",
+    "colCompany": "الشركة",
+    "colCategories": "الفئات",
+    "colBrands": "العلامات التجارية",
+    "colService": "خدمة العملاء",
+    "weAccept": "نقبل",
+    "rights": "جميع الحقوق محفوظة."
+  }
+}
