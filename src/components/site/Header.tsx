@@ -19,28 +19,33 @@ import {
 } from "lucide-react";
 import adlLogo from "@/assets/adl-logo-new.png.asset.json";
 import { listCategories } from "@/lib/woo/categories.functions";
+import { useLocale } from "@/i18n/LocaleProvider";
+import { LOCALE_META, SUPPORTED_LOCALES, SUPPORTED_CURRENCIES, CURRENCY_META, type Locale, type Currency } from "@/i18n/config";
 
 const NAV_LINKS = [
-  { label: "Home", to: "/" },
-  { label: "Products", to: "/products" },
-  { label: "Blog", to: "/blog" },
-  { label: "About Us", to: "/" },
-  { label: "Contact", to: "/" },
+  { key: "home", to: "/" as const },
+  { key: "products", to: "/products" as const },
+  { key: "blog", to: "/blog" as const },
+  { key: "about", to: "/" as const },
+  { key: "contact", to: "/" as const },
 ];
 
 const EXTRA_LINKS = [
-  { label: "Downloads", icon: Download },
-  { label: "Software Services", icon: Wrench },
-  { label: "Online Tokens", icon: KeyRound },
+  { key: "downloads", icon: Download },
+  { key: "softwareServices", icon: Wrench },
+  { key: "onlineTokens", icon: KeyRound },
 ];
 
 export function Header() {
   const [catOpen, setCatOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const [curOpen, setCurOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const { count, openCart } = useCart();
   const { user } = useAuth();
+  const { t, locale, currency, setLocale, setCurrency } = useLocale();
   const { data: wcCategories } = useQuery({
     queryKey: ["wc-categories-nav"],
     queryFn: () => listCategories({ data: { perPage: 50, hideEmpty: true } }),
@@ -59,17 +64,11 @@ export function Header() {
       {/* Top utility bar */}
       <div className="hidden sm:block border-b border-border bg-primary text-primary-foreground">
         <div className="container-px mx-auto flex h-9 max-w-[1400px] items-center justify-between text-xs">
-          <p>Premium automotive diagnostic & tuning equipment — shipped worldwide</p>
+          <p>{t("topbar.tagline")}</p>
           <div className="flex items-center gap-4">
-            <a href="#" className="hover:text-white/80">
-              Support
-            </a>
-            <a href="#" className="hover:text-white/80">
-              Track Order
-            </a>
-            <a href="#" className="hover:text-white/80">
-              B2B Inquiry
-            </a>
+            <a href="#" className="hover:text-white/80">{t("topbar.support")}</a>
+            <a href="#" className="hover:text-white/80">{t("topbar.trackOrder")}</a>
+            <a href="#" className="hover:text-white/80">{t("topbar.b2b")}</a>
           </div>
         </div>
       </div>
@@ -102,15 +101,15 @@ export function Header() {
                 type="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search diagnostic tools, ECU programmers, brands..."
-                aria-label="Search products"
+                placeholder={t("common.searchPlaceholder")}
+                aria-label={t("common.search")}
                 className="h-11 w-full rounded-full border border-border bg-secondary pl-11 pr-28 text-sm outline-none transition-colors focus:border-primary focus:bg-white"
               />
               <button
                 type="submit"
                 className="absolute right-1.5 top-1.5 h-8 rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
               >
-                Search
+                {t("common.search")}
               </button>
             </form>
           </div>
@@ -118,24 +117,65 @@ export function Header() {
           {/* Mobile login — top right */}
           <Link
             to={user ? "/account" : "/account/login"}
-            aria-label={user ? "Account" : "Login"}
+            aria-label={user ? t("common.account") : t("common.login")}
             className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-2 text-xs font-semibold uppercase tracking-wide text-foreground transition-colors hover:border-primary hover:text-primary lg:hidden"
           >
             <User className="h-4 w-4" />
-            <span className="hidden xs:inline sm:inline">{user?.firstName || (user ? "Account" : "Login")}</span>
+            <span className="hidden xs:inline sm:inline">{user?.firstName || (user ? t("common.account") : t("common.login"))}</span>
           </Link>
 
           {/* Account icons — desktop only (mobile uses fixed bottom nav) */}
           <div className="hidden shrink-0 items-center gap-1 sm:gap-3 lg:flex">
-            <button className="hidden items-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-primary lg:flex">
-              <Globe className="h-4 w-4" />
-              <span>EN</span>
-              <ChevronDown className="h-3 w-3" />
-            </button>
-            <button className="hidden items-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-primary lg:flex">
-              <span>USD $</span>
-              <ChevronDown className="h-3 w-3" />
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => { setLangOpen(v => !v); setCurOpen(false); }}
+                className="flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-semibold uppercase text-muted-foreground transition-colors hover:text-primary"
+                aria-haspopup="true"
+                aria-expanded={langOpen}
+              >
+                <Globe className="h-4 w-4" />
+                <span>{locale.toUpperCase()}</span>
+                <ChevronDown className="h-3 w-3" />
+              </button>
+              {langOpen && (
+                <div className="absolute right-0 top-full z-40 mt-1 w-40 overflow-hidden rounded-md border border-border bg-white shadow-lg">
+                  {SUPPORTED_LOCALES.map((l) => (
+                    <button
+                      key={l}
+                      onClick={() => { setLangOpen(false); setLocale(l as Locale); }}
+                      className={`flex w-full items-center justify-between px-3 py-2 text-sm hover:bg-secondary ${l === locale ? "font-semibold text-primary" : "text-foreground"}`}
+                    >
+                      <span>{LOCALE_META[l as Locale].nativeLabel}</span>
+                      <span className="text-xs uppercase text-muted-foreground">{l}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="relative">
+              <button
+                onClick={() => { setCurOpen(v => !v); setLangOpen(false); }}
+                className="flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-primary"
+                aria-haspopup="true"
+                aria-expanded={curOpen}
+              >
+                <span>{CURRENCY_META[currency].label}</span>
+                <ChevronDown className="h-3 w-3" />
+              </button>
+              {curOpen && (
+                <div className="absolute right-0 top-full z-40 mt-1 w-32 overflow-hidden rounded-md border border-border bg-white shadow-lg">
+                  {SUPPORTED_CURRENCIES.map((c) => (
+                    <button
+                      key={c}
+                      onClick={() => { setCurOpen(false); setCurrency(c as Currency); }}
+                      className={`flex w-full items-center justify-between px-3 py-2 text-sm hover:bg-secondary ${c === currency ? "font-semibold text-primary" : "text-foreground"}`}
+                    >
+                      <span>{CURRENCY_META[c as Currency].label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <IconButton label="Wishlist" icon={Heart} />
             <button
               aria-label="Open cart"
@@ -154,7 +194,7 @@ export function Header() {
               className="flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium transition-colors hover:border-primary hover:text-primary"
             >
               <User className="h-4 w-4" />
-              <span>{user?.firstName || user?.displayName || "Login"}</span>
+              <span>{user?.firstName || user?.displayName || t("common.login")}</span>
             </Link>
           </div>
         </div>
@@ -167,7 +207,7 @@ export function Header() {
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search products..."
+              placeholder={t("common.searchPlaceholder")}
               className="h-9 w-full rounded-full border border-border bg-secondary pl-9 pr-3 text-sm outline-none focus:border-primary focus:bg-white"
             />
           </form>
@@ -185,7 +225,7 @@ export function Header() {
               className="flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
             >
               <Menu className="h-4 w-4" />
-              <span>All Categories</span>
+              <span>{t("common.allCategories")}</span>
               <ChevronDown className="h-4 w-4" />
             </button>
             {catOpen && (
@@ -194,7 +234,7 @@ export function Header() {
                 className="absolute left-0 top-full z-40 mt-1 max-h-96 w-72 overflow-y-auto rounded-lg border border-border bg-white shadow-[var(--shadow-card)]"
               >
                 {categories.length === 0 ? (
-                  <div className="px-4 py-3 text-sm text-muted-foreground">Loading…</div>
+                  <div className="px-4 py-3 text-sm text-muted-foreground">{t("common.loading")}</div>
                 ) : (
                   categories.map((c) => (
                     <Link
@@ -217,11 +257,11 @@ export function Header() {
           <nav className="hidden items-center gap-1 lg:flex">
             {NAV_LINKS.map((n) => (
               <Link
-                key={n.label}
+                key={n.key}
                 to={n.to}
                 className="rounded-md px-3 py-2 text-sm font-bold uppercase tracking-wide text-foreground transition-colors hover:text-primary"
               >
-                {n.label}
+                {t(`nav.${n.key}`)}
               </Link>
             ))}
           </nav>
@@ -229,12 +269,12 @@ export function Header() {
           <div className="ml-auto hidden items-center gap-1 lg:flex">
             {EXTRA_LINKS.map((p) => (
               <a
-                key={p.label}
+                key={p.key}
                 href="#"
                 className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-bold uppercase tracking-wide text-foreground transition-colors hover:bg-secondary hover:text-primary"
               >
                 <p.icon className="h-4 w-4" />
-                {p.label}
+                {t(`nav.${p.key}`)}
               </a>
             ))}
           </div>
@@ -247,35 +287,63 @@ export function Header() {
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
           <div className="absolute left-0 top-0 h-full w-72 max-w-[80vw] overflow-y-auto bg-white p-5 shadow-xl">
             <div className="flex items-center justify-between">
-              <span className="text-base font-extrabold uppercase tracking-wide text-primary">Menu</span>
-              <button aria-label="Close" onClick={() => setMobileOpen(false)}>
+              <span className="text-base font-extrabold uppercase tracking-wide text-primary">{t("common.menu")}</span>
+              <button aria-label={t("common.close")} onClick={() => setMobileOpen(false)}>
                 <X className="h-5 w-5" />
               </button>
             </div>
             <nav className="mt-4 flex flex-col">
               {NAV_LINKS.map((n) => (
                 <Link
-                  key={n.label}
+                  key={n.key}
                   to={n.to}
                   onClick={() => setMobileOpen(false)}
                   className="border-b border-border px-1 py-2.5 text-sm font-bold uppercase tracking-wide text-black hover:text-primary"
                 >
-                  {n.label}
+                  {t(`nav.${n.key}`)}
                 </Link>
               ))}
               {EXTRA_LINKS.map((p) => (
                 <a
-                  key={p.label}
+                  key={p.key}
                   href="#"
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-2 border-b border-border px-1 py-2.5 text-sm font-bold uppercase tracking-wide text-black hover:text-primary"
                 >
-                  {/* <p.icon className="h-4 w-4 text-primary" /> */}
-                  {p.label}
+                  {t(`nav.${p.key}`)}
                 </a>
               ))}
+              {/* Language + currency in mobile drawer */}
               <p className="mt-5 px-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                Categories
+                {t("common.language")}
+              </p>
+              <div className="mt-1 flex flex-wrap gap-2 px-1">
+                {SUPPORTED_LOCALES.map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLocale(l as Locale)}
+                    className={`rounded-full border px-3 py-1 text-xs font-semibold ${l === locale ? "border-primary bg-primary text-primary-foreground" : "border-border text-foreground"}`}
+                  >
+                    {LOCALE_META[l as Locale].nativeLabel}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-4 px-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                {t("common.currency")}
+              </p>
+              <div className="mt-1 flex flex-wrap gap-2 px-1">
+                {SUPPORTED_CURRENCIES.map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => setCurrency(c as Currency)}
+                    className={`rounded-full border px-3 py-1 text-xs font-semibold ${c === currency ? "border-primary bg-primary text-primary-foreground" : "border-border text-foreground"}`}
+                  >
+                    {CURRENCY_META[c as Currency].label}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-5 px-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                {t("common.categories")}
               </p>
               {categories.map((c) => (
                 <Link
@@ -299,30 +367,34 @@ export function Header() {
         className="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-4 border-t border-border bg-white shadow-[0_-4px_16px_-4px_rgba(0,0,0,0.08)] lg:hidden"
       >
         <button
-          aria-label="Wishlist"
+          aria-label={t("common.wishlist")}
           className="flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary"
         >
           <Heart className="h-5 w-5" />
-          <span>Wishlist</span>
+          <span>{t("common.wishlist")}</span>
         </button>
-        <button className="flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary">
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary"
+          aria-label={t("common.language")}
+        >
           <Globe className="h-5 w-5" />
-          <span>EN</span>
+          <span>{locale.toUpperCase()}</span>
         </button>
         <Link
           to={user ? "/account" : "/account/login"}
           className="flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary"
         >
           <User className="h-5 w-5" />
-          <span>{user ? "Account" : "Login"}</span>
+          <span>{user ? t("common.account") : t("common.login")}</span>
         </Link>
         <button
           onClick={openCart}
-          aria-label="Open cart"
+          aria-label={t("common.cart")}
           className="relative flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary"
         >
           <ShoppingCart className="h-5 w-5" />
-          <span>Cart</span>
+          <span>{t("common.cart")}</span>
           {count > 0 && (
             <span className="absolute right-4 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-blue)] px-1 text-[10px] font-bold text-white">
               {count}
