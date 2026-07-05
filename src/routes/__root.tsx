@@ -15,6 +15,11 @@ import { CartProvider } from "@/components/site/CartProvider";
 import { CartDrawer } from "@/components/site/CartDrawer";
 import { AuthProvider } from "@/components/site/AuthProvider";
 import { Toaster } from "@/components/ui/sonner";
+import { LocaleProvider } from "@/i18n/LocaleProvider";
+import { detectI18n } from "@/i18n/detect.functions";
+import { DEFAULT_CURRENCY, DEFAULT_LOCALE, LOCALE_META, SUPPORTED_LOCALES } from "@/i18n/config";
+
+const SITE_URL = "https://adl.apaarr.com";
 
 function NotFoundComponent() {
   return (
@@ -77,7 +82,14 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
+  loader: async () => {
+    try {
+      return await detectI18n();
+    } catch {
+      return { locale: DEFAULT_LOCALE, currency: DEFAULT_CURRENCY, country: null, localeSource: "default" as const };
+    }
+  },
+  head: ({ loaderData }) => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -85,6 +97,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "ADL Automotive — Premium Diagnostic, Tuning & Workshop Equipment" },
       { name: "description", content: "Shop premium automotive diagnostic tools, ECU programmers, tuning software and workshop equipment. Trusted by professional technicians worldwide." },
       { name: "author", content: "ADL Automotive" },
+      { property: "og:locale", content: loaderData?.locale === "ar" ? "ar_AE" : "en_US" },
+      ...SUPPORTED_LOCALES.filter((l) => l !== (loaderData?.locale ?? DEFAULT_LOCALE)).map((l) => ({
+        property: "og:locale:alternate",
+        content: l === "ar" ? "ar_AE" : "en_US",
+      })),
       { property: "og:title", content: "ADL Automotive — Premium Diagnostic, Tuning & Workshop Equipment" },
       { property: "og:description", content: "Shop premium automotive diagnostic tools, ECU programmers, tuning software and workshop equipment. Trusted by professional technicians worldwide." },
       { property: "og:type", content: "website" },
@@ -106,6 +123,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
       },
+      // hreflang alternates. Stage 2 will produce truly per-language URLs; for now
+      // point crawlers at the language-prefixed variants which the app also serves.
+      { rel: "alternate", hrefLang: "en", href: `${SITE_URL}/en` },
+      { rel: "alternate", hrefLang: "ar", href: `${SITE_URL}/ar` },
+      { rel: "alternate", hrefLang: "x-default", href: `${SITE_URL}/` },
     ],
   }),
   shellComponent: RootShell,
@@ -115,8 +137,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const { loaderData } = Route.useMatch();
+  const locale = loaderData?.locale ?? DEFAULT_LOCALE;
+  const dir = LOCALE_META[locale].dir;
   return (
-    <html lang="en">
+    <html lang={locale} dir={dir}>
       <head>
         <HeadContent />
       </head>
@@ -130,17 +155,22 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const data = Route.useLoaderData();
+  const locale = data?.locale ?? DEFAULT_LOCALE;
+  const currency = data?.currency ?? DEFAULT_CURRENCY;
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <CartProvider>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-          <CartDrawer />
-          <Toaster richColors position="top-right" />
-        </CartProvider>
-      </AuthProvider>
+      <LocaleProvider locale={locale} currency={currency}>
+        <AuthProvider>
+          <CartProvider>
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            <Outlet />
+            <CartDrawer />
+            <Toaster richColors position="top-right" />
+          </CartProvider>
+        </AuthProvider>
+      </LocaleProvider>
     </QueryClientProvider>
   );
 }
