@@ -3,9 +3,11 @@ import type { Product } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/site/CartProvider";
 import { toast } from "sonner";
+import { useLocale } from "@/i18n/LocaleProvider";
 
 export function ProductListItem({ product }: { product: Product }) {
   const { addItem } = useCart();
+  const { formatPrice } = useLocale();
   const discount = product.oldPrice
     ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
     : 0;
@@ -81,10 +83,10 @@ export function ProductListItem({ product }: { product: Product }) {
         <div className="text-right">
           {product.oldPrice && (
             <div className="text-xs text-muted-foreground line-through">
-              ${product.oldPrice.toLocaleString()}
+              {formatPrice(product.oldPrice)}
             </div>
           )}
-          <div className="text-2xl font-bold text-primary">${product.price.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-primary">{formatPrice(product.price)}</div>
         </div>
         <div className="flex flex-col gap-2 sm:w-44">
           <Button onClick={handleAdd} className="bg-primary text-primary-foreground hover:bg-primary/90">
