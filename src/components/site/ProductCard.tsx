@@ -4,9 +4,11 @@ import type { Product } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/site/CartProvider";
 import { toast } from "sonner";
+import { useLocale } from "@/i18n/LocaleProvider";
 
 export function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart();
+  const { t, formatPrice } = useLocale();
   const discount = product.oldPrice ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100) : 0;
 
   const handleAdd = (e: React.MouseEvent) => {
@@ -45,12 +47,12 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="absolute left-3 top-3 flex flex-col gap-1">
           {product.badge === "new" && (
             <span className="rounded-full bg-[var(--accent-blue)] px-2.5 py-0.5 text-xs font-semibold text-white">
-              NEW
+                {t("product.new")}
             </span>
           )}
           {product.badge === "best" && (
             <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-primary-foreground">
-              BEST
+                {t("product.best")}
             </span>
           )}
           {discount > 0 && (
@@ -104,10 +106,10 @@ export function ProductCard({ product }: { product: Product }) {
           <div className="flex flex-col">
             {product.oldPrice && (
               <span className="text-[10px] text-muted-foreground line-through sm:text-xs">
-                ${product.oldPrice.toLocaleString()}
+                {formatPrice(product.oldPrice)}
               </span>
             )}
-            <span className="text-sm font-bold text-primary sm:text-lg">${product.price.toLocaleString()}</span>
+            <span className="text-sm font-bold text-primary sm:text-lg">{formatPrice(product.price)}</span>
           </div>
           <Button
             size="sm"
@@ -115,7 +117,7 @@ export function ProductCard({ product }: { product: Product }) {
             className="h-8 bg-primary px-2 text-primary-foreground hover:bg-primary/90 sm:h-9 sm:px-3"
           >
             <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Add</span>
+            <span className="hidden sm:inline">{t("product.addToCart")}</span>
           </Button>
         </div>
       </div>
