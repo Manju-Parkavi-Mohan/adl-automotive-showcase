@@ -17,7 +17,14 @@ import { AuthProvider } from "@/components/site/AuthProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { LocaleProvider } from "@/i18n/LocaleProvider";
 import { detectI18n } from "@/i18n/detect.functions";
-import { DEFAULT_CURRENCY, DEFAULT_LOCALE, LOCALE_META, SUPPORTED_LOCALES, isLocale } from "@/i18n/config";
+import {
+  DEFAULT_CURRENCY,
+  DEFAULT_LOCALE,
+  LOCALE_META,
+  SUPPORTED_LOCALES,
+  isLocale,
+  type Locale,
+} from "@/i18n/config";
 
 const SITE_URL = "https://adl.apaarr.com";
 
@@ -138,7 +145,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   const { loaderData } = Route.useMatch();
-  const locale = isLocale(loaderData?.locale) ? loaderData.locale : DEFAULT_LOCALE;
+  const rawLocale = (loaderData as { locale?: unknown } | undefined)?.locale;
+  const locale: Locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const dir = LOCALE_META[locale].dir;
   return (
     <html lang={locale} dir={dir}>
