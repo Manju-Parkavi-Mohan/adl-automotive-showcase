@@ -1,38 +1,32 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
+import { SUPPORTED_LOCALES } from "@/i18n/config";
+import { SITE_URL } from "@/i18n/seo";
 
 /**
- * Proxies the WordPress backend sitemap (Yoast / core WP sitemap) so the
- * storefront exposes `/sitemap.xml` sourced from the CMS. Yoast typically
- * serves `/sitemap_index.xml`; we try that first, then fall back to
- * `/wp-sitemap.xml` (WP core).
+ * Sitemap index — points crawlers at one sitemap per supported language.
+ * Each per-locale sitemap enumerates its own URLs with hreflang alternates.
  */
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const site = process.env.WORDPRESS_SITE_URL?.replace(/\/+$/, "");
-        if (!site) {
-          return new Response("Sitemap unavailable", { status: 503 });
-        }
-        const candidates = [`${site}/sitemap_index.xml`, `${site}/wp-sitemap.xml`];
-        for (const url of candidates) {
-          try {
-            const res = await fetch(url, { headers: { Accept: "application/xml" } });
-            if (res.ok) {
-              const xml = await res.text();
-              return new Response(xml, {
-                headers: {
-                  "Content-Type": "application/xml; charset=utf-8",
-                  "Cache-Control": "public, max-age=3600",
-                },
-              });
-            }
-          } catch {
-            // try next candidate
-          }
-        }
-        return new Response("Sitemap not found", { status: 502 });
+        const now = new Date().toISOString();
+        const sitemaps = SUPPORTED_LOCALES.map(
+          (l) => `  <sitemap>\n    <loc>${SITE_URL}/sitemap-${l}.xml</loc>\n    <lastmod>${now}</lastmod>\n  </sitemap>`,
+        );
+        const xml = [
+          `<?xml version="1.0" encoding="UTF-8"?>`,
+          `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
+          ...sitemaps,
+          `</sitemapindex>`,
+        ].join("\n");
+        return new Response(xml, {
+          headers: {
+            "Content-Type": "application/xml; charset=utf-8",
+            "Cache-Control": "public, max-age=3600",
+          },
+        });
       },
     },
   },

@@ -7,7 +7,7 @@ import { getPostBySlug } from "@/lib/wp/posts.functions";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
 import type { WPPost } from "@/lib/woo/types";
 
-export const Route = createFileRoute("/blog/$slug")({
+export const Route = createFileRoute("/{-$lang}/blog/$slug")({
   loader: ({ params, context }) =>
     context.queryClient.ensureQueryData({
       queryKey: ["wp-post", params.slug],
@@ -48,9 +48,9 @@ function BlogPostPage() {
         <div className="container-px mx-auto max-w-[1400px] py-4">
           <nav aria-label="Breadcrumb">
             <ol className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
-              <li><Link to="/" className="hover:text-primary">Home</Link></li>
+              <li><Link to="/{-$lang}" className="hover:text-primary">Home</Link></li>
               <li><ChevronRight className="h-3.5 w-3.5" /></li>
-              <li><Link to="/blog" className="hover:text-primary">Blog</Link></li>
+              <li><Link to="/{-$lang}/blog" className="hover:text-primary">Blog</Link></li>
               <li><ChevronRight className="h-3.5 w-3.5" /></li>
               <li className="line-clamp-1 max-w-xs font-medium text-foreground">
                 {post ? <span dangerouslySetInnerHTML={{ __html: post.title }} /> : slug}
@@ -66,7 +66,7 @@ function BlogPostPage() {
         ) : !post ? (
           <div className="rounded-xl border border-dashed border-border bg-secondary p-10 text-center">
             <p className="font-semibold">Post not found</p>
-            <Link to="/blog" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
+            <Link to="/{-$lang}/blog" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
               Back to blog
             </Link>
           </div>

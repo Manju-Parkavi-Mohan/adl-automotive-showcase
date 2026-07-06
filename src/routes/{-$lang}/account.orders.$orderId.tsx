@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/site/AuthProvider";
 import { getMyOrder } from "@/lib/woo/customer.functions";
 
-export const Route = createFileRoute("/account/orders/$orderId")({
+export const Route = createFileRoute("/{-$lang}/account/orders/$orderId")({
   head: () => ({ meta: [{ title: "Order details — ADL Automotive" }] }),
   component: OrderDetailPage,
 });
@@ -45,7 +45,7 @@ function OrderDetailPage() {
       <Header />
       <main className="container-px mx-auto max-w-[1100px] py-10">
         <Link
-          to="/account"
+          to="/{-$lang}/account"
           className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" /> Back to account
@@ -56,7 +56,7 @@ function OrderDetailPage() {
         ) : !user ? (
           <div className="rounded-xl border border-border bg-white p-8 text-center">
             <p className="text-sm">Please sign in to view this order.</p>
-            <Button asChild className="mt-4"><Link to="/account/login">Sign in</Link></Button>
+            <Button asChild className="mt-4"><Link to="/{-$lang}/account/login">Sign in</Link></Button>
           </div>
         ) : orderQuery.isError || !orderQuery.data ? (
           <div className="rounded-xl border border-border bg-white p-8 text-center">
@@ -64,7 +64,7 @@ function OrderDetailPage() {
             <p className="mt-2 text-sm text-muted-foreground">
               We couldn't load this order. It may not exist or isn't associated with your account.
             </p>
-            <Button asChild variant="outline" className="mt-4"><Link to="/account">Back to account</Link></Button>
+            <Button asChild variant="outline" className="mt-4"><Link to="/{-$lang}/account">Back to account</Link></Button>
           </div>
         ) : (
           <OrderView order={orderQuery.data} />
@@ -120,7 +120,7 @@ function OrderView({ order }: { order: NonNullable<Awaited<ReturnType<typeof get
               )}
               <div className="min-w-0 flex-1">
                 <Link
-                  to="/products/$productId"
+                  to="/{-$lang}/products/$productId"
                   params={{ productId: String(item.product_id) }}
                   className="line-clamp-2 text-sm font-semibold hover:text-primary"
                 >

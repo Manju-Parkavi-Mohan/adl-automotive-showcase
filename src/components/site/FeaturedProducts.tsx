@@ -94,7 +94,7 @@ export function NewArrivals() {
           title="New Arrivals"
           subtitle="The latest hardware additions from our trusted manufacturers."
           action={
-            <Link to="/products" search={{}} className="text-sm font-semibold text-primary hover:underline">
+            <Link to="/{-$lang}/products" search={{}} className="text-sm font-semibold text-primary hover:underline">
               View all →
             </Link>
           }

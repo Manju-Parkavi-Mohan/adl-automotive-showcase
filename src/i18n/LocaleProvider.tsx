@@ -67,7 +67,14 @@ export function LocaleProvider({
       formatPrice: (usd) => fmtPrice(usd, currency, locale),
       setLocale: (l) => {
         writeCookie(LOCALE_COOKIE, l);
-        if (typeof window !== "undefined") window.location.reload();
+        if (typeof window !== "undefined") {
+          // Navigate to the language-prefixed URL so the locale is reflected in
+          // the URL (canonical + shareable). Strip any existing /en or /ar prefix.
+          const path = window.location.pathname.replace(/^\/(en|ar)(?=\/|$)/, "") || "/";
+          const search = window.location.search;
+          const hash = window.location.hash;
+          window.location.assign(`/${l}${path === "/" ? "" : path}${search}${hash}` || "/");
+        }
       },
       setCurrency: (c) => {
         writeCookie(CURRENCY_COOKIE, c);

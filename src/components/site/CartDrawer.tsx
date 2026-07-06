@@ -35,7 +35,7 @@ export function CartDrawer() {
               <p className="text-sm font-medium text-foreground">Your cart is empty</p>
               <p className="mt-1 text-xs text-muted-foreground">Browse our latest equipment</p>
               <Button asChild className="mt-5" onClick={closeCart}>
-                <Link to="/products" search={{}}>Browse products</Link>
+                <Link to="/{-$lang}/products" search={{}}>Browse products</Link>
               </Button>
             </div>
           ) : (
@@ -95,10 +95,10 @@ export function CartDrawer() {
             <p className="mt-1 text-xs text-muted-foreground">Shipping and taxes calculated at checkout.</p>
             <div className="mt-4 flex flex-col gap-2">
               <Button asChild className="w-full" onClick={closeCart}>
-                <Link to="/checkout">Checkout</Link>
+                <Link to="/{-$lang}/checkout">Checkout</Link>
               </Button>
               <Button asChild variant="outline" className="w-full" onClick={closeCart}>
-                <Link to="/cart">View cart</Link>
+                <Link to="/{-$lang}/cart">View cart</Link>
               </Button>
             </div>
           </footer>

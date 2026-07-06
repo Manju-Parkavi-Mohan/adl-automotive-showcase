@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getCookie, getRequestHeader } from "@tanstack/react-start/server";
+import { getCookie, getRequestHeader, getRequestUrl } from "@tanstack/react-start/server";
 import {
   DEFAULT_CURRENCY,
   DEFAULT_LOCALE,
@@ -20,6 +20,10 @@ export interface DetectedI18n {
   country: string | null;
   /** source that decided the locale, useful for debugging / analytics */
   localeSource: "cookie" | "header" | "geo" | "default";
+  /** request pathname (no trailing slash except for "/") with any `/en` or `/ar` prefix stripped. */
+  path: string;
+  /** lang prefix present in the URL, or null when served at the root. */
+  urlLocale: Locale | null;
 }
 
 function parseAcceptLanguage(header: string | undefined | null): Locale | null {
@@ -56,11 +60,33 @@ export const detectI18n = createServerFn({ method: "GET" })
       (getRequestHeader("x-vercel-ip-country") as string | undefined) ??
       null;
 
+    // Read the incoming request URL to figure out the URL locale prefix + clean path.
+    let rawPath = "/";
+    try {
+      const url = getRequestUrl();
+      if (url) rawPath = new URL(url).pathname || "/";
+    } catch {
+      // ignore — non-request context
+    }
+    let urlLocale: Locale | null = null;
+    let cleanPath = rawPath;
+    const seg = rawPath.split("/")[1];
+    if (isLocale(seg)) {
+      urlLocale = seg;
+      cleanPath = rawPath.slice(seg.length + 1) || "/";
+    }
+    if (cleanPath.length > 1 && cleanPath.endsWith("/")) {
+      cleanPath = cleanPath.replace(/\/+$/, "") || "/";
+    }
+
     // Locale resolution
     let locale: Locale = DEFAULT_LOCALE;
     let localeSource: DetectedI18n["localeSource"] = "default";
 
-    if (isLocale(data.urlLocale)) {
+    if (urlLocale) {
+      locale = urlLocale;
+      localeSource = "cookie";
+    } else if (isLocale(data.urlLocale)) {
       locale = data.urlLocale;
       localeSource = "cookie"; // treat as sticky
     } else {
@@ -88,5 +114,12 @@ export const detectI18n = createServerFn({ method: "GET" })
     if (isCurrency(cookieCurrency)) currency = cookieCurrency;
     else currency = currencyForCountry(country);
 
-    return { locale, currency, country: country ?? null, localeSource };
+    return {
+      locale,
+      currency,
+      country: country ?? null,
+      localeSource,
+      path: cleanPath,
+      urlLocale,
+    };
   });

@@ -7,7 +7,7 @@ import { listPosts } from "@/lib/wp/posts.functions";
 import { getYoastForUrl } from "@/lib/wp/yoast.functions";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
 
-export const Route = createFileRoute("/blog/")({
+export const Route = createFileRoute("/{-$lang}/blog/")({
   loader: ({ context }) =>
     context.queryClient.ensureQueryData({
       queryKey: ["yoast", "/blog"],
@@ -64,7 +64,7 @@ function BlogIndex() {
               {posts.map((p) => (
                 <Link
                   key={p.id}
-                  to="/blog/$slug"
+                  to="/{-$lang}/blog/$slug"
                   params={{ slug: p.slug }}
                   className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-[var(--shadow-hover)]"
                 >

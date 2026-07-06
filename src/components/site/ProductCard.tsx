@@ -34,7 +34,7 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-xl bg-card shadow-[var(--shadow-card)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-hover)]">
       <Link
-        to="/products/$productId"
+        to="/{-$lang}/products/$productId"
         params={{ productId: product.id }}
         className="relative block aspect-square overflow-hidden bg-secondary"
       >
@@ -82,7 +82,7 @@ export function ProductCard({ product }: { product: Product }) {
           {product.brand}
         </p>
         <Link
-          to="/products/$productId"
+          to="/{-$lang}/products/$productId"
           params={{ productId: product.id }}
           className="line-clamp-2 text-xs font-semibold leading-snug text-foreground transition-colors hover:text-primary sm:text-sm"
           style={{ minHeight: "2lh" }}

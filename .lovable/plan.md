@@ -1,115 +1,101 @@
 
-# Multilingual SEO Foundation — Plan
+# Stage 2 — Subdirectory URLs, Per-Language SEO
 
-## Goals
-- SSR-resolved locale (`en`, `ar`) before any HTML is sent — zero flicker.
-- Subdirectory URLs: `/en/...`, `/ar/...`. Root `/` serves English content with `<link rel="canonical" href="…/en">`.
-- Auto currency (USD/EUR/AED) from IP, with manual override persisted in cookie.
-- Static UI strings live in `src/i18n/en.json` and `src/i18n/ar.json` — never hard-coded in components.
-- Full RTL layout when locale = `ar` (`<html dir="rtl">`).
-- hreflang + canonical + per-language sitemap on every page.
-- WordPress stays English-only for now; the code path for `?lang=` on Woo calls is wired but is a no-op until WPML is added on the WP side.
+## Goal
 
-## Architecture
+Make `/en/*` and `/ar/*` real URLs (not just cookie state), while `/` still serves the default (English) with a canonical pointing to `/en`. Every page gets its own canonical + hreflang alternates + per-language sitemap.
 
-### 1. Locale + currency detection (server-side, one round trip)
+## Approach
 
-New `createServerFn` `detectLocaleAndCurrency` runs in the root loader:
+Use TanStack Router's optional prefix segment `{-$lang}`. One route file serves all three shapes:
+- `/products` (root, resolves to detected locale)
+- `/en/products`
+- `/ar/products`
 
-```text
-Priority for locale:
-  1. URL segment (/en, /ar)      — from route params
-  2. Cookie `lc_locale`           — user override, sticky
-  3. Accept-Language header       — first supported match
-  4. CF-IPCountry → language map  — AE→ar, else en
-  5. Fallback: en
+Every existing route moves under `src/routes/{-$lang}/…`. Route paths change from `"/products"` to `"/{-$lang}/products"`. `lang` is validated to `"en" | "ar" | undefined` in each route — anything else throws `notFound()`.
 
-Priority for currency:
-  1. Cookie `lc_currency`         — user override
-  2. CF-IPCountry → currency map  — AE→AED, EU→EUR, else USD
-  3. Fallback: USD
-```
-
-Result flows through router context so every route + component can read it via a `useLocale()` / `useCurrency()` hook. `<html lang>` and `<html dir>` are set from this on the SSR shell.
-
-### 2. Route tree (optional-param prefix)
-
-Move existing routes under an optional `{-$lang}` prefix so one file serves `/`, `/en`, and `/ar`:
+## File moves (mechanical rename)
 
 ```text
 src/routes/
-  __root.tsx                              (unchanged shell + LocaleProvider)
+  __root.tsx                       (unchanged)
+  robots[.]txt.ts                  (unchanged path)
+  sitemap[.]xml.ts                 (rewritten: sitemap index)
+  sitemap-en[.]xml.ts              (new: per-locale)
+  sitemap-ar[.]xml.ts              (new: per-locale)
   {-$lang}/
-    index.tsx                             (was routes/index.tsx)
-    products/
-      index.tsx                           (was routes/products.index.tsx)
-      $productId.tsx                      (was routes/products.$productId.tsx)
+    index.tsx                      (was routes/index.tsx)
     cart.tsx
     checkout.tsx
-    blog/index.tsx, blog.$slug.tsx
-    account/... (login, register, orders)
-  sitemap[.]xml.ts                        (updated: emits /en/* and /ar/* + hreflang)
-  robots[.]txt.ts                         (unchanged; already exposes /sitemap.xml)
+    account.tsx / account.*.tsx
+    blog.tsx / blog.*.tsx
+    products.tsx / products.*.tsx
 ```
 
-Each route validates `params.lang` — only `en` | `ar` | `undefined` allowed; anything else throws `notFound()`. `undefined` means "root path" and resolves to the detected locale.
+## Link + navigate rewrites
 
-### 3. i18n dictionary + hook
+Every `<Link to="/x">` becomes:
 
-```text
-src/i18n/
-  index.ts        — types + loader
-  en.json         — all static strings, nested by section (nav, footer, product, cart, common)
-  ar.json         — Arabic mirror
+```tsx
+<Link to="/{-$lang}/x" params={(prev) => prev}>
 ```
 
-`useT()` hook returns a `t("nav.diagnostics")` function. Strings are bundled per-locale (no runtime fetch, no flash). Adding a new language later = add one JSON file + register in the supported list.
+`params={(prev) => prev}` preserves the current `lang` (undefined at `/`, `"en"` at `/en`, `"ar"` at `/ar`) so the link stays in the same language subtree the user is already browsing. Same shape for `navigate({ to, params })`.
 
-### 4. RTL
+## Root shell
 
-- `<html dir="rtl">` when `ar`, set from loader data on the shellComponent.
-- Tailwind's logical utilities (`ms-*`, `me-*`, `ps-*`, `pe-*`, `start-*`, `end-*`) replace `ml/mr/pl/pr/left/right` in the header, footer, drawer, and product card in this pass. Deep-page RTL polish for less-visible screens ships in a follow-up.
+- `RootShell` resolves locale from URL param first (`useParams({ strict: false }).lang`), falling back to loader's detected locale — this makes `<html lang dir>` and `<HeadContent>` match the URL immediately, no client flicker.
+- The root `head()` stops emitting site-wide hreflang links (moves to leaf routes so URLs are correct per page).
 
-### 5. Currency
+## Per-route SEO
 
-- FX rates: small static table in `src/i18n/currency.ts` (USD is the base; EUR ≈ 0.92, AED = 3.6725 pegged). Configurable in one place; live rates can be swapped in later behind a server fn.
-- `formatPrice(amount, currency)` used everywhere prices render — replaces the ad-hoc formatting in `ProductCard`, `ProductListItem`, cart, checkout.
-- Currency switcher in the top header (next to the language switcher) writes `lc_currency` cookie and reloads the route so SSR reflects the choice.
+Each leaf route's `head()` emits:
+- `<link rel="canonical" href="https://adl.apaarr.com/{lang}{path}">` — canonical is always the language-prefixed URL, even when served at `/path`. Root `/` canonicals to `/en`.
+- `<link rel="alternate" hreflang="en" href=".../en{path}">`
+- `<link rel="alternate" hreflang="ar" href=".../ar{path}">`
+- `<link rel="alternate" hreflang="x-default" href=".../en{path}">`
+- `og:url` self-referencing the language-prefixed URL.
 
-### 6. SEO plumbing (per route)
+A small helper `buildLocaleLinks(pathTemplate, params)` in `src/i18n/seo.ts` centralizes this so each route just calls it.
 
-Every leaf route's `head()` emits:
-- `<title>` and `<meta name="description">` from the locale dictionary (or WP/Yoast for product pages).
-- `<link rel="canonical" href=".../en/products/foo">` — always the language-prefixed URL, even when served at `/products/foo`.
-- `<link rel="alternate" hreflang="en" …>`, `<link rel="alternate" hreflang="ar" …>`, `<link rel="alternate" hreflang="x-default" …>` on every page.
-- `og:locale` + `og:locale:alternate`.
+## Sitemap
 
-### 7. Sitemap
+- `sitemap.xml` becomes a **sitemap index** listing `sitemap-en.xml` and `sitemap-ar.xml`.
+- Each per-locale sitemap lists that locale's URLs (home, products index, cart, checkout, blog index, account pages) plus dynamic product / blog slugs pulled from WooCommerce and WordPress, with `<xhtml:link rel="alternate" hreflang="…" />` on every `<url>` entry.
+- The existing WordPress-sitemap proxy moves aside; if we want to keep it, we expose it at `/wp-sitemap.xml`. For now, replace with the app-generated one.
 
-`sitemap.xml` becomes a sitemap index pointing at `sitemap-en.xml` and `sitemap-ar.xml`, each emitting the full route list for its language with `xhtml:link` hreflang alternates. Product URLs pulled from WooCommerce as they are today.
+## Language + currency switcher
 
-### 8. What stays unchanged in v1
+- Language switcher navigates to the same route with the new `lang` param instead of just writing a cookie (URL is now the source of truth).
+- Currency stays cookie-based (currency isn't a URL concern for SEO).
 
-- WordPress calls stay English-only. The Woo client gains a `locale` argument that's currently ignored; when WPML is added, flipping one line in `client.server.ts` enables per-language content.
-- Product SEO from Yoast: still fetched, still English until WP is multilingual. Arabic product pages show Arabic chrome (nav, buttons, labels) around English product body — clearly acceptable per your answer.
-- Existing components keep working; only the strings and price formatter change hands.
+## Root path (`/`) behavior
+
+Per your Q1 answer: keep serving default English content at `/` AND at `/en`, with `/` canonicalizing to `/en`. No redirect. Same HTML at both URLs; canonical dedupes for Google.
+
+## Out of scope for this pass
+
+- Translated product content (still English from WP until WPML is added).
+- Per-locale Yoast SEO (same reason).
+- 301 redirects for legacy `?lang=…` URLs — the site never used them.
+- Arabic-authored blog posts.
+
+## Risks I'm calling out up-front
+
+- **Bulk sed of Link/navigate calls**: 19 files touched. I'll batch-edit, then verify build + typecheck.
+- **`params={(prev) => prev}`** relies on the parent route also having a `lang` param, which it does with `{-$lang}` at the root of the optional prefix — so preservation works site-wide.
+- **`account.orders.$orderId.tsx`** now has two params (`lang`, `orderId`); the loader already reads `orderId`, that keeps working.
 
 ## Delivery order (single turn if you approve)
 
-1. i18n dictionary + `useT` + `LocaleProvider`.
-2. `detectLocaleAndCurrency` server fn + cookie helpers.
-3. Route tree move to `{-$lang}` (mechanical rename; child code unchanged).
-4. Root shell reads locale from loader, sets `<html lang dir>`, injects hreflang/canonical.
-5. Header/footer swap hard-coded strings for `t(...)` + add language/currency switchers.
-6. `formatPrice` swap in ProductCard / ProductListItem / cart / checkout.
-7. Sitemap becomes index + per-locale sitemaps.
+1. Create `{-$lang}` directory, move all page routes into it via `mv` — one shell call.
+2. sed `createFileRoute("/…")` → `createFileRoute("/{-$lang}/…")` across the moved files.
+3. sed `to="/…"` → `to="/{-$lang}/…"` and add `params={(prev) => prev}` across the 19 caller files.
+4. Add `src/i18n/seo.ts` with `buildLocaleLinks()` and `canonicalFor()`.
+5. Update each leaf route's `head()` to emit canonical + hreflang via the helper.
+6. Rewrite `sitemap[.]xml.ts` as an index; add `sitemap-en[.]xml.ts` and `sitemap-ar[.]xml.ts`.
+7. Update root shell to resolve locale from URL param first.
+8. Update Header language switcher to navigate instead of just cookie-set.
+9. Fix typecheck fallout, restart dev server, verify `/`, `/en`, `/ar/products`, and a product detail all render.
 
-## Out of scope for this pass (call out now to avoid surprise)
-
-- Full RTL audit of every deep account page — logical utilities land on the visible surfaces first; anything I miss shows up as mirrored padding, not broken layout.
-- Live FX rates (uses static table; hook is ready for a server fn swap).
-- Translated product content (waiting on WPML on the WP side).
-- Arabic-authored blog posts (same reason).
-- Per-locale Yoast SEO for products (same reason).
-
-Reply "go" to build, or tell me what to change.
+Reply **"go"** to build, or tell me what to change.

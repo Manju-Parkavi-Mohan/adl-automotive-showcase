@@ -112,7 +112,7 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
         {/* Mobile-only title */}
         <div className="mb-4 flex items-center justify-between md:hidden">
           <h2 className="text-xl font-extrabold uppercase tracking-tight text-black">{category.name}</h2>
-          <Link to="/products" search={{}} className="text-xs font-semibold text-primary">
+          <Link to="/{-$lang}/products" search={{}} className="text-xs font-semibold text-primary">
             View all →
           </Link>
         </div>
@@ -120,7 +120,7 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
         <div className="flex flex-col gap-5 md:flex-row md:items-stretch">
           {/* Category image tile — desktop only */}
           <Link
-            to="/products"
+            to="/{-$lang}/products"
             search={{}}
             className="group relative hidden shrink-0 overflow-hidden rounded-xl bg-black shadow-[var(--shadow-card)] md:block md:h-[400px] md:w-[280px]"
             aria-label={category.name}
