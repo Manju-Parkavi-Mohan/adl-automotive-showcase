@@ -144,13 +144,13 @@ export function ProductReviews({ productId, rating, reviewCount }: Props) {
               </p>
               <div className="mt-3 flex gap-2">
                 <Link
-                  to="/account/login"
+                  to="/{-$lang}/account/login"
                   className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
                 >
                   Sign in
                 </Link>
                 <Link
-                  to="/account/register"
+                  to="/{-$lang}/account/register"
                   className="inline-flex h-10 items-center justify-center rounded-md border border-border bg-white px-4 text-sm font-semibold hover:border-primary hover:text-primary"
                 >
                   Create account

@@ -10,25 +10,37 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SitemapEnDotxmlRouteImport } from './routes/sitemap-en[.]xml'
+import { Route as SitemapArDotxmlRouteImport } from './routes/sitemap-ar[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
-import { Route as ProductsRouteImport } from './routes/products'
-import { Route as CheckoutRouteImport } from './routes/checkout'
-import { Route as CartRouteImport } from './routes/cart'
-import { Route as BlogRouteImport } from './routes/blog'
-import { Route as AccountRouteImport } from './routes/account'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ProductsIndexRouteImport } from './routes/products.index'
-import { Route as BlogIndexRouteImport } from './routes/blog.index'
-import { Route as AccountIndexRouteImport } from './routes/account.index'
-import { Route as ProductsProductIdRouteImport } from './routes/products.$productId'
-import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
-import { Route as AccountRegisterRouteImport } from './routes/account.register'
-import { Route as AccountLoginRouteImport } from './routes/account.login'
-import { Route as AccountOrdersOrderIdRouteImport } from './routes/account.orders.$orderId'
+import { Route as Char123LangChar125IndexRouteImport } from './routes/{-$lang}/index'
+import { Route as Char123LangChar125ProductsRouteImport } from './routes/{-$lang}/products'
+import { Route as Char123LangChar125CheckoutRouteImport } from './routes/{-$lang}/checkout'
+import { Route as Char123LangChar125CartRouteImport } from './routes/{-$lang}/cart'
+import { Route as Char123LangChar125BlogRouteImport } from './routes/{-$lang}/blog'
+import { Route as Char123LangChar125AccountRouteImport } from './routes/{-$lang}/account'
+import { Route as Char123LangChar125ProductsIndexRouteImport } from './routes/{-$lang}/products.index'
+import { Route as Char123LangChar125BlogIndexRouteImport } from './routes/{-$lang}/blog.index'
+import { Route as Char123LangChar125AccountIndexRouteImport } from './routes/{-$lang}/account.index'
+import { Route as Char123LangChar125ProductsProductIdRouteImport } from './routes/{-$lang}/products.$productId'
+import { Route as Char123LangChar125BlogSlugRouteImport } from './routes/{-$lang}/blog.$slug'
+import { Route as Char123LangChar125AccountRegisterRouteImport } from './routes/{-$lang}/account.register'
+import { Route as Char123LangChar125AccountLoginRouteImport } from './routes/{-$lang}/account.login'
+import { Route as Char123LangChar125AccountOrdersOrderIdRouteImport } from './routes/{-$lang}/account.orders.$orderId'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapEnDotxmlRoute = SitemapEnDotxmlRouteImport.update({
+  id: '/sitemap-en.xml',
+  path: '/sitemap-en.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapArDotxmlRoute = SitemapArDotxmlRouteImport.update({
+  id: '/sitemap-ar.xml',
+  path: '/sitemap-ar.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
@@ -36,192 +48,217 @@ const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
   path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProductsRoute = ProductsRouteImport.update({
-  id: '/products',
-  path: '/products',
+const Char123LangChar125IndexRoute = Char123LangChar125IndexRouteImport.update({
+  id: '/{-$lang}/',
+  path: '/{-$lang}/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CheckoutRoute = CheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
+const Char123LangChar125ProductsRoute =
+  Char123LangChar125ProductsRouteImport.update({
+    id: '/{-$lang}/products',
+    path: '/{-$lang}/products',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char123LangChar125CheckoutRoute =
+  Char123LangChar125CheckoutRouteImport.update({
+    id: '/{-$lang}/checkout',
+    path: '/{-$lang}/checkout',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char123LangChar125CartRoute = Char123LangChar125CartRouteImport.update({
+  id: '/{-$lang}/cart',
+  path: '/{-$lang}/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CartRoute = CartRouteImport.update({
-  id: '/cart',
-  path: '/cart',
+const Char123LangChar125BlogRoute = Char123LangChar125BlogRouteImport.update({
+  id: '/{-$lang}/blog',
+  path: '/{-$lang}/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AccountRoute = AccountRouteImport.update({
-  id: '/account',
-  path: '/account',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductsIndexRoute = ProductsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ProductsRoute,
-} as any)
-const BlogIndexRoute = BlogIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => BlogRoute,
-} as any)
-const AccountIndexRoute = AccountIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AccountRoute,
-} as any)
-const ProductsProductIdRoute = ProductsProductIdRouteImport.update({
-  id: '/$productId',
-  path: '/$productId',
-  getParentRoute: () => ProductsRoute,
-} as any)
-const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => BlogRoute,
-} as any)
-const AccountRegisterRoute = AccountRegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => AccountRoute,
-} as any)
-const AccountLoginRoute = AccountLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => AccountRoute,
-} as any)
-const AccountOrdersOrderIdRoute = AccountOrdersOrderIdRouteImport.update({
-  id: '/orders/$orderId',
-  path: '/orders/$orderId',
-  getParentRoute: () => AccountRoute,
-} as any)
+const Char123LangChar125AccountRoute =
+  Char123LangChar125AccountRouteImport.update({
+    id: '/{-$lang}/account',
+    path: '/{-$lang}/account',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char123LangChar125ProductsIndexRoute =
+  Char123LangChar125ProductsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => Char123LangChar125ProductsRoute,
+  } as any)
+const Char123LangChar125BlogIndexRoute =
+  Char123LangChar125BlogIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => Char123LangChar125BlogRoute,
+  } as any)
+const Char123LangChar125AccountIndexRoute =
+  Char123LangChar125AccountIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => Char123LangChar125AccountRoute,
+  } as any)
+const Char123LangChar125ProductsProductIdRoute =
+  Char123LangChar125ProductsProductIdRouteImport.update({
+    id: '/$productId',
+    path: '/$productId',
+    getParentRoute: () => Char123LangChar125ProductsRoute,
+  } as any)
+const Char123LangChar125BlogSlugRoute =
+  Char123LangChar125BlogSlugRouteImport.update({
+    id: '/$slug',
+    path: '/$slug',
+    getParentRoute: () => Char123LangChar125BlogRoute,
+  } as any)
+const Char123LangChar125AccountRegisterRoute =
+  Char123LangChar125AccountRegisterRouteImport.update({
+    id: '/register',
+    path: '/register',
+    getParentRoute: () => Char123LangChar125AccountRoute,
+  } as any)
+const Char123LangChar125AccountLoginRoute =
+  Char123LangChar125AccountLoginRouteImport.update({
+    id: '/login',
+    path: '/login',
+    getParentRoute: () => Char123LangChar125AccountRoute,
+  } as any)
+const Char123LangChar125AccountOrdersOrderIdRoute =
+  Char123LangChar125AccountOrdersOrderIdRouteImport.update({
+    id: '/orders/$orderId',
+    path: '/orders/$orderId',
+    getParentRoute: () => Char123LangChar125AccountRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/account': typeof AccountRouteWithChildren
-  '/blog': typeof BlogRouteWithChildren
-  '/cart': typeof CartRoute
-  '/checkout': typeof CheckoutRoute
-  '/products': typeof ProductsRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap-ar.xml': typeof SitemapArDotxmlRoute
+  '/sitemap-en.xml': typeof SitemapEnDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/account/login': typeof AccountLoginRoute
-  '/account/register': typeof AccountRegisterRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/products/$productId': typeof ProductsProductIdRoute
-  '/account/': typeof AccountIndexRoute
-  '/blog/': typeof BlogIndexRoute
-  '/products/': typeof ProductsIndexRoute
-  '/account/orders/$orderId': typeof AccountOrdersOrderIdRoute
+  '/{-$lang}/account': typeof Char123LangChar125AccountRouteWithChildren
+  '/{-$lang}/blog': typeof Char123LangChar125BlogRouteWithChildren
+  '/{-$lang}/cart': typeof Char123LangChar125CartRoute
+  '/{-$lang}/checkout': typeof Char123LangChar125CheckoutRoute
+  '/{-$lang}/products': typeof Char123LangChar125ProductsRouteWithChildren
+  '/{-$lang}/': typeof Char123LangChar125IndexRoute
+  '/{-$lang}/account/login': typeof Char123LangChar125AccountLoginRoute
+  '/{-$lang}/account/register': typeof Char123LangChar125AccountRegisterRoute
+  '/{-$lang}/blog/$slug': typeof Char123LangChar125BlogSlugRoute
+  '/{-$lang}/products/$productId': typeof Char123LangChar125ProductsProductIdRoute
+  '/{-$lang}/account/': typeof Char123LangChar125AccountIndexRoute
+  '/{-$lang}/blog/': typeof Char123LangChar125BlogIndexRoute
+  '/{-$lang}/products/': typeof Char123LangChar125ProductsIndexRoute
+  '/{-$lang}/account/orders/$orderId': typeof Char123LangChar125AccountOrdersOrderIdRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/cart': typeof CartRoute
-  '/checkout': typeof CheckoutRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap-ar.xml': typeof SitemapArDotxmlRoute
+  '/sitemap-en.xml': typeof SitemapEnDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/account/login': typeof AccountLoginRoute
-  '/account/register': typeof AccountRegisterRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/products/$productId': typeof ProductsProductIdRoute
-  '/account': typeof AccountIndexRoute
-  '/blog': typeof BlogIndexRoute
-  '/products': typeof ProductsIndexRoute
-  '/account/orders/$orderId': typeof AccountOrdersOrderIdRoute
+  '/{-$lang}/cart': typeof Char123LangChar125CartRoute
+  '/{-$lang}/checkout': typeof Char123LangChar125CheckoutRoute
+  '/{-$lang}': typeof Char123LangChar125IndexRoute
+  '/{-$lang}/account/login': typeof Char123LangChar125AccountLoginRoute
+  '/{-$lang}/account/register': typeof Char123LangChar125AccountRegisterRoute
+  '/{-$lang}/blog/$slug': typeof Char123LangChar125BlogSlugRoute
+  '/{-$lang}/products/$productId': typeof Char123LangChar125ProductsProductIdRoute
+  '/{-$lang}/account': typeof Char123LangChar125AccountIndexRoute
+  '/{-$lang}/blog': typeof Char123LangChar125BlogIndexRoute
+  '/{-$lang}/products': typeof Char123LangChar125ProductsIndexRoute
+  '/{-$lang}/account/orders/$orderId': typeof Char123LangChar125AccountOrdersOrderIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/account': typeof AccountRouteWithChildren
-  '/blog': typeof BlogRouteWithChildren
-  '/cart': typeof CartRoute
-  '/checkout': typeof CheckoutRoute
-  '/products': typeof ProductsRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap-ar.xml': typeof SitemapArDotxmlRoute
+  '/sitemap-en.xml': typeof SitemapEnDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/account/login': typeof AccountLoginRoute
-  '/account/register': typeof AccountRegisterRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/products/$productId': typeof ProductsProductIdRoute
-  '/account/': typeof AccountIndexRoute
-  '/blog/': typeof BlogIndexRoute
-  '/products/': typeof ProductsIndexRoute
-  '/account/orders/$orderId': typeof AccountOrdersOrderIdRoute
+  '/{-$lang}/account': typeof Char123LangChar125AccountRouteWithChildren
+  '/{-$lang}/blog': typeof Char123LangChar125BlogRouteWithChildren
+  '/{-$lang}/cart': typeof Char123LangChar125CartRoute
+  '/{-$lang}/checkout': typeof Char123LangChar125CheckoutRoute
+  '/{-$lang}/products': typeof Char123LangChar125ProductsRouteWithChildren
+  '/{-$lang}/': typeof Char123LangChar125IndexRoute
+  '/{-$lang}/account/login': typeof Char123LangChar125AccountLoginRoute
+  '/{-$lang}/account/register': typeof Char123LangChar125AccountRegisterRoute
+  '/{-$lang}/blog/$slug': typeof Char123LangChar125BlogSlugRoute
+  '/{-$lang}/products/$productId': typeof Char123LangChar125ProductsProductIdRoute
+  '/{-$lang}/account/': typeof Char123LangChar125AccountIndexRoute
+  '/{-$lang}/blog/': typeof Char123LangChar125BlogIndexRoute
+  '/{-$lang}/products/': typeof Char123LangChar125ProductsIndexRoute
+  '/{-$lang}/account/orders/$orderId': typeof Char123LangChar125AccountOrdersOrderIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/account'
-    | '/blog'
-    | '/cart'
-    | '/checkout'
-    | '/products'
     | '/robots.txt'
+    | '/sitemap-ar.xml'
+    | '/sitemap-en.xml'
     | '/sitemap.xml'
-    | '/account/login'
-    | '/account/register'
-    | '/blog/$slug'
-    | '/products/$productId'
-    | '/account/'
-    | '/blog/'
-    | '/products/'
-    | '/account/orders/$orderId'
+    | '/{-$lang}/account'
+    | '/{-$lang}/blog'
+    | '/{-$lang}/cart'
+    | '/{-$lang}/checkout'
+    | '/{-$lang}/products'
+    | '/{-$lang}/'
+    | '/{-$lang}/account/login'
+    | '/{-$lang}/account/register'
+    | '/{-$lang}/blog/$slug'
+    | '/{-$lang}/products/$productId'
+    | '/{-$lang}/account/'
+    | '/{-$lang}/blog/'
+    | '/{-$lang}/products/'
+    | '/{-$lang}/account/orders/$orderId'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
-    | '/cart'
-    | '/checkout'
     | '/robots.txt'
+    | '/sitemap-ar.xml'
+    | '/sitemap-en.xml'
     | '/sitemap.xml'
-    | '/account/login'
-    | '/account/register'
-    | '/blog/$slug'
-    | '/products/$productId'
-    | '/account'
-    | '/blog'
-    | '/products'
-    | '/account/orders/$orderId'
+    | '/{-$lang}/cart'
+    | '/{-$lang}/checkout'
+    | '/{-$lang}'
+    | '/{-$lang}/account/login'
+    | '/{-$lang}/account/register'
+    | '/{-$lang}/blog/$slug'
+    | '/{-$lang}/products/$productId'
+    | '/{-$lang}/account'
+    | '/{-$lang}/blog'
+    | '/{-$lang}/products'
+    | '/{-$lang}/account/orders/$orderId'
   id:
     | '__root__'
-    | '/'
-    | '/account'
-    | '/blog'
-    | '/cart'
-    | '/checkout'
-    | '/products'
     | '/robots.txt'
+    | '/sitemap-ar.xml'
+    | '/sitemap-en.xml'
     | '/sitemap.xml'
-    | '/account/login'
-    | '/account/register'
-    | '/blog/$slug'
-    | '/products/$productId'
-    | '/account/'
-    | '/blog/'
-    | '/products/'
-    | '/account/orders/$orderId'
+    | '/{-$lang}/account'
+    | '/{-$lang}/blog'
+    | '/{-$lang}/cart'
+    | '/{-$lang}/checkout'
+    | '/{-$lang}/products'
+    | '/{-$lang}/'
+    | '/{-$lang}/account/login'
+    | '/{-$lang}/account/register'
+    | '/{-$lang}/blog/$slug'
+    | '/{-$lang}/products/$productId'
+    | '/{-$lang}/account/'
+    | '/{-$lang}/blog/'
+    | '/{-$lang}/products/'
+    | '/{-$lang}/account/orders/$orderId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AccountRoute: typeof AccountRouteWithChildren
-  BlogRoute: typeof BlogRouteWithChildren
-  CartRoute: typeof CartRoute
-  CheckoutRoute: typeof CheckoutRoute
-  ProductsRoute: typeof ProductsRouteWithChildren
   RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapArDotxmlRoute: typeof SitemapArDotxmlRoute
+  SitemapEnDotxmlRoute: typeof SitemapEnDotxmlRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  Char123LangChar125AccountRoute: typeof Char123LangChar125AccountRouteWithChildren
+  Char123LangChar125BlogRoute: typeof Char123LangChar125BlogRouteWithChildren
+  Char123LangChar125CartRoute: typeof Char123LangChar125CartRoute
+  Char123LangChar125CheckoutRoute: typeof Char123LangChar125CheckoutRoute
+  Char123LangChar125ProductsRoute: typeof Char123LangChar125ProductsRouteWithChildren
+  Char123LangChar125IndexRoute: typeof Char123LangChar125IndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -233,6 +270,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap-en.xml': {
+      id: '/sitemap-en.xml'
+      path: '/sitemap-en.xml'
+      fullPath: '/sitemap-en.xml'
+      preLoaderRoute: typeof SitemapEnDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap-ar.xml': {
+      id: '/sitemap-ar.xml'
+      path: '/sitemap-ar.xml'
+      fullPath: '/sitemap-ar.xml'
+      preLoaderRoute: typeof SitemapArDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/robots.txt': {
       id: '/robots.txt'
       path: '/robots.txt'
@@ -240,170 +291,174 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/products': {
-      id: '/products'
-      path: '/products'
-      fullPath: '/products'
-      preLoaderRoute: typeof ProductsRouteImport
+    '/{-$lang}/': {
+      id: '/{-$lang}/'
+      path: '/{-$lang}'
+      fullPath: '/{-$lang}/'
+      preLoaderRoute: typeof Char123LangChar125IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/checkout': {
-      id: '/checkout'
-      path: '/checkout'
-      fullPath: '/checkout'
-      preLoaderRoute: typeof CheckoutRouteImport
+    '/{-$lang}/products': {
+      id: '/{-$lang}/products'
+      path: '/{-$lang}/products'
+      fullPath: '/{-$lang}/products'
+      preLoaderRoute: typeof Char123LangChar125ProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cart': {
-      id: '/cart'
-      path: '/cart'
-      fullPath: '/cart'
-      preLoaderRoute: typeof CartRouteImport
+    '/{-$lang}/checkout': {
+      id: '/{-$lang}/checkout'
+      path: '/{-$lang}/checkout'
+      fullPath: '/{-$lang}/checkout'
+      preLoaderRoute: typeof Char123LangChar125CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
+    '/{-$lang}/cart': {
+      id: '/{-$lang}/cart'
+      path: '/{-$lang}/cart'
+      fullPath: '/{-$lang}/cart'
+      preLoaderRoute: typeof Char123LangChar125CartRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/account': {
-      id: '/account'
-      path: '/account'
-      fullPath: '/account'
-      preLoaderRoute: typeof AccountRouteImport
+    '/{-$lang}/blog': {
+      id: '/{-$lang}/blog'
+      path: '/{-$lang}/blog'
+      fullPath: '/{-$lang}/blog'
+      preLoaderRoute: typeof Char123LangChar125BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
+    '/{-$lang}/account': {
+      id: '/{-$lang}/account'
+      path: '/{-$lang}/account'
+      fullPath: '/{-$lang}/account'
+      preLoaderRoute: typeof Char123LangChar125AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/{-$lang}/products/': {
+      id: '/{-$lang}/products/'
       path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      fullPath: '/{-$lang}/products/'
+      preLoaderRoute: typeof Char123LangChar125ProductsIndexRouteImport
+      parentRoute: typeof Char123LangChar125ProductsRoute
     }
-    '/products/': {
-      id: '/products/'
+    '/{-$lang}/blog/': {
+      id: '/{-$lang}/blog/'
       path: '/'
-      fullPath: '/products/'
-      preLoaderRoute: typeof ProductsIndexRouteImport
-      parentRoute: typeof ProductsRoute
+      fullPath: '/{-$lang}/blog/'
+      preLoaderRoute: typeof Char123LangChar125BlogIndexRouteImport
+      parentRoute: typeof Char123LangChar125BlogRoute
     }
-    '/blog/': {
-      id: '/blog/'
+    '/{-$lang}/account/': {
+      id: '/{-$lang}/account/'
       path: '/'
-      fullPath: '/blog/'
-      preLoaderRoute: typeof BlogIndexRouteImport
-      parentRoute: typeof BlogRoute
+      fullPath: '/{-$lang}/account/'
+      preLoaderRoute: typeof Char123LangChar125AccountIndexRouteImport
+      parentRoute: typeof Char123LangChar125AccountRoute
     }
-    '/account/': {
-      id: '/account/'
-      path: '/'
-      fullPath: '/account/'
-      preLoaderRoute: typeof AccountIndexRouteImport
-      parentRoute: typeof AccountRoute
-    }
-    '/products/$productId': {
-      id: '/products/$productId'
+    '/{-$lang}/products/$productId': {
+      id: '/{-$lang}/products/$productId'
       path: '/$productId'
-      fullPath: '/products/$productId'
-      preLoaderRoute: typeof ProductsProductIdRouteImport
-      parentRoute: typeof ProductsRoute
+      fullPath: '/{-$lang}/products/$productId'
+      preLoaderRoute: typeof Char123LangChar125ProductsProductIdRouteImport
+      parentRoute: typeof Char123LangChar125ProductsRoute
     }
-    '/blog/$slug': {
-      id: '/blog/$slug'
+    '/{-$lang}/blog/$slug': {
+      id: '/{-$lang}/blog/$slug'
       path: '/$slug'
-      fullPath: '/blog/$slug'
-      preLoaderRoute: typeof BlogSlugRouteImport
-      parentRoute: typeof BlogRoute
+      fullPath: '/{-$lang}/blog/$slug'
+      preLoaderRoute: typeof Char123LangChar125BlogSlugRouteImport
+      parentRoute: typeof Char123LangChar125BlogRoute
     }
-    '/account/register': {
-      id: '/account/register'
+    '/{-$lang}/account/register': {
+      id: '/{-$lang}/account/register'
       path: '/register'
-      fullPath: '/account/register'
-      preLoaderRoute: typeof AccountRegisterRouteImport
-      parentRoute: typeof AccountRoute
+      fullPath: '/{-$lang}/account/register'
+      preLoaderRoute: typeof Char123LangChar125AccountRegisterRouteImport
+      parentRoute: typeof Char123LangChar125AccountRoute
     }
-    '/account/login': {
-      id: '/account/login'
+    '/{-$lang}/account/login': {
+      id: '/{-$lang}/account/login'
       path: '/login'
-      fullPath: '/account/login'
-      preLoaderRoute: typeof AccountLoginRouteImport
-      parentRoute: typeof AccountRoute
+      fullPath: '/{-$lang}/account/login'
+      preLoaderRoute: typeof Char123LangChar125AccountLoginRouteImport
+      parentRoute: typeof Char123LangChar125AccountRoute
     }
-    '/account/orders/$orderId': {
-      id: '/account/orders/$orderId'
+    '/{-$lang}/account/orders/$orderId': {
+      id: '/{-$lang}/account/orders/$orderId'
       path: '/orders/$orderId'
-      fullPath: '/account/orders/$orderId'
-      preLoaderRoute: typeof AccountOrdersOrderIdRouteImport
-      parentRoute: typeof AccountRoute
+      fullPath: '/{-$lang}/account/orders/$orderId'
+      preLoaderRoute: typeof Char123LangChar125AccountOrdersOrderIdRouteImport
+      parentRoute: typeof Char123LangChar125AccountRoute
     }
   }
 }
 
-interface AccountRouteChildren {
-  AccountLoginRoute: typeof AccountLoginRoute
-  AccountRegisterRoute: typeof AccountRegisterRoute
-  AccountIndexRoute: typeof AccountIndexRoute
-  AccountOrdersOrderIdRoute: typeof AccountOrdersOrderIdRoute
+interface Char123LangChar125AccountRouteChildren {
+  Char123LangChar125AccountLoginRoute: typeof Char123LangChar125AccountLoginRoute
+  Char123LangChar125AccountRegisterRoute: typeof Char123LangChar125AccountRegisterRoute
+  Char123LangChar125AccountIndexRoute: typeof Char123LangChar125AccountIndexRoute
+  Char123LangChar125AccountOrdersOrderIdRoute: typeof Char123LangChar125AccountOrdersOrderIdRoute
 }
 
-const AccountRouteChildren: AccountRouteChildren = {
-  AccountLoginRoute: AccountLoginRoute,
-  AccountRegisterRoute: AccountRegisterRoute,
-  AccountIndexRoute: AccountIndexRoute,
-  AccountOrdersOrderIdRoute: AccountOrdersOrderIdRoute,
+const Char123LangChar125AccountRouteChildren: Char123LangChar125AccountRouteChildren =
+  {
+    Char123LangChar125AccountLoginRoute: Char123LangChar125AccountLoginRoute,
+    Char123LangChar125AccountRegisterRoute:
+      Char123LangChar125AccountRegisterRoute,
+    Char123LangChar125AccountIndexRoute: Char123LangChar125AccountIndexRoute,
+    Char123LangChar125AccountOrdersOrderIdRoute:
+      Char123LangChar125AccountOrdersOrderIdRoute,
+  }
+
+const Char123LangChar125AccountRouteWithChildren =
+  Char123LangChar125AccountRoute._addFileChildren(
+    Char123LangChar125AccountRouteChildren,
+  )
+
+interface Char123LangChar125BlogRouteChildren {
+  Char123LangChar125BlogSlugRoute: typeof Char123LangChar125BlogSlugRoute
+  Char123LangChar125BlogIndexRoute: typeof Char123LangChar125BlogIndexRoute
 }
 
-const AccountRouteWithChildren =
-  AccountRoute._addFileChildren(AccountRouteChildren)
+const Char123LangChar125BlogRouteChildren: Char123LangChar125BlogRouteChildren =
+  {
+    Char123LangChar125BlogSlugRoute: Char123LangChar125BlogSlugRoute,
+    Char123LangChar125BlogIndexRoute: Char123LangChar125BlogIndexRoute,
+  }
 
-interface BlogRouteChildren {
-  BlogSlugRoute: typeof BlogSlugRoute
-  BlogIndexRoute: typeof BlogIndexRoute
+const Char123LangChar125BlogRouteWithChildren =
+  Char123LangChar125BlogRoute._addFileChildren(
+    Char123LangChar125BlogRouteChildren,
+  )
+
+interface Char123LangChar125ProductsRouteChildren {
+  Char123LangChar125ProductsProductIdRoute: typeof Char123LangChar125ProductsProductIdRoute
+  Char123LangChar125ProductsIndexRoute: typeof Char123LangChar125ProductsIndexRoute
 }
 
-const BlogRouteChildren: BlogRouteChildren = {
-  BlogSlugRoute: BlogSlugRoute,
-  BlogIndexRoute: BlogIndexRoute,
-}
+const Char123LangChar125ProductsRouteChildren: Char123LangChar125ProductsRouteChildren =
+  {
+    Char123LangChar125ProductsProductIdRoute:
+      Char123LangChar125ProductsProductIdRoute,
+    Char123LangChar125ProductsIndexRoute: Char123LangChar125ProductsIndexRoute,
+  }
 
-const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
-
-interface ProductsRouteChildren {
-  ProductsProductIdRoute: typeof ProductsProductIdRoute
-  ProductsIndexRoute: typeof ProductsIndexRoute
-}
-
-const ProductsRouteChildren: ProductsRouteChildren = {
-  ProductsProductIdRoute: ProductsProductIdRoute,
-  ProductsIndexRoute: ProductsIndexRoute,
-}
-
-const ProductsRouteWithChildren = ProductsRoute._addFileChildren(
-  ProductsRouteChildren,
-)
+const Char123LangChar125ProductsRouteWithChildren =
+  Char123LangChar125ProductsRoute._addFileChildren(
+    Char123LangChar125ProductsRouteChildren,
+  )
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AccountRoute: AccountRouteWithChildren,
-  BlogRoute: BlogRouteWithChildren,
-  CartRoute: CartRoute,
-  CheckoutRoute: CheckoutRoute,
-  ProductsRoute: ProductsRouteWithChildren,
   RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapArDotxmlRoute: SitemapArDotxmlRoute,
+  SitemapEnDotxmlRoute: SitemapEnDotxmlRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  Char123LangChar125AccountRoute: Char123LangChar125AccountRouteWithChildren,
+  Char123LangChar125BlogRoute: Char123LangChar125BlogRouteWithChildren,
+  Char123LangChar125CartRoute: Char123LangChar125CartRoute,
+  Char123LangChar125CheckoutRoute: Char123LangChar125CheckoutRoute,
+  Char123LangChar125ProductsRoute: Char123LangChar125ProductsRouteWithChildren,
+  Char123LangChar125IndexRoute: Char123LangChar125IndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

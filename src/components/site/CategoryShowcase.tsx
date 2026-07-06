@@ -104,7 +104,7 @@ export function CategoryShowcase() {
               : categories.map((c) => (
                   <Link
                     key={c.id}
-                    to="/products"
+                    to="/{-$lang}/products"
                     search={{}}
                     data-cat-card
                     className="group flex h-[110px] w-[calc((100%-20px)/2)] shrink-0 snap-start items-center justify-between gap-2 rounded-2xl bg-white px-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md sm:h-[120px] sm:w-[260px]"

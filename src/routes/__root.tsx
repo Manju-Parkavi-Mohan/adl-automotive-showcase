@@ -21,12 +21,10 @@ import {
   DEFAULT_CURRENCY,
   DEFAULT_LOCALE,
   LOCALE_META,
-  SUPPORTED_LOCALES,
   isLocale,
   type Locale,
 } from "@/i18n/config";
-
-const SITE_URL = "https://adl.apaarr.com";
+import { buildLocaleLinks, ogUrlFor, SITE_URL } from "@/i18n/seo";
 
 function NotFoundComponent() {
   return (
@@ -39,7 +37,7 @@ function NotFoundComponent() {
         </p>
         <div className="mt-6">
           <Link
-            to="/"
+            to="/{-$lang}"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Go home
@@ -93,10 +91,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     try {
       return await detectI18n();
     } catch {
-      return { locale: DEFAULT_LOCALE, currency: DEFAULT_CURRENCY, country: null, localeSource: "default" as const };
+      return {
+        locale: DEFAULT_LOCALE,
+        currency: DEFAULT_CURRENCY,
+        country: null,
+        localeSource: "default" as const,
+        path: "/",
+        urlLocale: null,
+      };
     }
   },
-  head: ({ loaderData }) => ({
+  head: ({ loaderData }) => {
+    const locale: Locale = isLocale(loaderData?.locale) ? loaderData.locale : DEFAULT_LOCALE;
+    const cleanPath = loaderData?.path ?? "/";
+    return ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -104,14 +112,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "ADL Automotive — Premium Diagnostic, Tuning & Workshop Equipment" },
       { name: "description", content: "Shop premium automotive diagnostic tools, ECU programmers, tuning software and workshop equipment. Trusted by professional technicians worldwide." },
       { name: "author", content: "ADL Automotive" },
-      { property: "og:locale", content: loaderData?.locale === "ar" ? "ar_AE" : "en_US" },
-      ...SUPPORTED_LOCALES.filter((l) => l !== (loaderData?.locale ?? DEFAULT_LOCALE)).map((l) => ({
-        property: "og:locale:alternate",
-        content: l === "ar" ? "ar_AE" : "en_US",
-      })),
+      { property: "og:locale", content: locale === "ar" ? "ar_AE" : "en_US" },
+      { property: "og:locale:alternate", content: locale === "ar" ? "en_US" : "ar_AE" },
       { property: "og:title", content: "ADL Automotive — Premium Diagnostic, Tuning & Workshop Equipment" },
       { property: "og:description", content: "Shop premium automotive diagnostic tools, ECU programmers, tuning software and workshop equipment. Trusted by professional technicians worldwide." },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "ADL Automotive" },
+      { property: "og:url", content: ogUrlFor(cleanPath, locale) },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@ADLAutomotive" },
       { name: "twitter:title", content: "ADL Automotive — Premium Diagnostic, Tuning & Workshop Equipment" },
@@ -130,13 +137,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
       },
-      // hreflang alternates. Stage 2 will produce truly per-language URLs; for now
-      // point crawlers at the language-prefixed variants which the app also serves.
-      { rel: "alternate", hrefLang: "en", href: `${SITE_URL}/en` },
-      { rel: "alternate", hrefLang: "ar", href: `${SITE_URL}/ar` },
-      { rel: "alternate", hrefLang: "x-default", href: `${SITE_URL}/` },
+      // Per-page hreflang + canonical. buildLocaleLinks produces one canonical
+      // and one alternate per supported locale plus x-default. Because links
+      // concatenate across matches, we deliberately keep them ONLY at the root
+      // so every page has exactly one canonical.
+      ...buildLocaleLinks(cleanPath, locale),
     ],
-  }),
+    });
+  },
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,

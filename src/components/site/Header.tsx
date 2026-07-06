@@ -23,11 +23,11 @@ import { useLocale } from "@/i18n/LocaleProvider";
 import { LOCALE_META, SUPPORTED_LOCALES, SUPPORTED_CURRENCIES, CURRENCY_META, type Locale, type Currency } from "@/i18n/config";
 
 const NAV_LINKS = [
-  { key: "home", to: "/" as const },
-  { key: "products", to: "/products" as const },
-  { key: "blog", to: "/blog" as const },
-  { key: "about", to: "/" as const },
-  { key: "contact", to: "/" as const },
+  { key: "home", to: "/{-$lang}" as const },
+  { key: "products", to: "/{-$lang}/products" as const },
+  { key: "blog", to: "/{-$lang}/blog" as const },
+  { key: "about", to: "/{-$lang}" as const },
+  { key: "contact", to: "/{-$lang}" as const },
 ];
 
 const EXTRA_LINKS = [
@@ -56,7 +56,7 @@ export function Header() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
-    navigate({ to: "/products", search: { search: searchQuery.trim() } });
+    navigate({ to: "/{-$lang}/products", search: { search: searchQuery.trim() } });
   };
 
   return (
@@ -86,7 +86,7 @@ export function Header() {
           </button>
           {/* Logo — centered on mobile, left on desktop */}
           <Link
-            to="/"
+            to="/{-$lang}"
             aria-label="ADL Automotive — home"
             className="flex shrink-0 items-center justify-center lg:justify-start"
           >
@@ -116,7 +116,7 @@ export function Header() {
 
           {/* Mobile login — top right */}
           <Link
-            to={user ? "/account" : "/account/login"}
+            to={user ? "/{-$lang}/account" : "/{-$lang}/account/login"}
             aria-label={user ? t("common.account") : t("common.login")}
             className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-2 text-xs font-semibold uppercase tracking-wide text-foreground transition-colors hover:border-primary hover:text-primary lg:hidden"
           >
@@ -190,7 +190,7 @@ export function Header() {
               )}
             </button>
             <Link
-              to={user ? "/account" : "/account/login"}
+              to={user ? "/{-$lang}/account" : "/{-$lang}/account/login"}
               className="flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium transition-colors hover:border-primary hover:text-primary"
             >
               <User className="h-4 w-4" />
@@ -239,7 +239,7 @@ export function Header() {
                   categories.map((c) => (
                     <Link
                       key={c.id}
-                      to="/products"
+                      to="/{-$lang}/products"
                       search={{}}
                       onClick={() => setCatOpen(false)}
                       className="flex items-center gap-3 border-b border-border px-4 py-3 text-sm font-medium text-foreground transition-colors last:border-0 hover:bg-secondary hover:text-primary"
@@ -348,7 +348,7 @@ export function Header() {
               {categories.map((c) => (
                 <Link
                   key={c.id}
-                  to="/products"
+                  to="/{-$lang}/products"
                   search={{}}
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-2 border-b border-border px-1 py-2 text-xs font-semibold uppercase tracking-wide text-black hover:text-primary"
@@ -382,7 +382,7 @@ export function Header() {
           <span>{locale.toUpperCase()}</span>
         </button>
         <Link
-          to={user ? "/account" : "/account/login"}
+          to={user ? "/{-$lang}/account" : "/{-$lang}/account/login"}
           className="flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary"
         >
           <User className="h-5 w-5" />
