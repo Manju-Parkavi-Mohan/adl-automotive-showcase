@@ -6,7 +6,7 @@ import { useCart } from "@/components/site/CartProvider";
 import { Button } from "@/components/ui/button";
 import { seoToMeta } from "@/lib/seo";
 
-export const Route = createFileRoute("/cart")({
+export const Route = createFileRoute("/{-$lang}/cart")({
   head: () => ({
     meta: seoToMeta(undefined, {
       title: "Your Cart — ADL Automotive",

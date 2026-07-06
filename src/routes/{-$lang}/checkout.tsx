@@ -12,7 +12,7 @@ import { createOrder } from "@/lib/woo/orders.functions";
 import { toast } from "sonner";
 import { seoToMeta } from "@/lib/seo";
 
-export const Route = createFileRoute("/checkout")({
+export const Route = createFileRoute("/{-$lang}/checkout")({
   head: () => ({
     meta: seoToMeta(undefined, {
       title: "Secure Checkout — ADL Automotive",

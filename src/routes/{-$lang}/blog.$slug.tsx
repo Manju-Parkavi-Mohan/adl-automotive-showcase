@@ -7,7 +7,7 @@ import { getPostBySlug } from "@/lib/wp/posts.functions";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
 import type { WPPost } from "@/lib/woo/types";
 
-export const Route = createFileRoute("/blog/$slug")({
+export const Route = createFileRoute("/{-$lang}/blog/$slug")({
   loader: ({ params, context }) =>
     context.queryClient.ensureQueryData({
       queryKey: ["wp-post", params.slug],

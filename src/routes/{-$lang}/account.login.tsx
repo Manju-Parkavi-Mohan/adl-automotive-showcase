@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { AlertCircle } from "lucide-react";
 import { seoToMeta } from "@/lib/seo";
 
-export const Route = createFileRoute("/account/login")({
+export const Route = createFileRoute("/{-$lang}/account/login")({
   head: () => ({
     meta: seoToMeta(undefined, {
       title: "Sign in — ADL Automotive",

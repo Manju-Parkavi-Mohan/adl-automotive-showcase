@@ -11,7 +11,7 @@ import { useAuth } from "@/components/site/AuthProvider";
 import { toast } from "sonner";
 import { seoToMeta } from "@/lib/seo";
 
-export const Route = createFileRoute("/account/register")({
+export const Route = createFileRoute("/{-$lang}/account/register")({
   head: () => ({
     meta: seoToMeta(undefined, {
       title: "Create account — ADL Automotive",

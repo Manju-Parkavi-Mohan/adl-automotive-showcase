@@ -10,7 +10,7 @@ import { WhyChooseUs } from "@/components/site/WhyChooseUs";
 import { getYoastForUrl } from "@/lib/wp/yoast.functions";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/{-$lang}/")({
   loader: ({ context }) =>
     context.queryClient.ensureQueryData({
       queryKey: ["yoast", "/"],

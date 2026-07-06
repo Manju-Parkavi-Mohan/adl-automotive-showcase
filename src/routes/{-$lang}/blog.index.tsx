@@ -7,7 +7,7 @@ import { listPosts } from "@/lib/wp/posts.functions";
 import { getYoastForUrl } from "@/lib/wp/yoast.functions";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
 
-export const Route = createFileRoute("/blog/")({
+export const Route = createFileRoute("/{-$lang}/blog/")({
   loader: ({ context }) =>
     context.queryClient.ensureQueryData({
       queryKey: ["yoast", "/blog"],

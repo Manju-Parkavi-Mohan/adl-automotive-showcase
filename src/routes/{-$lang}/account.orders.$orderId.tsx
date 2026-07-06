@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/site/AuthProvider";
 import { getMyOrder } from "@/lib/woo/customer.functions";
 
-export const Route = createFileRoute("/account/orders/$orderId")({
+export const Route = createFileRoute("/{-$lang}/account/orders/$orderId")({
   head: () => ({ meta: [{ title: "Order details — ADL Automotive" }] }),
   component: OrderDetailPage,
 });

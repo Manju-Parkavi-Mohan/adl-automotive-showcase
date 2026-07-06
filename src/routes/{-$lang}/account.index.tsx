@@ -19,7 +19,7 @@ import { ProductCard } from "@/components/site/ProductCard";
 import { wooToDisplay } from "@/lib/woo/adapter";
 import { seoToMeta } from "@/lib/seo";
 
-export const Route = createFileRoute("/account/")({
+export const Route = createFileRoute("/{-$lang}/account/")({
   head: () => ({
     meta: seoToMeta(undefined, {
       title: "My Account — ADL Automotive",

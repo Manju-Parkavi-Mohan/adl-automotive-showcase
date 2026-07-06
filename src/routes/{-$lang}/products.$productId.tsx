@@ -19,7 +19,7 @@ import { pushRecentlyViewed } from "@/lib/recently-viewed";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
 import { ProductReviews } from "@/components/site/ProductReviews";
 
-export const Route = createFileRoute("/products/$productId")({
+export const Route = createFileRoute("/{-$lang}/products/$productId")({
   loader: ({ params, context }) =>
     context.queryClient.ensureQueryData({
       queryKey: ["wc-product", params.productId],

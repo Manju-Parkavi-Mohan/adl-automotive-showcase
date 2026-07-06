@@ -14,7 +14,7 @@ import { wooToDisplay } from "@/lib/woo/adapter";
 import { getYoastForUrl } from "@/lib/wp/yoast.functions";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
 
-export const Route = createFileRoute("/products/")({
+export const Route = createFileRoute("/{-$lang}/products/")({
   validateSearch: (search) =>
     typeof search.search === "string" && search.search.trim()
       ? { search: search.search }
