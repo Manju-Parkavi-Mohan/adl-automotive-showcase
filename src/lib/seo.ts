@@ -69,8 +69,13 @@ export function seoToMeta(
   return meta;
 }
 
-export function seoToLinks(seo: SeoMeta | undefined): Array<{ rel: string; href: string }> {
-  return seo?.canonical ? [{ rel: "canonical", href: seo.canonical }] : [];
+/**
+ * @deprecated Canonical + hreflang are now emitted from the root route via
+ * `buildLocaleLinks`. Returning `[]` here prevents duplicate canonical tags.
+ * Kept for API compatibility with existing callers.
+ */
+export function seoToLinks(_seo: SeoMeta | undefined): Array<{ rel: string; href: string }> {
+  return [];
 }
 
 export function seoToScripts(
