@@ -170,9 +170,9 @@ function ProductsPage() {
         <div className="container-px mx-auto max-w-[1400px] py-10">
           <nav aria-label="Breadcrumb" className="mb-5">
             <ol className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <li><Link to="/" className="hover:text-primary">Home</Link></li>
+              <li><Link to="/{-$lang}" className="hover:text-primary">Home</Link></li>
               <li><ChevronRight className="h-3.5 w-3.5" /></li>
-              <li><Link to="/products" search={{}} className="hover:text-primary">Shop</Link></li>
+              <li><Link to="/{-$lang}/products" search={{}} className="hover:text-primary">Shop</Link></li>
               {isSearching && (
                 <>
                   <li><ChevronRight className="h-3.5 w-3.5" /></li>

@@ -88,7 +88,7 @@ function AccountPage() {
     mutationFn: () => logout(),
     onSuccess: () => {
       setUser(null);
-      navigate({ to: "/" }).catch(() => {});
+      navigate({ to: "/{-$lang}" }).catch(() => {});
     },
   });
 
@@ -112,8 +112,8 @@ function AccountPage() {
             Sign in to review your WooCommerce orders, saved billing details, recently viewed products, and checkout preferences.
           </p>
           <div className="mt-6 flex justify-center gap-3">
-            <Button asChild><Link to="/account/login">Sign in</Link></Button>
-            <Button asChild variant="outline"><Link to="/account/register">Create account</Link></Button>
+            <Button asChild><Link to="/{-$lang}/account/login">Sign in</Link></Button>
+            <Button asChild variant="outline"><Link to="/{-$lang}/account/register">Create account</Link></Button>
           </div>
         </div>
       </Shell>
@@ -274,7 +274,7 @@ function OrdersTable({ orders }: { orders: Awaited<ReturnType<typeof listMyOrder
             <tr key={o.id} className="border-b border-border last:border-0">
               <td className="py-3 pr-4 font-semibold">
                 <Link
-                  to="/account/orders/$orderId"
+                  to="/{-$lang}/account/orders/$orderId"
                   params={{ orderId: String(o.id) }}
                   className="text-primary hover:underline"
                 >
@@ -287,7 +287,7 @@ function OrdersTable({ orders }: { orders: Awaited<ReturnType<typeof listMyOrder
               <td className="py-3 pr-4"><StatusPill status={o.status} /></td>
               <td className="py-3 pr-4 text-right font-semibold">
                 <Link
-                  to="/account/orders/$orderId"
+                  to="/{-$lang}/account/orders/$orderId"
                   params={{ orderId: String(o.id) }}
                   className="hover:text-primary"
                 >
@@ -330,7 +330,7 @@ function OverviewPanel({
             icon={Package}
             title="No orders yet"
             body="When you place an order it will appear here."
-            cta={<Button asChild><Link to="/products" search={{}}>Browse products</Link></Button>}
+            cta={<Button asChild><Link to="/{-$lang}/products" search={{}}>Browse products</Link></Button>}
           />
         ) : (
           <OrdersTable orders={recent} />
@@ -364,7 +364,7 @@ function OrdersPanel({ orders, loading }: { orders: Awaited<ReturnType<typeof li
           icon={Package}
           title="No orders yet"
           body="When you place an order it will appear here."
-          cta={<Button asChild><Link to="/products" search={{}}>Browse products</Link></Button>}
+          cta={<Button asChild><Link to="/{-$lang}/products" search={{}}>Browse products</Link></Button>}
         />
       ) : (
         <OrdersTable orders={orders} />
@@ -468,7 +468,7 @@ function ViewedPanel({
           icon={Eye}
           title="Nothing here yet"
           body="Products you open will show up here so you can find them again easily."
-          cta={<Button asChild><Link to="/products" search={{}}>Browse products</Link></Button>}
+          cta={<Button asChild><Link to="/{-$lang}/products" search={{}}>Browse products</Link></Button>}
         />
       </PanelCard>
     );

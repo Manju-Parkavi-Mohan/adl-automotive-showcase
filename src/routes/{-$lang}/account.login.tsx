@@ -42,7 +42,7 @@ function LoginPage() {
         customerId: data.customerId,
       });
       toast.success("Signed in");
-      navigate({ to: "/account" }).catch(() => {});
+      navigate({ to: "/{-$lang}/account" }).catch(() => {});
     },
     onError: (err) => toast.error(err instanceof Error ? err.message : "Login failed"),
   });
@@ -75,7 +75,7 @@ function LoginPage() {
               <AlertTitle>Sign-in failed</AlertTitle>
               <AlertDescription>
                 We couldn't verify your credentials. Please double-check your email and password, then try again. If you continue to have trouble, you can{" "}
-                <Link to="/account/register" className="font-semibold underline">create a new account</Link>{" "}
+                <Link to="/{-$lang}/account/register" className="font-semibold underline">create a new account</Link>{" "}
                 or contact our support team for help.
               </AlertDescription>
             </Alert>
@@ -84,7 +84,7 @@ function LoginPage() {
             {mutation.isPending ? "Signing in…" : "Sign in"}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            Don't have an account? <Link to="/account/register" className="font-semibold text-primary hover:underline">Create one</Link>
+            Don't have an account? <Link to="/{-$lang}/account/register" className="font-semibold text-primary hover:underline">Create one</Link>
           </p>
         </form>
         <p className="mt-4 text-center text-xs text-muted-foreground">

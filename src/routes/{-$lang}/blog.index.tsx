@@ -64,7 +64,7 @@ function BlogIndex() {
               {posts.map((p) => (
                 <Link
                   key={p.id}
-                  to="/blog/$slug"
+                  to="/{-$lang}/blog/$slug"
                   params={{ slug: p.slug }}
                   className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-[var(--shadow-hover)]"
                 >

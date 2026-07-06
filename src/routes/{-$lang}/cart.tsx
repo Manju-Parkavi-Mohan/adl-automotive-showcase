@@ -36,21 +36,21 @@ function CartPage() {
           <div className="mt-10 grid place-items-center rounded-xl border border-dashed border-border bg-secondary py-24 text-center">
             <ShoppingBag className="mb-3 h-10 w-10 text-muted-foreground" />
             <p className="font-semibold">Your cart is empty</p>
-            <Button asChild className="mt-5"><Link to="/products" search={{}}>Browse products</Link></Button>
+            <Button asChild className="mt-5"><Link to="/{-$lang}/products" search={{}}>Browse products</Link></Button>
           </div>
         ) : (
           <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
             <ul className="divide-y divide-border rounded-xl border border-border bg-white">
               {items.map((item) => (
                 <li key={item.productId} className="flex gap-4 p-4">
-                  <Link to="/products/$productId" params={{ productId: item.slug }} className="h-24 w-24 shrink-0 overflow-hidden rounded-md bg-secondary">
+                  <Link to="/{-$lang}/products/$productId" params={{ productId: item.slug }} className="h-24 w-24 shrink-0 overflow-hidden rounded-md bg-secondary">
                     <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
                   </Link>
                   <div className="flex flex-1 flex-col">
                     {item.brand && (
                       <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{item.brand}</p>
                     )}
-                    <Link to="/products/$productId" params={{ productId: item.slug }} className="line-clamp-2 text-sm font-semibold hover:text-primary">
+                    <Link to="/{-$lang}/products/$productId" params={{ productId: item.slug }} className="line-clamp-2 text-sm font-semibold hover:text-primary">
                       {item.name}
                     </Link>
                     <p className="mt-1 text-sm font-bold text-primary">{fmt(item.price)}</p>
@@ -83,7 +83,7 @@ function CartPage() {
               </dl>
               <div className="my-4 h-px bg-border" />
               <div className="flex justify-between text-base font-bold"><span>Total</span><span>{fmt(subtotal)}</span></div>
-              <Button asChild className="mt-5 w-full"><Link to="/checkout">Checkout</Link></Button>
+              <Button asChild className="mt-5 w-full"><Link to="/{-$lang}/checkout">Checkout</Link></Button>
               <Button variant="outline" className="mt-2 w-full" onClick={clear}>Empty cart</Button>
             </aside>
           </div>

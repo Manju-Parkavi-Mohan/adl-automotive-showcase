@@ -39,7 +39,7 @@ function RegisterPage() {
         customerId: data.customerId,
       });
       toast.success("Account created");
-      navigate({ to: "/account" }).catch(() => {});
+      navigate({ to: "/{-$lang}/account" }).catch(() => {});
     },
     onError: (err) => toast.error(err instanceof Error ? err.message : "Could not create account"),
   });
@@ -80,7 +80,7 @@ function RegisterPage() {
             {mutation.isPending ? "Creating account…" : "Create account"}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            Already have an account? <Link to="/account/login" className="font-semibold text-primary hover:underline">Sign in</Link>
+            Already have an account? <Link to="/{-$lang}/account/login" className="font-semibold text-primary hover:underline">Sign in</Link>
           </p>
         </form>
       </main>
