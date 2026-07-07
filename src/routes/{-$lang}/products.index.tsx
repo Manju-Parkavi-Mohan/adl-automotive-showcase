@@ -229,12 +229,12 @@ function ProductsPage() {
             )}
           </div>
 
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ms-auto flex items-center gap-3">
             <div className="relative">
               <select
                 value={sort}
                 onChange={(e) => { setSort(e.target.value as typeof sort); setPage(1); }}
-                className="h-10 appearance-none rounded-md border border-border bg-white pl-3 pr-9 text-sm font-medium outline-none focus:border-primary"
+                className="h-10 appearance-none rounded-md border border-border bg-white ps-3 pe-9 text-sm font-medium outline-none focus:border-primary"
                 aria-label="Sort by"
               >
                 {SORT_OPTIONS.map((o) => <option key={o.id} value={o.id}>Sort: {o.label}</option>)}
@@ -411,7 +411,7 @@ function FiltersPanel(props: {
       </FilterGroup>
 
       <FilterGroup title="Brands">
-        <div className="max-h-56 space-y-1 overflow-y-auto pr-1">
+        <div className="max-h-56 space-y-1 overflow-y-auto pe-1">
           {props.allBrands.length === 0 && (
             <p className="px-2 text-xs text-muted-foreground">No brands on this page</p>
           )}
@@ -455,7 +455,7 @@ function FiltersPanel(props: {
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star key={i} className={`h-3.5 w-3.5 ${i < r ? "fill-current" : "text-muted-foreground/30"}`} />
               ))}
-              <span className="ml-1 text-xs text-foreground">& up</span>
+              <span className="ms-1 text-xs text-foreground">& up</span>
             </span>
           </button>
         ))}

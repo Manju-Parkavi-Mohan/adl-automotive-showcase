@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { listCategories } from "@/lib/woo/categories.functions";
+import { useLocale } from "@/i18n/LocaleProvider";
 
 export function SectionHeader({
   eyebrow,
@@ -28,6 +29,7 @@ export function SectionHeader({
 }
 
 export function CategoryShowcase() {
+  const { t } = useLocale();
   const { data, isLoading } = useQuery({
     queryKey: ["wc-categories-showcase"],
     queryFn: () => listCategories({ data: { perPage: 50, hideEmpty: true } }),
@@ -72,7 +74,7 @@ export function CategoryShowcase() {
     <section aria-label="Product categories" className="bg-secondary py-10">
       <div className="container-px mx-auto max-w-[1400px]">
         <h2 className="mb-6 text-2xl font-extrabold uppercase tracking-tight text-black sm:text-3xl">
-          Shop by Category
+          {t("home.shopByCategory")}
         </h2>
         <div className="relative">
           {/* Left arrow */}
@@ -109,7 +111,7 @@ export function CategoryShowcase() {
                     data-cat-card
                     className="group flex h-[110px] w-[calc((100%-20px)/2)] shrink-0 snap-start items-center justify-between gap-2 rounded-2xl bg-white px-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md sm:h-[120px] sm:w-[260px]"
                   >
-                    <span className="flex-1 text-left text-[13px] font-extrabold leading-tight text-black sm:text-[15px]">
+                    <span className="flex-1 text-start text-[13px] font-extrabold leading-tight text-black sm:text-[15px]">
                       {c.name}
                     </span>
                     {c.image?.src && (

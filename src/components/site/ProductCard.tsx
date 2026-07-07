@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/site/CartProvider";
 import { toast } from "sonner";
 import { useLocale } from "@/i18n/LocaleProvider";
+import { Money, Percent, Num } from "@/components/site/Money";
 
 export function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart();
-  const { t, formatPrice } = useLocale();
+  const { t } = useLocale();
   const discount = product.oldPrice ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100) : 0;
 
   const handleAdd = (e: React.MouseEvent) => {
@@ -57,7 +58,7 @@ export function ProductCard({ product }: { product: Product }) {
           )}
           {discount > 0 && (
             <span className="rounded-full bg-destructive px-2.5 py-0.5 text-xs font-semibold text-white">
-              -{discount}%
+              <Percent value={discount} sign="-" />
             </span>
           )}
         </div>
@@ -99,17 +100,15 @@ export function ProductCard({ product }: { product: Product }) {
               />
             ))}
           </div>
-          <span>({product.reviewCount})</span>
+          <span><Num>({product.reviewCount})</Num></span>
         </div>
 
         <div className="mt-auto flex items-end justify-between pt-1 sm:pt-2">
           <div className="flex flex-col">
             {product.oldPrice && (
-              <span className="text-[10px] text-muted-foreground line-through sm:text-xs">
-                {formatPrice(product.oldPrice)}
-              </span>
+              <Money usd={product.oldPrice} strike className="text-[10px] text-muted-foreground sm:text-xs" />
             )}
-            <span className="text-sm font-bold text-primary sm:text-lg">{formatPrice(product.price)}</span>
+            <Money usd={product.price} className="text-sm font-bold text-primary sm:text-lg" />
           </div>
           <Button
             size="sm"
