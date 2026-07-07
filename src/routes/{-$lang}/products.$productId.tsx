@@ -18,6 +18,8 @@ import type { WooProduct } from "@/lib/woo/types";
 import { pushRecentlyViewed } from "@/lib/recently-viewed";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
 import { ProductReviews } from "@/components/site/ProductReviews";
+import { Money, Percent, Num } from "@/components/site/Money";
+import { useLocale } from "@/i18n/LocaleProvider";
 
 export const Route = createFileRoute("/{-$lang}/products/$productId")({
   loader: ({ params, context }) =>
@@ -53,6 +55,7 @@ export const Route = createFileRoute("/{-$lang}/products/$productId")({
 });
 
 function NotFoundView() {
+  // t() inside functional component; simple English fallback fine here
   return (
     <div className="grid min-h-screen place-items-center bg-secondary px-4 text-center">
       <div>
@@ -66,15 +69,17 @@ function NotFoundView() {
   );
 }
 
-const TABS = [
-  { id: "description", label: "Description" },
-  { id: "specs", label: "Specifications" },
-  { id: "reviews", label: "Reviews" },
-] as const;
+const TAB_IDS = ["description", "specs", "reviews"] as const;
 
 function ProductDetailPage() {
   const { productId } = Route.useParams();
   const { addItem } = useCart();
+  const { t } = useLocale();
+  const TABS = [
+    { id: "description" as const, label: t("product.tabDescription") },
+    { id: "specs" as const, label: t("product.tabSpecs") },
+    { id: "reviews" as const, label: t("product.tabReviews") },
+  ];
 
   const productQuery = useQuery({
     queryKey: ["wc-product", productId],
@@ -97,14 +102,14 @@ function ProductDetailPage() {
 
   const [imageIndex, setImageIndex] = useState(0);
   const [qty, setQty] = useState(1);
-  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("description");
+  const [tab, setTab] = useState<(typeof TAB_IDS)[number]>("description");
 
   if (productQuery.isLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container-px mx-auto max-w-[1400px] py-24 text-center text-sm text-muted-foreground">
-          Loading product…
+          {t("product.loading")}
         </div>
         <Footer />
       </div>
@@ -145,9 +150,9 @@ function ProductDetailPage() {
         <div className="container-px mx-auto max-w-[1400px] py-4">
           <nav aria-label="Breadcrumb">
             <ol className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
-              <li><Link to="/{-$lang}" className="hover:text-primary">Home</Link></li>
+              <li><Link to="/{-$lang}" className="hover:text-primary">{t("common.home")}</Link></li>
               <li><ChevronRight className="h-3.5 w-3.5" /></li>
-              <li><Link to="/{-$lang}/products" search={{}} className="hover:text-primary">Products</Link></li>
+              <li><Link to="/{-$lang}/products" search={{}} className="hover:text-primary">{t("nav.products")}</Link></li>
               <li><ChevronRight className="h-3.5 w-3.5" /></li>
               <li><span className="text-muted-foreground">{categoryLabel}</span></li>
               <li><ChevronRight className="h-3.5 w-3.5" /></li>
@@ -180,15 +185,15 @@ function ProductDetailPage() {
                 alt={product.name}
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute left-4 top-4 flex flex-col gap-2">
+              <div className="absolute start-4 top-4 flex flex-col gap-2">
                 {product.badge === "new" && (
-                  <span className="rounded-full bg-[var(--accent-blue)] px-3 py-1 text-xs font-semibold text-white">NEW</span>
+                  <span className="rounded-full bg-[var(--accent-blue)] px-3 py-1 text-xs font-semibold text-white">{t("product.new")}</span>
                 )}
                 {discount > 0 && (
-                  <span className="rounded-full bg-destructive px-3 py-1 text-xs font-semibold text-white">-{discount}% OFF</span>
+                  <span className="rounded-full bg-destructive px-3 py-1 text-xs font-semibold text-white"><Percent value={discount} sign="-" /> {t("product.off")}</span>
                 )}
               </div>
-              <div className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white/95 text-foreground shadow-sm">
+              <div className="absolute end-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white/95 text-foreground shadow-sm">
                 <ZoomIn className="h-4 w-4" />
               </div>
             </div>
@@ -209,12 +214,12 @@ function ProductDetailPage() {
                     <Star key={i} className={`h-4 w-4 ${i < Math.round(product.rating) ? "fill-current" : "text-muted-foreground/30"}`} />
                   ))}
                 </div>
-                <span className="font-semibold text-foreground">{product.rating.toFixed(1)}</span>
-                <span className="text-muted-foreground">({product.reviewCount} reviews)</span>
+                <span className="font-semibold text-foreground"><Num>{product.rating.toFixed(1)}</Num></span>
+                <span className="text-muted-foreground">({t("product.reviewsCount", { count: product.reviewCount })})</span>
               </div>
-              <span className="text-muted-foreground">SKU: <span className="font-medium text-foreground">{product.sku}</span></span>
+              <span className="text-muted-foreground">{t("product.sku")}: <span className="font-medium text-foreground"><Num>{product.sku}</Num></span></span>
               <span className={`inline-flex items-center gap-1.5 font-medium ${product.inStock ? "text-emerald-600" : "text-destructive"}`}>
-                <Check className="h-4 w-4" /> {product.inStock ? "In Stock" : "Out of Stock"}
+                <Check className="h-4 w-4" /> {product.inStock ? t("product.inStock") : t("product.outOfStock")}
               </span>
             </div>
 
@@ -224,54 +229,50 @@ function ProductDetailPage() {
 
             <div className="mt-6 rounded-xl border border-border bg-secondary p-6">
               <div className="flex flex-wrap items-end gap-3">
-                <span className="text-4xl font-extrabold text-primary">
-                  ${product.price.toLocaleString()}
-                </span>
+                <Money usd={product.price} className="text-4xl font-extrabold text-primary" />
                 {product.oldPrice && (
                   <>
-                    <span className="text-lg text-muted-foreground line-through">
-                      ${product.oldPrice.toLocaleString()}
-                    </span>
+                    <Money usd={product.oldPrice} strike className="text-lg text-muted-foreground" />
                     <span className="rounded-md bg-destructive/10 px-2 py-0.5 text-xs font-semibold text-destructive">
-                      Save ${(product.oldPrice - product.price).toLocaleString()}
+                      {t("product.save")} <Money usd={product.oldPrice - product.price} />
                     </span>
                   </>
                 )}
               </div>
-              <p className="mt-1.5 text-xs text-muted-foreground">VAT included · Free shipping on orders over $1,000</p>
+              <p className="mt-1.5 text-xs text-muted-foreground">{t("product.vatIncluded")}</p>
 
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <div className="inline-flex h-12 items-center rounded-md border border-border bg-white">
-                  <button aria-label="Decrease quantity" onClick={() => setQty((q) => Math.max(1, q - 1))} className="grid h-full w-11 place-items-center text-muted-foreground hover:text-primary">
+                  <button aria-label={t("product.decrease")} onClick={() => setQty((q) => Math.max(1, q - 1))} className="grid h-full w-11 place-items-center text-muted-foreground hover:text-primary">
                     <Minus className="h-4 w-4" />
                   </button>
-                  <input aria-label="Quantity" type="number" min={1} value={qty} onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))} className="h-full w-12 border-x border-border bg-transparent text-center text-sm font-semibold outline-none" />
-                  <button aria-label="Increase quantity" onClick={() => setQty((q) => q + 1)} className="grid h-full w-11 place-items-center text-muted-foreground hover:text-primary">
+                  <input aria-label={t("product.quantity")} type="number" min={1} value={qty} onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))} className="h-full w-12 border-x border-border bg-transparent text-center text-sm font-semibold outline-none" />
+                  <button aria-label={t("product.increase")} onClick={() => setQty((q) => q + 1)} className="grid h-full w-11 place-items-center text-muted-foreground hover:text-primary">
                     <Plus className="h-4 w-4" />
                   </button>
                 </div>
                 <button onClick={handleAdd} disabled={!product.inStock} className="inline-flex h-12 flex-1 min-w-[200px] items-center justify-center gap-2 rounded-md bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60">
                   <ShoppingCart className="h-4 w-4" />
-                  {product.inStock ? "Add to Cart" : "Out of stock"}
+                  {product.inStock ? t("product.addToCart") : t("product.outOfStock")}
                 </button>
               </div>
 
               <div className="mt-3 flex flex-wrap gap-2">
                 <button className="inline-flex h-11 flex-1 min-w-[160px] items-center justify-center gap-2 rounded-md border border-border bg-white text-sm font-semibold transition-colors hover:border-primary hover:text-primary">
-                  <Heart className="h-4 w-4" /> Add to Wishlist
+                  <Heart className="h-4 w-4" /> {t("product.addToWishlist")}
                 </button>
                 <button className="inline-flex h-11 flex-1 min-w-[160px] items-center justify-center gap-2 rounded-md border border-border bg-white text-sm font-semibold transition-colors hover:border-primary hover:text-primary">
-                  <Share2 className="h-4 w-4" /> Share
+                  <Share2 className="h-4 w-4" /> {t("product.share")}
                 </button>
               </div>
             </div>
 
             <ul className="mt-6 grid grid-cols-2 gap-3 text-sm">
               {[
-                { icon: Truck, label: "Free worldwide shipping" },
-                { icon: ShieldCheck, label: "100% genuine product" },
-                { icon: RotateCcw, label: "30-day returns" },
-                { icon: Headphones, label: "Expert tech support" },
+                { icon: Truck, label: t("product.features.shipping") },
+                { icon: ShieldCheck, label: t("product.features.genuine") },
+                { icon: RotateCcw, label: t("product.features.returns") },
+                { icon: Headphones, label: t("product.features.support") },
               ].map((f) => (
                 <li key={f.label} className="flex items-center gap-2.5 rounded-md border border-border bg-white px-3 py-2.5">
                   <f.icon className="h-4 w-4 shrink-0 text-primary" />
@@ -303,10 +304,10 @@ function ProductDetailPage() {
         </section>
 
         <section className="mt-16">
-          <SectionHeader eyebrow="You may also like" title="Related Products"
-            action={<Link to="/{-$lang}/products" search={{}} className="text-sm font-semibold text-primary hover:underline">View all →</Link>} />
+          <SectionHeader eyebrow={t("product.relatedEyebrow")} title={t("product.relatedTitle")}
+            action={<Link to="/{-$lang}/products" search={{}} className="text-sm font-semibold text-primary hover:underline">{t("common.viewAllArrow")}</Link>} />
           {related.length === 0 ? (
-            <p className="mt-6 text-sm text-muted-foreground">No related products available.</p>
+            <p className="mt-6 text-sm text-muted-foreground">{t("product.noRelated")}</p>
           ) : (
             <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {related.map((p) => <ProductCard key={p.id} product={p} />)}

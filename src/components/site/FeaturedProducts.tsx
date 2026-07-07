@@ -5,6 +5,7 @@ import { ProductCard } from "./ProductCard";
 import { SectionHeader } from "./CategoryShowcase";
 import { listProducts } from "@/lib/woo/products.functions";
 import { wooToDisplay } from "@/lib/woo/adapter";
+import { useLocale } from "@/i18n/LocaleProvider";
 
 type TabId = "featured" | "popular" | "best" | "rated";
 
@@ -15,14 +16,15 @@ type ListInput = {
   order?: "asc" | "desc";
 };
 
-const TABS: { id: TabId; label: string; query: ListInput }[] = [
-  { id: "featured", label: "Featured", query: { featured: true, perPage: 8 } },
-  // { id: "popular", label: "Popular", query: { orderby: "popularity", perPage: 8 } },
-  { id: "best", label: "Best Selling", query: { orderby: "popularity", perPage: 8 } },
-  { id: "rated", label: "Top Rated", query: { orderby: "rating", perPage: 8 } },
+const TABS_META: { id: TabId; labelKey: string; query: ListInput }[] = [
+  { id: "featured", labelKey: "home.featuredTab", query: { featured: true, perPage: 8 } },
+  { id: "best", labelKey: "home.bestSellingTab", query: { orderby: "popularity", perPage: 8 } },
+  { id: "rated", labelKey: "home.topRatedTab", query: { orderby: "rating", perPage: 8 } },
 ];
 
 export function FeaturedProducts() {
+  const { t } = useLocale();
+  const TABS = TABS_META;
   const [active, setActive] = useState<TabId>("featured");
   const tab = TABS.find((t) => t.id === active)!;
   const { data, isLoading } = useQuery({
@@ -45,22 +47,22 @@ export function FeaturedProducts() {
   return (
     <section className="container-px mx-auto max-w-[1400px] py-10">
       <SectionHeader
-        eyebrow="Curated selection"
-        title="Featured Products"
-        subtitle="Workshop favourites and editor picks across diagnostics and tuning."
+        eyebrow={t("home.featuredEyebrow")}
+        title={t("home.featured")}
+        subtitle={t("home.featuredSubtitle")}
         action={
           <div className="flex flex-wrap gap-1.5 rounded-full bg-secondary p-1">
-            {TABS.map((t) => (
+            {TABS.map((tab) => (
               <button
-                key={t.id}
-                onClick={() => setActive(t.id)}
+                key={tab.id}
+                onClick={() => setActive(tab.id)}
                 className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                  active === t.id
+                  active === tab.id
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {t.label}
+                {t(tab.labelKey)}
               </button>
             ))}
           </div>
@@ -80,6 +82,7 @@ export function FeaturedProducts() {
 }
 
 export function NewArrivals() {
+  const { t } = useLocale();
   const { data, isLoading } = useQuery({
     queryKey: ["wc-new-arrivals"],
     queryFn: () => listProducts({ data: { orderby: "date", order: "desc", perPage: 4 } }),
@@ -90,12 +93,12 @@ export function NewArrivals() {
     <section className="bg-secondary py-20">
       <div className="container-px mx-auto max-w-[1400px]">
         <SectionHeader
-          eyebrow="Just landed"
-          title="New Arrivals"
-          subtitle="The latest hardware additions from our trusted manufacturers."
+          eyebrow={t("home.newArrivalsEyebrow")}
+          title={t("home.newArrivals")}
+          subtitle={t("home.newArrivalsSubtitle")}
           action={
             <Link to="/{-$lang}/products" search={{}} className="text-sm font-semibold text-primary hover:underline">
-              View all →
+              {t("common.viewAllArrow")}
             </Link>
           }
         />

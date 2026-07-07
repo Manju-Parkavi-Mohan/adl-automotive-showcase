@@ -1,28 +1,28 @@
 import { Truck, ShieldCheck, Lock, RotateCcw, Headphones, Zap } from "lucide-react";
-
-const FEATURES = [
-  { icon: Truck, title: "Free Shipping", text: "On qualifying orders to 60+ countries." },
-  { icon: ShieldCheck, title: "Genuine Products", text: "100% authentic, sourced direct from manufacturers." },
-  { icon: Lock, title: "Secure Payments", text: "SSL-encrypted checkout with global processors." },
-  { icon: RotateCcw, title: "Money Back Guarantee", text: "30-day no-questions-asked returns." },
-  { icon: Headphones, title: "Technical Support", text: "Expert technicians available 6 days a week." },
-  { icon: Zap, title: "Fast Delivery", text: "Express dispatch from European & UAE warehouses." },
-];
+import { useLocale } from "@/i18n/LocaleProvider";
 
 export function WhyChooseUs() {
+  const { t } = useLocale();
+  const FEATURES = [
+    { icon: Truck, title: t("why.shippingT"), text: t("why.shippingB") },
+    { icon: ShieldCheck, title: t("why.genuineT"), text: t("why.genuineB") },
+    { icon: Lock, title: t("why.secureT"), text: t("why.secureB") },
+    { icon: RotateCcw, title: t("why.returnsT"), text: t("why.returnsB") },
+    { icon: Headphones, title: t("why.supportT"), text: t("why.supportB") },
+    { icon: Zap, title: t("why.fastT"), text: t("why.fastB") },
+  ];
   return (
     <section className="bg-secondary py-20">
       <div className="container-px mx-auto max-w-[1400px]">
         <div className="mx-auto max-w-2xl text-center">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.25em] text-[var(--accent-blue)]">
-            Why ADL Automotive
+            {t("home.whyEyebrow")}
           </p>
           <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-            The professional standard, delivered worldwide
+            {t("home.whyTitle")}
           </h2>
           <p className="mt-3 text-base text-muted-foreground">
-            We support independent workshops, dealers and tuning specialists with vetted hardware
-            and dedicated after-sales service.
+            {t("home.whyBody")}
           </p>
         </div>
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

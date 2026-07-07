@@ -3,37 +3,22 @@ import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import bannerAutodome from "@/assets/banner-adl-autodome.jpg.asset.json";
 import bannerDiagnostic from "@/assets/banner-diagnostic.jpg.asset.json";
 import bannerScanner from "@/assets/banner-scanner.jpg.asset.json";
+import { useLocale } from "@/i18n/LocaleProvider";
 
-const SLIDES = [
-  {
-    eyebrow: "Workshop Diagnostics",
-    title: "Dealer-Grade Diagnostic Equipment",
-    description: "Professional scan tools and key programmers trusted by independent workshops worldwide.",
-    cta: "Shop Diagnostic Tools",
-    image: bannerAutodome.url,
-  },
-  {
-    eyebrow: "ECU Calibration",
-    title: "Performance Tuning, Engineered.",
-    description: "Bench, OBD and boot-mode programmers from Alientech, Magic Motorsport, Dimsport and more.",
-    cta: "Explore Tuning Tools",
-    image: bannerScanner.url,
-  },
-  {
-    eyebrow: "Workshop Equipment",
-    title: "Equip Your Bay With Confidence",
-    description: "From lifts to laptops — premium hardware ready to ship from our European warehouse.",
-    cta: "Browse Equipment",
-    image: bannerDiagnostic.url,
-  },
-];
+const SLIDE_IMAGES = [bannerAutodome.url, bannerScanner.url, bannerDiagnostic.url];
 
 export function HeroCarousel() {
+  const { t } = useLocale();
+  const SLIDES = [
+    { eyebrow: t("hero.s1e"), title: t("hero.s1t"), description: t("hero.s1d"), cta: t("hero.s1c"), image: SLIDE_IMAGES[0] },
+    { eyebrow: t("hero.s2e"), title: t("hero.s2t"), description: t("hero.s2d"), cta: t("hero.s2c"), image: SLIDE_IMAGES[1] },
+    { eyebrow: t("hero.s3e"), title: t("hero.s3t"), description: t("hero.s3d"), cta: t("hero.s3c"), image: SLIDE_IMAGES[2] },
+  ];
   const [i, setI] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setI((v) => (v + 1) % SLIDES.length), 6000);
     return () => clearInterval(t);
-  }, []);
+  }, [SLIDES.length]);
   const slide = SLIDES[i];
 
   return (
@@ -65,7 +50,7 @@ export function HeroCarousel() {
                 {slide.cta} <ArrowRight className="h-4 w-4" />
               </button>
               <button className="inline-flex items-center gap-2 rounded-md border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20">
-                View Catalog
+                {t("hero.viewCatalog")}
               </button>
             </div>
           </div>
