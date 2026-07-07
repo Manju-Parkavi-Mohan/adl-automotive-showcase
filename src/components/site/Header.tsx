@@ -103,7 +103,7 @@ export function Header() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t("common.searchPlaceholder")}
                 aria-label={t("common.search")}
-                className="h-11 w-full rounded-full border border-border bg-secondary pl-11 pr-28 text-sm outline-none transition-colors focus:border-primary focus:bg-white"
+                className="h-11 w-full rounded-full border border-border bg-secondary ps-11 pe-28 text-sm outline-none transition-colors focus:border-primary focus:bg-white"
               />
               <button
                 type="submit"
@@ -208,7 +208,7 @@ export function Header() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t("common.searchPlaceholder")}
-              className="h-9 w-full rounded-full border border-border bg-secondary pl-9 pr-3 text-sm outline-none focus:border-primary focus:bg-white"
+              className="h-9 w-full rounded-full border border-border bg-secondary ps-9 pe-3 text-sm outline-none focus:border-primary focus:bg-white"
             />
           </form>
         </div>
@@ -266,7 +266,7 @@ export function Header() {
             ))}
           </nav>
 
-          <div className="ml-auto hidden items-center gap-1 lg:flex">
+          <div className="ms-auto hidden items-center gap-1 lg:flex">
             {EXTRA_LINKS.map((p) => (
               <a
                 key={p.key}

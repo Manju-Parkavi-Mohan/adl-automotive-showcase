@@ -353,7 +353,7 @@ function SpecsPanel({ woo }: { woo: WooProduct }) {
         <tbody>
           {rows.map((row, i) => (
             <tr key={`${row[0]}-${i}`} className={i % 2 === 0 ? "bg-secondary" : "bg-white"}>
-              <th scope="row" className="w-1/3 px-5 py-3.5 text-left font-semibold text-foreground">{row[0]}</th>
+              <th scope="row" className="w-1/3 px-5 py-3.5 text-start font-semibold text-foreground">{row[0]}</th>
               <td className="px-5 py-3.5 text-foreground/80">{row[1]}</td>
             </tr>
           ))}

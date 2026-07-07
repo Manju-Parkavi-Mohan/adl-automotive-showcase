@@ -2,13 +2,12 @@ import { Link } from "@tanstack/react-router";
 import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import { useCart } from "./CartProvider";
 import { Button } from "@/components/ui/button";
-
-function formatUSD(n: number) {
-  return n.toLocaleString("en-US", { style: "currency", currency: "USD" });
-}
+import { Money, Num } from "@/components/site/Money";
+import { useLocale } from "@/i18n/LocaleProvider";
 
 export function CartDrawer() {
   const { isOpen, closeCart, items, subtotal, updateQuantity, removeItem } = useCart();
+  const { t } = useLocale();
 
   if (!isOpen) return null;
 
@@ -20,10 +19,10 @@ export function CartDrawer() {
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={closeCart}
       />
-      <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-white shadow-2xl">
+      <aside className="absolute end-0 top-0 flex h-full w-full max-w-md flex-col bg-white shadow-2xl">
         <header className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h2 className="text-lg font-semibold text-foreground">Your Cart</h2>
-          <button aria-label="Close" onClick={closeCart} className="rounded-md p-1 hover:bg-secondary">
+          <h2 className="text-lg font-semibold text-foreground">{t("cart.title")}</h2>
+          <button aria-label={t("common.close")} onClick={closeCart} className="rounded-md p-1 hover:bg-secondary">
             <X className="h-5 w-5" />
           </button>
         </header>
@@ -32,10 +31,10 @@ export function CartDrawer() {
           {items.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
               <ShoppingBag className="mb-3 h-10 w-10 text-muted-foreground" />
-              <p className="text-sm font-medium text-foreground">Your cart is empty</p>
-              <p className="mt-1 text-xs text-muted-foreground">Browse our latest equipment</p>
+              <p className="text-sm font-medium text-foreground">{t("cart.empty")}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("cart.emptyHint")}</p>
               <Button asChild className="mt-5" onClick={closeCart}>
-                <Link to="/{-$lang}/products" search={{}}>Browse products</Link>
+                <Link to="/{-$lang}/products" search={{}}>{t("cart.browse")}</Link>
               </Button>
             </div>
           ) : (
@@ -52,19 +51,19 @@ export function CartDrawer() {
                       </p>
                     )}
                     <p className="line-clamp-2 text-sm font-medium text-foreground">{item.name}</p>
-                    <p className="mt-1 text-sm font-semibold text-primary">{formatUSD(item.price)}</p>
+                    <Money usd={item.price} className="mt-1 text-sm font-semibold text-primary" />
                     <div className="mt-2 flex items-center justify-between">
                       <div className="inline-flex items-center rounded-md border border-border">
                         <button
-                          aria-label="Decrease quantity"
+                          aria-label={t("product.decrease")}
                           className="grid h-7 w-7 place-items-center hover:bg-secondary"
                           onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                         >
                           <Minus className="h-3.5 w-3.5" />
                         </button>
-                        <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
+                        <span className="w-8 text-center text-sm font-medium"><Num>{item.quantity}</Num></span>
                         <button
-                          aria-label="Increase quantity"
+                          aria-label={t("product.increase")}
                           className="grid h-7 w-7 place-items-center hover:bg-secondary"
                           onClick={() => updateQuantity(item.productId, item.quantity + 1)}
                         >
@@ -72,7 +71,7 @@ export function CartDrawer() {
                         </button>
                       </div>
                       <button
-                        aria-label="Remove item"
+                        aria-label={t("cart.remove")}
                         className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-destructive"
                         onClick={() => removeItem(item.productId)}
                       >
@@ -89,16 +88,16 @@ export function CartDrawer() {
         {items.length > 0 && (
           <footer className="border-t border-border bg-secondary/40 px-5 py-4">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span className="text-base font-bold text-foreground">{formatUSD(subtotal)}</span>
+              <span className="text-muted-foreground">{t("cart.subtotal")}</span>
+              <Money usd={subtotal} className="text-base font-bold text-foreground" />
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">Shipping and taxes calculated at checkout.</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t("cart.shippingTaxNote")}</p>
             <div className="mt-4 flex flex-col gap-2">
               <Button asChild className="w-full" onClick={closeCart}>
-                <Link to="/{-$lang}/checkout">Checkout</Link>
+                <Link to="/{-$lang}/checkout">{t("cart.checkout")}</Link>
               </Button>
               <Button asChild variant="outline" className="w-full" onClick={closeCart}>
-                <Link to="/{-$lang}/cart">View cart</Link>
+                <Link to="/{-$lang}/cart">{t("cart.viewCart")}</Link>
               </Button>
             </div>
           </footer>

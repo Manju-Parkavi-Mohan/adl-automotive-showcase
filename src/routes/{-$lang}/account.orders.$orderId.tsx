@@ -93,7 +93,7 @@ function OrderView({ order }: { order: NonNullable<Awaited<ReturnType<typeof get
               })}
             </p>
           </div>
-          <div className="text-right">
+          <div className="text-end">
             <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold capitalize ${tone}`}>
               {order.status.replace(/-/g, " ")}
             </span>

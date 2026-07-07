@@ -21,7 +21,7 @@ interface LocaleContextValue {
   locale: Locale;
   currency: Currency;
   dir: "ltr" | "rtl";
-  t: (path: string, fallback?: string) => string;
+  t: (path: string, fallbackOrVars?: string | Record<string, string | number>, vars?: Record<string, string | number>) => string;
   formatPrice: (usdAmount: number) => string;
   setLocale: (l: Locale) => void;
   setCurrency: (c: Currency) => void;
@@ -38,6 +38,11 @@ function lookup(dict: Record<string, unknown>, path: string): string | undefined
     } else return undefined;
   }
   return typeof cur === "string" ? cur : undefined;
+}
+
+function interpolate(template: string, vars?: Record<string, string | number>): string {
+  if (!vars) return template;
+  return template.replace(/\{(\w+)\}/g, (_, k) => (k in vars ? String(vars[k]) : `{${k}}`));
 }
 
 // One-year sticky cookie. Client-side write; SSR reads it on next request.
@@ -63,7 +68,12 @@ export function LocaleProvider({
       locale,
       currency,
       dir: LOCALE_META[locale].dir,
-      t: (path, fb) => lookup(dict, path) ?? lookup(fallbackDict, path) ?? fb ?? path,
+      t: (path, fbOrVars, vars) => {
+        const fb = typeof fbOrVars === "string" ? fbOrVars : undefined;
+        const v = typeof fbOrVars === "object" ? fbOrVars : vars;
+        const raw = lookup(dict, path) ?? lookup(fallbackDict, path) ?? fb ?? path;
+        return interpolate(raw, v);
+      },
       formatPrice: (usd) => fmtPrice(usd, currency, locale),
       setLocale: (l) => {
         writeCookie(LOCALE_COOKIE, l);
@@ -94,7 +104,7 @@ export function useLocale(): LocaleContextValue {
       locale: DEFAULT_LOCALE,
       currency: DEFAULT_CURRENCY,
       dir: "ltr",
-      t: (p, fb) => fb ?? p,
+      t: (p, fbOrVars) => (typeof fbOrVars === "string" ? fbOrVars : p),
       formatPrice: (usd) => fmtPrice(usd, DEFAULT_CURRENCY, DEFAULT_LOCALE),
       setLocale: () => {},
       setCurrency: () => {},

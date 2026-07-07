@@ -262,17 +262,17 @@ function OrdersTable({ orders }: { orders: Awaited<ReturnType<typeof listMyOrder
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-border text-left text-xs uppercase tracking-wider text-muted-foreground">
-            <th className="py-3 pr-4">Order</th>
-            <th className="py-3 pr-4">Date</th>
-            <th className="py-3 pr-4">Status</th>
-            <th className="py-3 pr-4 text-right">Total</th>
+          <tr className="border-b border-border text-start text-xs uppercase tracking-wider text-muted-foreground">
+            <th className="py-3 pe-4">Order</th>
+            <th className="py-3 pe-4">Date</th>
+            <th className="py-3 pe-4">Status</th>
+            <th className="py-3 pe-4 text-end">Total</th>
           </tr>
         </thead>
         <tbody>
           {orders.map((o) => (
             <tr key={o.id} className="border-b border-border last:border-0">
-              <td className="py-3 pr-4 font-semibold">
+              <td className="py-3 pe-4 font-semibold">
                 <Link
                   to="/{-$lang}/account/orders/$orderId"
                   params={{ orderId: String(o.id) }}
@@ -281,11 +281,11 @@ function OrdersTable({ orders }: { orders: Awaited<ReturnType<typeof listMyOrder
                   #{o.number}
                 </Link>
               </td>
-              <td className="py-3 pr-4 text-muted-foreground">
+              <td className="py-3 pe-4 text-muted-foreground">
                 {new Date(o.date_created).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
               </td>
-              <td className="py-3 pr-4"><StatusPill status={o.status} /></td>
-              <td className="py-3 pr-4 text-right font-semibold">
+              <td className="py-3 pe-4"><StatusPill status={o.status} /></td>
+              <td className="py-3 pe-4 text-end font-semibold">
                 <Link
                   to="/{-$lang}/account/orders/$orderId"
                   params={{ orderId: String(o.id) }}

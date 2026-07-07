@@ -107,7 +107,7 @@ export function ProductReviews({ productId, rating, reviewCount }: Props) {
                       </button>
                     );
                   })}
-                  <span className="ml-2 text-sm text-muted-foreground">
+                  <span className="ms-2 text-sm text-muted-foreground">
                     {hover || ratingValue} / 5
                   </span>
                 </div>

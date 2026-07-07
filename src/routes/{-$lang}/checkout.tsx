@@ -11,6 +11,8 @@ import { useAuth } from "@/components/site/AuthProvider";
 import { createOrder } from "@/lib/woo/orders.functions";
 import { toast } from "sonner";
 import { seoToMeta } from "@/lib/seo";
+import { Money, Num } from "@/components/site/Money";
+import { useLocale } from "@/i18n/LocaleProvider";
 
 export const Route = createFileRoute("/{-$lang}/checkout")({
   head: () => ({
@@ -23,14 +25,11 @@ export const Route = createFileRoute("/{-$lang}/checkout")({
   component: CheckoutPage,
 });
 
-function fmt(n: number) {
-  return n.toLocaleString("en-US", { style: "currency", currency: "USD" });
-}
-
 function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLocale();
 
   const [form, setForm] = useState({
     first_name: user?.firstName ?? "",
@@ -84,8 +83,8 @@ function CheckoutPage() {
       <div className="min-h-screen bg-background">
         <Header />
         <main className="container-px mx-auto max-w-[1400px] py-20 text-center">
-          <h1 className="text-2xl font-bold">Your cart is empty</h1>
-          <Button asChild className="mt-6"><Link to="/{-$lang}/products" search={{}}>Browse products</Link></Button>
+          <h1 className="text-2xl font-bold">{t("checkout.emptyCart")}</h1>
+          <Button asChild className="mt-6"><Link to="/{-$lang}/products" search={{}}>{t("cart.browse")}</Link></Button>
         </main>
         <Footer />
       </div>
@@ -96,7 +95,7 @@ function CheckoutPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container-px mx-auto max-w-[1400px] py-12">
-        <h1 className="text-3xl font-bold tracking-tight">Checkout</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t("checkout.title")}</h1>
 
         <form
           onSubmit={(e) => {
@@ -106,20 +105,20 @@ function CheckoutPage() {
           className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]"
         >
           <div className="space-y-6 rounded-xl border border-border bg-white p-6">
-            <h2 className="text-lg font-semibold">Billing details</h2>
+            <h2 className="text-lg font-semibold">{t("checkout.billing")}</h2>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="First name" required><Input required value={form.first_name} onChange={update("first_name")} /></Field>
-              <Field label="Last name" required><Input required value={form.last_name} onChange={update("last_name")} /></Field>
-              <Field label="Email" required><Input type="email" required value={form.email} onChange={update("email")} /></Field>
-              <Field label="Phone"><Input value={form.phone} onChange={update("phone")} /></Field>
-              <Field label="Address line 1" required className="sm:col-span-2"><Input required value={form.address_1} onChange={update("address_1")} /></Field>
-              <Field label="Address line 2" className="sm:col-span-2"><Input value={form.address_2} onChange={update("address_2")} /></Field>
-              <Field label="City" required><Input required value={form.city} onChange={update("city")} /></Field>
-              <Field label="State / Region"><Input value={form.state} onChange={update("state")} /></Field>
-              <Field label="Postal code" required><Input required value={form.postcode} onChange={update("postcode")} /></Field>
-              <Field label="Country (2-letter)" required><Input required maxLength={2} value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value.toUpperCase() }))} /></Field>
+              <Field label={t("checkout.firstName")} required><Input required value={form.first_name} onChange={update("first_name")} /></Field>
+              <Field label={t("checkout.lastName")} required><Input required value={form.last_name} onChange={update("last_name")} /></Field>
+              <Field label={t("checkout.email")} required><Input type="email" required value={form.email} onChange={update("email")} /></Field>
+              <Field label={t("checkout.phone")}><Input value={form.phone} onChange={update("phone")} /></Field>
+              <Field label={t("checkout.address1")} required className="sm:col-span-2"><Input required value={form.address_1} onChange={update("address_1")} /></Field>
+              <Field label={t("checkout.address2")} className="sm:col-span-2"><Input value={form.address_2} onChange={update("address_2")} /></Field>
+              <Field label={t("checkout.city")} required><Input required value={form.city} onChange={update("city")} /></Field>
+              <Field label={t("checkout.state")}><Input value={form.state} onChange={update("state")} /></Field>
+              <Field label={t("checkout.postcode")} required><Input required value={form.postcode} onChange={update("postcode")} /></Field>
+              <Field label={t("checkout.country")} required><Input required maxLength={2} value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value.toUpperCase() }))} /></Field>
             </div>
-            <Field label="Order note">
+            <Field label={t("checkout.note")}>
               <textarea
                 value={form.note}
                 onChange={update("note")}
@@ -130,21 +129,21 @@ function CheckoutPage() {
           </div>
 
           <aside className="h-fit space-y-4 rounded-xl border border-border bg-secondary p-6">
-            <h2 className="text-lg font-bold">Your order</h2>
+            <h2 className="text-lg font-bold">{t("checkout.yourOrder")}</h2>
             <ul className="space-y-3 text-sm">
               {items.map((i) => (
                 <li key={i.productId} className="flex justify-between gap-3">
-                  <span className="line-clamp-2 text-foreground/80">{i.name} × {i.quantity}</span>
-                  <span className="shrink-0 font-medium">{fmt(i.price * i.quantity)}</span>
+                  <span className="line-clamp-2 text-foreground/80">{i.name} <bdi dir="ltr">× {i.quantity}</bdi></span>
+                  <Money usd={i.price * i.quantity} className="shrink-0 font-medium" />
                 </li>
               ))}
             </ul>
             <div className="my-2 h-px bg-border" />
-            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span className="font-medium">{fmt(subtotal)}</span></div>
-            <div className="flex justify-between text-base font-bold"><span>Total</span><span>{fmt(subtotal)}</span></div>
-            <p className="text-xs text-muted-foreground">Payment is collected manually for this demo (Cash on Delivery).</p>
+            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{t("cart.subtotal")}</span><Money usd={subtotal} className="font-medium" /></div>
+            <div className="flex justify-between text-base font-bold"><span>{t("cart.total")}</span><Money usd={subtotal} /></div>
+            <p className="text-xs text-muted-foreground">{t("checkout.codNote")}</p>
             <Button type="submit" className="w-full" disabled={mutation.isPending}>
-              {mutation.isPending ? "Placing order…" : "Place order"}
+              {mutation.isPending ? t("checkout.placing") : t("checkout.place")}
             </Button>
           </aside>
         </form>

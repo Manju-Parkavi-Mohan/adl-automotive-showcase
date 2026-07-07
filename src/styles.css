@@ -179,3 +179,32 @@
 
 /* Prevent tiny horizontal overflow from scrollers/marquees on mobile */
 html, body { overflow-x: hidden; }
+
+/*
+ * Bidi isolation for numeric / currency / percentage tokens.
+ *
+ * Inside a `dir="rtl"` context, characters like `-`, `$`, digits and `%`
+ * belong to Unicode's "weak" or "neutral" categories, so the surrounding
+ * Arabic text can flip them to visually incorrect order (e.g. "-12%" →
+ * "%12-", "$2,900" → "900,2$"). Wrapping the value in a <bdi> element or
+ * applying the `.lc-num` class isolates it and forces internal LTR
+ * rendering while still respecting the outer flow for layout.
+ *
+ * <bdi> already applies `unicode-bidi: isolate` by default, but we also
+ * pin direction to LTR so numbers render in western order even when the
+ * document direction is RTL.
+ */
+bdi,
+.lc-num {
+  unicode-bidi: isolate;
+  direction: ltr;
+  white-space: nowrap;
+}
+
+/* Hard-force LTR internals for numeric inputs (quantities, phone numbers) */
+[dir="rtl"] input[type="number"],
+[dir="rtl"] input[type="tel"] {
+  direction: ltr;
+  text-align: end;
+  unicode-bidi: isolate;
+}
