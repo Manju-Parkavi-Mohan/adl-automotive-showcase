@@ -68,6 +68,7 @@ export interface WooOrderSummary {
   total: string;
   currency: string;
   date_created: string;
+  order_key?: string;
 }
 
 export interface ProductListResult {
