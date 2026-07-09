@@ -47,6 +47,7 @@ export const createOrder = createServerFn({ method: "POST" })
       total: string;
       currency: string;
       date_created: string;
+      order_key: string;
     }>("/orders", {
       method: "POST",
       body: {
@@ -68,6 +69,7 @@ export const createOrder = createServerFn({ method: "POST" })
       total: res.data.total,
       currency: res.data.currency,
       date_created: res.data.date_created,
+      order_key: res.data.order_key,
     } satisfies WooOrderSummary;
   });
 
