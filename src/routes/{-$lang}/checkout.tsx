@@ -252,13 +252,13 @@ function PaymentStep({
           paymentSession: {
             id: data.payment_session_id,
             payment_session_token: data.payment_session_token,
-          } as unknown as Parameters<typeof loadCheckoutWebComponents>[0]["paymentSession"],
+          },
           appearance: {
             colorAction: `oklch(${primary})`,
             colorPrimary: `oklch(${primary})`,
-            borderRadius: ["8px", "8px"],
+            borderRadius: ["8px", "8px"] as [string, string],
             fontFamily,
-          } as unknown as Parameters<typeof loadCheckoutWebComponents>[0]["appearance"],
+          },
           onPaymentCompleted: () => {
             onSuccess();
           },
