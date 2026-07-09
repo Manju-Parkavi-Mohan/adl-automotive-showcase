@@ -77,7 +77,11 @@ function CheckoutPage() {
       setOrder(order);
     },
     onError: (err) => {
-      toast.error(err instanceof Error ? err.message : "Could not place order");
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "We couldn't start your order, please check your details and try again",
+      );
     },
   });
 
@@ -163,6 +167,11 @@ function CheckoutPage() {
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary"
               />
             </Field>
+            {mutation.isError && (
+              <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+                We couldn't start your order, please check your details and try again.
+              </div>
+            )}
           </div>
 
           <aside className="h-fit space-y-4 rounded-xl border border-border bg-secondary p-6">
