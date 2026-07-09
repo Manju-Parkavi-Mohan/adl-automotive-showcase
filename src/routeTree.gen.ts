@@ -23,6 +23,7 @@ import { Route as Char123LangChar125ProductsIndexRouteImport } from './routes/{-
 import { Route as Char123LangChar125BlogIndexRouteImport } from './routes/{-$lang}/blog.index'
 import { Route as Char123LangChar125AccountIndexRouteImport } from './routes/{-$lang}/account.index'
 import { Route as Char123LangChar125ProductsProductIdRouteImport } from './routes/{-$lang}/products.$productId'
+import { Route as Char123LangChar125CheckoutReturnRouteImport } from './routes/{-$lang}/checkout_.return'
 import { Route as Char123LangChar125BlogSlugRouteImport } from './routes/{-$lang}/blog.$slug'
 import { Route as Char123LangChar125AccountRegisterRouteImport } from './routes/{-$lang}/account.register'
 import { Route as Char123LangChar125AccountLoginRouteImport } from './routes/{-$lang}/account.login'
@@ -106,6 +107,12 @@ const Char123LangChar125ProductsProductIdRoute =
     path: '/$productId',
     getParentRoute: () => Char123LangChar125ProductsRoute,
   } as any)
+const Char123LangChar125CheckoutReturnRoute =
+  Char123LangChar125CheckoutReturnRouteImport.update({
+    id: '/{-$lang}/checkout_/return',
+    path: '/{-$lang}/checkout/return',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const Char123LangChar125BlogSlugRoute =
   Char123LangChar125BlogSlugRouteImport.update({
     id: '/$slug',
@@ -151,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/{-$lang}/account/login': typeof Char123LangChar125AccountLoginRoute
   '/{-$lang}/account/register': typeof Char123LangChar125AccountRegisterRoute
   '/{-$lang}/blog/$slug': typeof Char123LangChar125BlogSlugRoute
+  '/{-$lang}/checkout/return': typeof Char123LangChar125CheckoutReturnRoute
   '/{-$lang}/products/$productId': typeof Char123LangChar125ProductsProductIdRoute
   '/{-$lang}/account/': typeof Char123LangChar125AccountIndexRoute
   '/{-$lang}/blog/': typeof Char123LangChar125BlogIndexRoute
@@ -169,6 +177,7 @@ export interface FileRoutesByTo {
   '/{-$lang}/account/login': typeof Char123LangChar125AccountLoginRoute
   '/{-$lang}/account/register': typeof Char123LangChar125AccountRegisterRoute
   '/{-$lang}/blog/$slug': typeof Char123LangChar125BlogSlugRoute
+  '/{-$lang}/checkout/return': typeof Char123LangChar125CheckoutReturnRoute
   '/{-$lang}/products/$productId': typeof Char123LangChar125ProductsProductIdRoute
   '/{-$lang}/account': typeof Char123LangChar125AccountIndexRoute
   '/{-$lang}/blog': typeof Char123LangChar125BlogIndexRoute
@@ -191,6 +200,7 @@ export interface FileRoutesById {
   '/{-$lang}/account/login': typeof Char123LangChar125AccountLoginRoute
   '/{-$lang}/account/register': typeof Char123LangChar125AccountRegisterRoute
   '/{-$lang}/blog/$slug': typeof Char123LangChar125BlogSlugRoute
+  '/{-$lang}/checkout_/return': typeof Char123LangChar125CheckoutReturnRoute
   '/{-$lang}/products/$productId': typeof Char123LangChar125ProductsProductIdRoute
   '/{-$lang}/account/': typeof Char123LangChar125AccountIndexRoute
   '/{-$lang}/blog/': typeof Char123LangChar125BlogIndexRoute
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/account/login'
     | '/{-$lang}/account/register'
     | '/{-$lang}/blog/$slug'
+    | '/{-$lang}/checkout/return'
     | '/{-$lang}/products/$productId'
     | '/{-$lang}/account/'
     | '/{-$lang}/blog/'
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/account/login'
     | '/{-$lang}/account/register'
     | '/{-$lang}/blog/$slug'
+    | '/{-$lang}/checkout/return'
     | '/{-$lang}/products/$productId'
     | '/{-$lang}/account'
     | '/{-$lang}/blog'
@@ -253,6 +265,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/account/login'
     | '/{-$lang}/account/register'
     | '/{-$lang}/blog/$slug'
+    | '/{-$lang}/checkout_/return'
     | '/{-$lang}/products/$productId'
     | '/{-$lang}/account/'
     | '/{-$lang}/blog/'
@@ -272,6 +285,7 @@ export interface RootRouteChildren {
   Char123LangChar125CheckoutRoute: typeof Char123LangChar125CheckoutRoute
   Char123LangChar125ProductsRoute: typeof Char123LangChar125ProductsRouteWithChildren
   Char123LangChar125IndexRoute: typeof Char123LangChar125IndexRoute
+  Char123LangChar125CheckoutReturnRoute: typeof Char123LangChar125CheckoutReturnRoute
   ApiPublicCheckoutWebhookRoute: typeof ApiPublicCheckoutWebhookRoute
 }
 
@@ -374,6 +388,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/{-$lang}/products/$productId'
       preLoaderRoute: typeof Char123LangChar125ProductsProductIdRouteImport
       parentRoute: typeof Char123LangChar125ProductsRoute
+    }
+    '/{-$lang}/checkout_/return': {
+      id: '/{-$lang}/checkout_/return'
+      path: '/{-$lang}/checkout/return'
+      fullPath: '/{-$lang}/checkout/return'
+      preLoaderRoute: typeof Char123LangChar125CheckoutReturnRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/{-$lang}/blog/$slug': {
       id: '/{-$lang}/blog/$slug'
@@ -479,6 +500,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char123LangChar125CheckoutRoute: Char123LangChar125CheckoutRoute,
   Char123LangChar125ProductsRoute: Char123LangChar125ProductsRouteWithChildren,
   Char123LangChar125IndexRoute: Char123LangChar125IndexRoute,
+  Char123LangChar125CheckoutReturnRoute: Char123LangChar125CheckoutReturnRoute,
   ApiPublicCheckoutWebhookRoute: ApiPublicCheckoutWebhookRoute,
 }
 export const routeTree = rootRouteImport

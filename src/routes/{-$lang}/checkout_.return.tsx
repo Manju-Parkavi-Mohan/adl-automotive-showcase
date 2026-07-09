@@ -16,7 +16,7 @@ const searchSchema = z.object({
   order_key: z.string().optional().default(""),
 });
 
-export const Route = createFileRoute("/{-$lang}/checkout/return")({
+export const Route = createFileRoute("/{-$lang}/checkout_/return")({
   validateSearch: (input) => searchSchema.parse(input),
   head: () => ({
     meta: seoToMeta(undefined, {
