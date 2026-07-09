@@ -27,6 +27,7 @@ import { Route as Char123LangChar125BlogSlugRouteImport } from './routes/{-$lang
 import { Route as Char123LangChar125AccountRegisterRouteImport } from './routes/{-$lang}/account.register'
 import { Route as Char123LangChar125AccountLoginRouteImport } from './routes/{-$lang}/account.login'
 import { Route as Char123LangChar125AccountOrdersOrderIdRouteImport } from './routes/{-$lang}/account.orders.$orderId'
+import { Route as ApiPublicCheckoutWebhookRouteImport } from './routes/api/public/checkout/webhook'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -129,6 +130,12 @@ const Char123LangChar125AccountOrdersOrderIdRoute =
     path: '/orders/$orderId',
     getParentRoute: () => Char123LangChar125AccountRoute,
   } as any)
+const ApiPublicCheckoutWebhookRoute =
+  ApiPublicCheckoutWebhookRouteImport.update({
+    id: '/api/public/checkout/webhook',
+    path: '/api/public/checkout/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/robots.txt': typeof RobotsDottxtRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/{-$lang}/account/': typeof Char123LangChar125AccountIndexRoute
   '/{-$lang}/blog/': typeof Char123LangChar125BlogIndexRoute
   '/{-$lang}/products/': typeof Char123LangChar125ProductsIndexRoute
+  '/api/public/checkout/webhook': typeof ApiPublicCheckoutWebhookRoute
   '/{-$lang}/account/orders/$orderId': typeof Char123LangChar125AccountOrdersOrderIdRoute
 }
 export interface FileRoutesByTo {
@@ -165,6 +173,7 @@ export interface FileRoutesByTo {
   '/{-$lang}/account': typeof Char123LangChar125AccountIndexRoute
   '/{-$lang}/blog': typeof Char123LangChar125BlogIndexRoute
   '/{-$lang}/products': typeof Char123LangChar125ProductsIndexRoute
+  '/api/public/checkout/webhook': typeof ApiPublicCheckoutWebhookRoute
   '/{-$lang}/account/orders/$orderId': typeof Char123LangChar125AccountOrdersOrderIdRoute
 }
 export interface FileRoutesById {
@@ -186,6 +195,7 @@ export interface FileRoutesById {
   '/{-$lang}/account/': typeof Char123LangChar125AccountIndexRoute
   '/{-$lang}/blog/': typeof Char123LangChar125BlogIndexRoute
   '/{-$lang}/products/': typeof Char123LangChar125ProductsIndexRoute
+  '/api/public/checkout/webhook': typeof ApiPublicCheckoutWebhookRoute
   '/{-$lang}/account/orders/$orderId': typeof Char123LangChar125AccountOrdersOrderIdRoute
 }
 export interface FileRouteTypes {
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/account/'
     | '/{-$lang}/blog/'
     | '/{-$lang}/products/'
+    | '/api/public/checkout/webhook'
     | '/{-$lang}/account/orders/$orderId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -225,6 +236,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/account'
     | '/{-$lang}/blog'
     | '/{-$lang}/products'
+    | '/api/public/checkout/webhook'
     | '/{-$lang}/account/orders/$orderId'
   id:
     | '__root__'
@@ -245,6 +257,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/account/'
     | '/{-$lang}/blog/'
     | '/{-$lang}/products/'
+    | '/api/public/checkout/webhook'
     | '/{-$lang}/account/orders/$orderId'
   fileRoutesById: FileRoutesById
 }
@@ -259,6 +272,7 @@ export interface RootRouteChildren {
   Char123LangChar125CheckoutRoute: typeof Char123LangChar125CheckoutRoute
   Char123LangChar125ProductsRoute: typeof Char123LangChar125ProductsRouteWithChildren
   Char123LangChar125IndexRoute: typeof Char123LangChar125IndexRoute
+  ApiPublicCheckoutWebhookRoute: typeof ApiPublicCheckoutWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -389,6 +403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LangChar125AccountOrdersOrderIdRouteImport
       parentRoute: typeof Char123LangChar125AccountRoute
     }
+    '/api/public/checkout/webhook': {
+      id: '/api/public/checkout/webhook'
+      path: '/api/public/checkout/webhook'
+      fullPath: '/api/public/checkout/webhook'
+      preLoaderRoute: typeof ApiPublicCheckoutWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -458,17 +479,8 @@ const rootRouteChildren: RootRouteChildren = {
   Char123LangChar125CheckoutRoute: Char123LangChar125CheckoutRoute,
   Char123LangChar125ProductsRoute: Char123LangChar125ProductsRouteWithChildren,
   Char123LangChar125IndexRoute: Char123LangChar125IndexRoute,
+  ApiPublicCheckoutWebhookRoute: ApiPublicCheckoutWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
