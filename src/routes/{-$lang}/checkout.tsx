@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { Header } from "@/components/site/Header";
@@ -11,8 +11,12 @@ import { useAuth } from "@/components/site/AuthProvider";
 import { createOrder } from "@/lib/woo/orders.functions";
 import { toast } from "sonner";
 import { seoToMeta } from "@/lib/seo";
-import { Money, Num } from "@/components/site/Money";
+import { Money } from "@/components/site/Money";
 import { useLocale } from "@/i18n/LocaleProvider";
+import type { WooOrderSummary } from "@/lib/woo/types";
+
+const CKO_SESSION_ENDPOINT =
+  "https://api.adlautomotive.com/wp-json/cko/v1/payment-session";
 
 export const Route = createFileRoute("/{-$lang}/checkout")({
   head: () => ({
@@ -30,6 +34,7 @@ function CheckoutPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t } = useLocale();
+  const [order, setOrder] = useState<WooOrderSummary | null>(null);
 
   const [form, setForm] = useState({
     first_name: user?.firstName ?? "",
@@ -69,22 +74,54 @@ function CheckoutPage() {
         },
       }),
     onSuccess: (order) => {
-      toast.success(`Order #${order.number} placed`);
-      clear();
-      navigate({ to: "/{-$lang}/account" }).catch(() => {});
+      setOrder(order);
     },
     onError: (err) => {
       toast.error(err instanceof Error ? err.message : "Could not place order");
     },
   });
 
-  if (items.length === 0 && !mutation.isPending && !mutation.isSuccess) {
+  if (items.length === 0 && !mutation.isPending && !order) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <main className="container-px mx-auto max-w-[1400px] py-20 text-center">
           <h1 className="text-2xl font-bold">{t("checkout.emptyCart")}</h1>
           <Button asChild className="mt-6"><Link to="/{-$lang}/products" search={{}}>{t("cart.browse")}</Link></Button>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (order) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container-px mx-auto max-w-[1400px] py-12">
+          <h1 className="text-3xl font-bold tracking-tight">{t("checkout.title")}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Order #{order.number} — complete your payment below.
+          </p>
+          <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
+            <PaymentStep
+              order={order}
+              onSuccess={() => {
+                clear();
+                navigate({
+                  to: "/{-$lang}/checkout/return",
+                  search: { status: "success", order_id: order.id, order_key: order.order_key ?? "" },
+                }).catch(() => {});
+              }}
+            />
+            <aside className="h-fit space-y-4 rounded-xl border border-border bg-secondary p-6">
+              <h2 className="text-lg font-bold">{t("checkout.yourOrder")}</h2>
+              <div className="flex justify-between text-base font-bold">
+                <span>{t("cart.total")}</span>
+                <Money usd={subtotal} />
+              </div>
+            </aside>
+          </div>
         </main>
         <Footer />
       </div>
