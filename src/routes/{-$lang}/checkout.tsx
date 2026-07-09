@@ -242,9 +242,6 @@ function PaymentStep({
 
         const rootStyles = getComputedStyle(document.documentElement);
         const primary = rootStyles.getPropertyValue("--primary").trim() || "#0F4C81";
-        const fontFamily =
-          rootStyles.getPropertyValue("--font-sans").trim() ||
-          "Inter, ui-sans-serif, system-ui, sans-serif";
 
         const checkout = await loadCheckoutWebComponents({
           publicKey: data.public_key,
@@ -257,7 +254,6 @@ function PaymentStep({
             colorAction: `oklch(${primary})`,
             colorPrimary: `oklch(${primary})`,
             borderRadius: ["8px", "8px"] as [string, string],
-            fontFamily,
           },
           onPaymentCompleted: () => {
             onSuccess();
