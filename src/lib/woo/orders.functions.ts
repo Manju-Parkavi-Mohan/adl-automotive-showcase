@@ -51,8 +51,8 @@ export const createOrder = createServerFn({ method: "POST" })
     }>("/orders", {
       method: "POST",
       body: {
-        payment_method: "cod",
-        payment_method_title: "Cash on Delivery (Demo)",
+        payment_method: "cko_gateway",
+        payment_method_title: "Checkout.com",
         set_paid: false,
         status: "pending",
         customer_id: customerId ?? 0,
