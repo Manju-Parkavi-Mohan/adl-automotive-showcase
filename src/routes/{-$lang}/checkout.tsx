@@ -200,3 +200,122 @@ function Field({ label, required, children, className }: { label: string; requir
     </div>
   );
 }
+
+function PaymentStep({
+  order,
+  onSuccess,
+}: {
+  order: WooOrderSummary;
+  onSuccess: () => void;
+}) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    let componentInstance: { unmount?: () => void } | null = null;
+    setLoading(true);
+    setError(null);
+
+    (async () => {
+      try {
+        const res = await fetch(CKO_SESSION_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ order_id: order.id, order_key: order.order_key }),
+        });
+        if (!res.ok) throw new Error(`Failed to start payment session (${res.status})`);
+        const data = (await res.json()) as {
+          payment_session_token: string;
+          public_key: string;
+          environment: "sandbox" | "production";
+          payment_session_id: string;
+        };
+        if (cancelled) return;
+
+        const { loadCheckoutWebComponents } = await import(
+          "@checkout.com/checkout-web-components"
+        );
+        if (cancelled) return;
+
+        const rootStyles = getComputedStyle(document.documentElement);
+        const primary = rootStyles.getPropertyValue("--primary").trim() || "#0F4C81";
+        const fontFamily =
+          rootStyles.getPropertyValue("--font-sans").trim() ||
+          "Inter, ui-sans-serif, system-ui, sans-serif";
+
+        const checkout = await loadCheckoutWebComponents({
+          publicKey: data.public_key,
+          environment: data.environment,
+          paymentSession: {
+            id: data.payment_session_id,
+            payment_session_token: data.payment_session_token,
+          } as unknown as Parameters<typeof loadCheckoutWebComponents>[0]["paymentSession"],
+          appearance: {
+            colorAction: `oklch(${primary})`,
+            colorPrimary: `oklch(${primary})`,
+            borderRadius: ["8px", "8px"],
+            fontFamily,
+          } as unknown as Parameters<typeof loadCheckoutWebComponents>[0]["appearance"],
+          onPaymentCompleted: () => {
+            onSuccess();
+          },
+          onError: (_component, err) => {
+            const msg =
+              (err && typeof err === "object" && "message" in err && typeof (err as { message: unknown }).message === "string"
+                ? (err as { message: string }).message
+                : "Payment failed. Please try again.");
+            setError(msg);
+          },
+        });
+
+        if (cancelled) return;
+        const flow = checkout.create("flow");
+        if (containerRef.current) {
+          flow.mount(containerRef.current);
+          componentInstance = flow as unknown as { unmount?: () => void };
+        }
+        setLoading(false);
+      } catch (err) {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : "Could not initialise payment");
+        setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      try {
+        componentInstance?.unmount?.();
+      } catch {
+        // ignore
+      }
+    };
+  }, [order.id, order.order_key, attempt, onSuccess]);
+
+  return (
+    <div className="space-y-4 rounded-xl border border-border bg-white p-6">
+      <h2 className="text-lg font-semibold">Payment</h2>
+      {loading && !error && (
+        <p className="text-sm text-muted-foreground">Loading secure payment form…</p>
+      )}
+      {error && (
+        <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+          <p className="font-medium">{error}</p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mt-3"
+            onClick={() => setAttempt((n) => n + 1)}
+          >
+            Try again
+          </Button>
+        </div>
+      )}
+      <div ref={containerRef} />
+    </div>
+  );
+}
