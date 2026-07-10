@@ -128,6 +128,37 @@ export const logout = createServerFn({ method: "POST" }).handler(async () => {
   return { ok: true };
 });
 
+// Send a password reset email via the standard WordPress lost-password flow.
+// Posts form-encoded data to wp-login.php?action=lostpassword. For security we
+// always return { ok: true } so we don't leak which emails exist.
+export const requestPasswordReset = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) =>
+    z.object({ email: z.string().email() }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const base = (process.env.WORDPRESS_SITE_URL || "").replace(/\/+$/, "");
+    if (!base) throw new Error("Server not configured");
+    const url = `${base}/wp-login.php?action=lostpassword`;
+    try {
+      await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Accept: "text/html",
+        },
+        body: new URLSearchParams({
+          user_login: data.email,
+          redirect_to: "",
+          wp_lang: "",
+        }).toString(),
+        redirect: "manual",
+      });
+    } catch {
+      // swallow — we always return ok
+    }
+    return { ok: true };
+  });
+
 export const getCurrentUser = createServerFn({ method: "GET" }).handler(async () => {
   const session = await getAppSession();
   if (!session.data?.jwt) return null;
