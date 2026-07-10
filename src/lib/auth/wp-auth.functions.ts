@@ -90,15 +90,36 @@ export const register = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    await wcFetch<RawWooCustomer>("/customers", {
-      method: "POST",
-      body: {
-        email: data.email,
-        password: data.password,
-        first_name: data.firstName,
-        last_name: data.lastName,
-      },
-    });
+    try {
+      await wcFetch<RawWooCustomer>("/customers", {
+        method: "POST",
+        body: {
+          email: data.email,
+          password: data.password,
+          first_name: data.firstName,
+          last_name: data.lastName,
+        },
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      const lower = msg.toLowerCase();
+      if (
+        lower.includes("registration-error-email-exists") ||
+        lower.includes("email address is already") ||
+        lower.includes("already registered") ||
+        lower.includes("email_exists") ||
+        lower.includes("existing_user_email")
+      ) {
+        throw new Error("An account with this email already exists. Please sign in instead or use the forgot password link.");
+      }
+      if (lower.includes("invalid_email") || lower.includes("not a valid email")) {
+        throw new Error("Please enter a valid email address.");
+      }
+      if (lower.includes("password")) {
+        throw new Error("Password doesn't meet the requirements. Use at least 8 characters.");
+      }
+      throw new Error("We couldn't create your account. Please check your details and try again.");
+    }
     const res = await wpFetch<JwtTokenResponse>("/wp-json/jwt-auth/v1/token", {
       method: "POST",
       body: { username: data.email, password: data.password },
