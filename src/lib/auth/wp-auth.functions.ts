@@ -50,10 +50,23 @@ export const login = createServerFn({ method: "POST" })
     z.object({ username: z.string().min(1), password: z.string().min(1) }).parse(input),
   )
   .handler(async ({ data }) => {
-    const res = await wpFetch<JwtTokenResponse>("/wp-json/jwt-auth/v1/token", {
-      method: "POST",
-      body: { username: data.username, password: data.password },
-    });
+    let res;
+    try {
+      res = await wpFetch<JwtTokenResponse>("/wp-json/jwt-auth/v1/token", {
+        method: "POST",
+        body: { username: data.username, password: data.password },
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      const lower = msg.toLowerCase();
+      if (lower.includes("incorrect_password") || lower.includes("invalid_password")) {
+        throw new Error("The password you entered is incorrect. Try again or reset your password.");
+      }
+      if (lower.includes("invalid_username") || lower.includes("invalid_email") || lower.includes("unknown")) {
+        throw new Error("We couldn't find an account with that email. Please check the address or create an account.");
+      }
+      throw new Error("We couldn't sign you in. Please check your email and password and try again.");
+    }
     const token = res.data?.token;
     if (!token) throw new Error("Login failed: no token returned");
 
