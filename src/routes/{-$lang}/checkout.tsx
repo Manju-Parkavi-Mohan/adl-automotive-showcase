@@ -187,7 +187,6 @@ function CheckoutPage() {
             <div className="my-2 h-px bg-border" />
             <div className="flex justify-between text-sm"><span className="text-muted-foreground">{t("cart.subtotal")}</span><Money usd={subtotal} className="font-medium" /></div>
             <div className="flex justify-between text-base font-bold"><span>{t("cart.total")}</span><Money usd={subtotal} /></div>
-            <p className="text-xs text-muted-foreground">{t("checkout.codNote")}</p>
             <Button type="submit" className="w-full" disabled={mutation.isPending}>
               {mutation.isPending ? t("checkout.placing") : t("checkout.place")}
             </Button>
