@@ -248,9 +248,6 @@ function PaymentStep({
         );
         if (cancelled) return;
 
-        const rootStyles = getComputedStyle(document.documentElement);
-        const primary = rootStyles.getPropertyValue("--primary").trim() || "#0F4C81";
-
         const checkout = await loadCheckoutWebComponents({
           publicKey: data.public_key,
           environment: data.environment,
@@ -259,8 +256,8 @@ function PaymentStep({
             payment_session_token: data.payment_session_token,
           },
           appearance: {
-            colorAction: `oklch(${primary})`,
-            colorPrimary: `oklch(${primary})`,
+            colorAction: "#0F4C81",
+            colorPrimary: "#0F4C81",
             borderRadius: ["8px", "8px"] as [string, string],
           },
           onPaymentCompleted: () => {
