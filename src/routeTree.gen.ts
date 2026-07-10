@@ -27,6 +27,7 @@ import { Route as Char123LangChar125CheckoutReturnRouteImport } from './routes/{
 import { Route as Char123LangChar125BlogSlugRouteImport } from './routes/{-$lang}/blog.$slug'
 import { Route as Char123LangChar125AccountRegisterRouteImport } from './routes/{-$lang}/account.register'
 import { Route as Char123LangChar125AccountLoginRouteImport } from './routes/{-$lang}/account.login'
+import { Route as Char123LangChar125AccountForgotPasswordRouteImport } from './routes/{-$lang}/account.forgot-password'
 import { Route as Char123LangChar125AccountOrdersOrderIdRouteImport } from './routes/{-$lang}/account.orders.$orderId'
 import { Route as ApiPublicCheckoutWebhookRouteImport } from './routes/api/public/checkout/webhook'
 
@@ -131,6 +132,12 @@ const Char123LangChar125AccountLoginRoute =
     path: '/login',
     getParentRoute: () => Char123LangChar125AccountRoute,
   } as any)
+const Char123LangChar125AccountForgotPasswordRoute =
+  Char123LangChar125AccountForgotPasswordRouteImport.update({
+    id: '/forgot-password',
+    path: '/forgot-password',
+    getParentRoute: () => Char123LangChar125AccountRoute,
+  } as any)
 const Char123LangChar125AccountOrdersOrderIdRoute =
   Char123LangChar125AccountOrdersOrderIdRouteImport.update({
     id: '/orders/$orderId',
@@ -155,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/{-$lang}/checkout': typeof Char123LangChar125CheckoutRoute
   '/{-$lang}/products': typeof Char123LangChar125ProductsRouteWithChildren
   '/{-$lang}/': typeof Char123LangChar125IndexRoute
+  '/{-$lang}/account/forgot-password': typeof Char123LangChar125AccountForgotPasswordRoute
   '/{-$lang}/account/login': typeof Char123LangChar125AccountLoginRoute
   '/{-$lang}/account/register': typeof Char123LangChar125AccountRegisterRoute
   '/{-$lang}/blog/$slug': typeof Char123LangChar125BlogSlugRoute
@@ -174,6 +182,7 @@ export interface FileRoutesByTo {
   '/{-$lang}/cart': typeof Char123LangChar125CartRoute
   '/{-$lang}/checkout': typeof Char123LangChar125CheckoutRoute
   '/{-$lang}': typeof Char123LangChar125IndexRoute
+  '/{-$lang}/account/forgot-password': typeof Char123LangChar125AccountForgotPasswordRoute
   '/{-$lang}/account/login': typeof Char123LangChar125AccountLoginRoute
   '/{-$lang}/account/register': typeof Char123LangChar125AccountRegisterRoute
   '/{-$lang}/blog/$slug': typeof Char123LangChar125BlogSlugRoute
@@ -197,6 +206,7 @@ export interface FileRoutesById {
   '/{-$lang}/checkout': typeof Char123LangChar125CheckoutRoute
   '/{-$lang}/products': typeof Char123LangChar125ProductsRouteWithChildren
   '/{-$lang}/': typeof Char123LangChar125IndexRoute
+  '/{-$lang}/account/forgot-password': typeof Char123LangChar125AccountForgotPasswordRoute
   '/{-$lang}/account/login': typeof Char123LangChar125AccountLoginRoute
   '/{-$lang}/account/register': typeof Char123LangChar125AccountRegisterRoute
   '/{-$lang}/blog/$slug': typeof Char123LangChar125BlogSlugRoute
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/checkout'
     | '/{-$lang}/products'
     | '/{-$lang}/'
+    | '/{-$lang}/account/forgot-password'
     | '/{-$lang}/account/login'
     | '/{-$lang}/account/register'
     | '/{-$lang}/blog/$slug'
@@ -240,6 +251,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/cart'
     | '/{-$lang}/checkout'
     | '/{-$lang}'
+    | '/{-$lang}/account/forgot-password'
     | '/{-$lang}/account/login'
     | '/{-$lang}/account/register'
     | '/{-$lang}/blog/$slug'
@@ -262,6 +274,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/checkout'
     | '/{-$lang}/products'
     | '/{-$lang}/'
+    | '/{-$lang}/account/forgot-password'
     | '/{-$lang}/account/login'
     | '/{-$lang}/account/register'
     | '/{-$lang}/blog/$slug'
@@ -417,6 +430,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LangChar125AccountLoginRouteImport
       parentRoute: typeof Char123LangChar125AccountRoute
     }
+    '/{-$lang}/account/forgot-password': {
+      id: '/{-$lang}/account/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/{-$lang}/account/forgot-password'
+      preLoaderRoute: typeof Char123LangChar125AccountForgotPasswordRouteImport
+      parentRoute: typeof Char123LangChar125AccountRoute
+    }
     '/{-$lang}/account/orders/$orderId': {
       id: '/{-$lang}/account/orders/$orderId'
       path: '/orders/$orderId'
@@ -435,6 +455,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface Char123LangChar125AccountRouteChildren {
+  Char123LangChar125AccountForgotPasswordRoute: typeof Char123LangChar125AccountForgotPasswordRoute
   Char123LangChar125AccountLoginRoute: typeof Char123LangChar125AccountLoginRoute
   Char123LangChar125AccountRegisterRoute: typeof Char123LangChar125AccountRegisterRoute
   Char123LangChar125AccountIndexRoute: typeof Char123LangChar125AccountIndexRoute
@@ -443,6 +464,8 @@ interface Char123LangChar125AccountRouteChildren {
 
 const Char123LangChar125AccountRouteChildren: Char123LangChar125AccountRouteChildren =
   {
+    Char123LangChar125AccountForgotPasswordRoute:
+      Char123LangChar125AccountForgotPasswordRoute,
     Char123LangChar125AccountLoginRoute: Char123LangChar125AccountLoginRoute,
     Char123LangChar125AccountRegisterRoute:
       Char123LangChar125AccountRegisterRoute,

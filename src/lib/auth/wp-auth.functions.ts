@@ -50,10 +50,23 @@ export const login = createServerFn({ method: "POST" })
     z.object({ username: z.string().min(1), password: z.string().min(1) }).parse(input),
   )
   .handler(async ({ data }) => {
-    const res = await wpFetch<JwtTokenResponse>("/wp-json/jwt-auth/v1/token", {
-      method: "POST",
-      body: { username: data.username, password: data.password },
-    });
+    let res;
+    try {
+      res = await wpFetch<JwtTokenResponse>("/wp-json/jwt-auth/v1/token", {
+        method: "POST",
+        body: { username: data.username, password: data.password },
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      const lower = msg.toLowerCase();
+      if (lower.includes("incorrect_password") || lower.includes("invalid_password")) {
+        throw new Error("The password you entered is incorrect. Try again or reset your password.");
+      }
+      if (lower.includes("invalid_username") || lower.includes("invalid_email") || lower.includes("unknown")) {
+        throw new Error("We couldn't find an account with that email. Please check the address or create an account.");
+      }
+      throw new Error("We couldn't sign you in. Please check your email and password and try again.");
+    }
     const token = res.data?.token;
     if (!token) throw new Error("Login failed: no token returned");
 
@@ -90,15 +103,36 @@ export const register = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    await wcFetch<RawWooCustomer>("/customers", {
-      method: "POST",
-      body: {
-        email: data.email,
-        password: data.password,
-        first_name: data.firstName,
-        last_name: data.lastName,
-      },
-    });
+    try {
+      await wcFetch<RawWooCustomer>("/customers", {
+        method: "POST",
+        body: {
+          email: data.email,
+          password: data.password,
+          first_name: data.firstName,
+          last_name: data.lastName,
+        },
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      const lower = msg.toLowerCase();
+      if (
+        lower.includes("registration-error-email-exists") ||
+        lower.includes("email address is already") ||
+        lower.includes("already registered") ||
+        lower.includes("email_exists") ||
+        lower.includes("existing_user_email")
+      ) {
+        throw new Error("An account with this email already exists. Please sign in instead or use the forgot password link.");
+      }
+      if (lower.includes("invalid_email") || lower.includes("not a valid email")) {
+        throw new Error("Please enter a valid email address.");
+      }
+      if (lower.includes("password")) {
+        throw new Error("Password doesn't meet the requirements. Use at least 8 characters.");
+      }
+      throw new Error("We couldn't create your account. Please check your details and try again.");
+    }
     const res = await wpFetch<JwtTokenResponse>("/wp-json/jwt-auth/v1/token", {
       method: "POST",
       body: { username: data.email, password: data.password },
@@ -127,6 +161,37 @@ export const logout = createServerFn({ method: "POST" }).handler(async () => {
   await session.clear();
   return { ok: true };
 });
+
+// Send a password reset email via the standard WordPress lost-password flow.
+// Posts form-encoded data to wp-login.php?action=lostpassword. For security we
+// always return { ok: true } so we don't leak which emails exist.
+export const requestPasswordReset = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) =>
+    z.object({ email: z.string().email() }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const base = (process.env.WORDPRESS_SITE_URL || "").replace(/\/+$/, "");
+    if (!base) throw new Error("Server not configured");
+    const url = `${base}/wp-login.php?action=lostpassword`;
+    try {
+      await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Accept: "text/html",
+        },
+        body: new URLSearchParams({
+          user_login: data.email,
+          redirect_to: "",
+          wp_lang: "",
+        }).toString(),
+        redirect: "manual",
+      });
+    } catch {
+      // swallow — we always return ok
+    }
+    return { ok: true };
+  });
 
 export const getCurrentUser = createServerFn({ method: "GET" }).handler(async () => {
   const session = await getAppSession();
