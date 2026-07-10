@@ -187,7 +187,6 @@ function CheckoutPage() {
             <div className="my-2 h-px bg-border" />
             <div className="flex justify-between text-sm"><span className="text-muted-foreground">{t("cart.subtotal")}</span><Money usd={subtotal} className="font-medium" /></div>
             <div className="flex justify-between text-base font-bold"><span>{t("cart.total")}</span><Money usd={subtotal} /></div>
-            <p className="text-xs text-muted-foreground">{t("checkout.codNote")}</p>
             <Button type="submit" className="w-full" disabled={mutation.isPending}>
               {mutation.isPending ? t("checkout.placing") : t("checkout.place")}
             </Button>
@@ -249,9 +248,6 @@ function PaymentStep({
         );
         if (cancelled) return;
 
-        const rootStyles = getComputedStyle(document.documentElement);
-        const primary = rootStyles.getPropertyValue("--primary").trim() || "#0F4C81";
-
         const checkout = await loadCheckoutWebComponents({
           publicKey: data.public_key,
           environment: data.environment,
@@ -260,8 +256,8 @@ function PaymentStep({
             payment_session_token: data.payment_session_token,
           },
           appearance: {
-            colorAction: `oklch(${primary})`,
-            colorPrimary: `oklch(${primary})`,
+            colorAction: "#0F4C81",
+            colorPrimary: "#0F4C81",
             borderRadius: ["8px", "8px"] as [string, string],
           },
           onPaymentCompleted: () => {
