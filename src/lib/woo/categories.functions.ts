@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { wcFetch } from "./client.server";
 import type { WooCategory } from "./types";
+import { decodeHtml } from "@/lib/html";
 
 interface RawWooCategory {
   id: number;
@@ -36,7 +37,7 @@ export const listCategories = createServerFn({ method: "GET" })
       .filter((c) => c.slug !== "uncategorized")
       .map((c) => ({
         id: c.id,
-        name: c.name,
+        name: decodeHtml(c.name),
         slug: c.slug,
         parent: c.parent,
         count: c.count,
