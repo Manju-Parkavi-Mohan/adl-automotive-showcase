@@ -6,33 +6,17 @@ function requireEnv(name: string): string {
   return v;
 }
 
-// Two supported transports:
-//  1) Standalone: direct calls to <WORDPRESS_SITE_URL>/wp-json/wc/v3 using
-//     WOOCOMMERCE_CONSUMER_KEY + WOOCOMMERCE_CONSUMER_SECRET (HTTP Basic).
-//  2) Lovable connector gateway: calls routed through
-//     https://connector-gateway.lovable.dev/woocommerce using
-//     LOVABLE_API_KEY + WOOCOMMERCE_API_KEY (connector-managed).
-// The right mode is picked automatically based on which env vars are set.
-
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/woocommerce";
-
-function useGateway(): boolean {
-  return Boolean(process.env.LOVABLE_API_KEY && process.env.WOOCOMMERCE_API_KEY);
-}
+// Standalone transport only: direct calls to
+// <WORDPRESS_SITE_URL>/wp-json/wc/v3 using WOOCOMMERCE_CONSUMER_KEY +
+// WOOCOMMERCE_CONSUMER_SECRET (HTTP Basic). The Lovable connector gateway
+// is intentionally not used — every request goes straight to the store.
 
 function wcBase(): string {
-  if (useGateway()) return GATEWAY_URL;
   const raw = requireEnv("WORDPRESS_SITE_URL").replace(/\/+$/, "");
   return `${raw}/wp-json/wc/v3`;
 }
 
 function wcAuthHeaders(): Record<string, string> {
-  if (useGateway()) {
-    return {
-      Authorization: `Bearer ${process.env.LOVABLE_API_KEY!}`,
-      "X-Connection-Api-Key": process.env.WOOCOMMERCE_API_KEY!,
-    };
-  }
   const key = requireEnv("WOOCOMMERCE_CONSUMER_KEY");
   const secret = requireEnv("WOOCOMMERCE_CONSUMER_SECRET");
   const token = Buffer.from(`${key}:${secret}`).toString("base64");
