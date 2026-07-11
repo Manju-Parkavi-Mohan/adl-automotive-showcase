@@ -1,3 +1,5 @@
+import { decodeHtml } from "@/lib/html";
+
 export interface WooImage {
   src: string;
   alt?: string;
