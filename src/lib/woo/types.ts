@@ -1,3 +1,5 @@
+import { decodeHtml } from "@/lib/html";
+
 export interface WooImage {
   src: string;
   alt?: string;
@@ -256,7 +258,7 @@ export function adaptProduct(raw: RawWooProduct): WooProduct {
     id: raw.id,
     slug: raw.slug,
     sku: raw.sku || `WC-${raw.id}`,
-    name: raw.name,
+    name: decodeHtml(raw.name),
     description: raw.description || "",
     short_description: raw.short_description || "",
     price,
@@ -271,8 +273,8 @@ export function adaptProduct(raw: RawWooProduct): WooProduct {
     featured: raw.featured,
     date_created: raw.date_created,
     type: raw.type,
-    categories: raw.categories || [],
-    brand,
+    categories: (raw.categories || []).map((c) => ({ ...c, name: decodeHtml(c.name) })),
+    brand: brand ? decodeHtml(brand) : brand,
     images: (raw.images || []).map((i) => ({ src: i.src, alt: i.alt })),
     attributes: (raw.attributes || []).map((a) => ({ id: a.id, name: a.name, options: a.options })),
     permalink: raw.permalink,
