@@ -38,6 +38,7 @@ const EXTRA_LINKS = [
 
 export function Header() {
   const [catOpen, setCatOpen] = useState(false);
+  const [hoveredCat, setHoveredCat] = useState<number | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [curOpen, setCurOpen] = useState(false);
@@ -51,7 +52,14 @@ export function Header() {
     queryFn: () => listCategories({ data: { perPage: 50, hideEmpty: true } }),
     staleTime: 5 * 60_000,
   });
-  const categories = wcCategories ?? [];
+  const allCategories = wcCategories ?? [];
+  const topCategories = allCategories.filter((c) => !c.parent);
+  const subsByParent = allCategories.reduce<Record<number, typeof allCategories>>((acc, c) => {
+    if (c.parent) {
+      (acc[c.parent] ||= []).push(c);
+    }
+    return acc;
+  }, {});
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -231,23 +239,52 @@ export function Header() {
             {catOpen && (
               <div
                 onMouseLeave={() => setCatOpen(false)}
-                className="absolute left-0 top-full z-40 mt-1 max-h-96 w-72 overflow-y-auto rounded-lg border border-border bg-white shadow-[var(--shadow-card)]"
+                className="absolute left-0 top-full z-40 mt-1 flex rounded-lg border border-border bg-white shadow-[var(--shadow-card)]"
               >
-                {categories.length === 0 ? (
-                  <div className="px-4 py-3 text-sm text-muted-foreground">{t("common.loading")}</div>
-                ) : (
-                  categories.map((c) => (
-                    <Link
-                      key={c.id}
-                      to="/{-$lang}/products"
-                      search={{}}
-                      onClick={() => setCatOpen(false)}
-                      className="flex items-center gap-3 border-b border-border px-4 py-3 text-sm font-medium text-foreground transition-colors last:border-0 hover:bg-secondary hover:text-primary"
-                    >
-                      <Tag className="h-4 w-4 text-primary" />
-                      {c.name}
-                    </Link>
-                  ))
+                <div className="max-h-96 w-72 overflow-y-auto">
+                  {topCategories.length === 0 ? (
+                    <div className="px-4 py-3 text-sm text-muted-foreground">{t("common.loading")}</div>
+                  ) : (
+                    topCategories.map((c) => {
+                      const subs = subsByParent[c.id] ?? [];
+                      const hasSubs = subs.length > 0;
+                      return (
+                        <div
+                          key={c.id}
+                          onMouseEnter={() => setHoveredCat(c.id)}
+                          className="border-b border-border last:border-0"
+                        >
+                          <Link
+                            to="/{-$lang}/products"
+                            search={{}}
+                            onClick={() => setCatOpen(false)}
+                            className={`flex items-center justify-between gap-3 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-primary ${hoveredCat === c.id ? "bg-secondary text-primary" : ""}`}
+                          >
+                            <span className="flex items-center gap-3">
+                              <Tag className="h-4 w-4 text-primary" />
+                              {c.name}
+                            </span>
+                            {hasSubs && <ChevronDown className="h-4 w-4 -rotate-90 text-muted-foreground" />}
+                          </Link>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+                {hoveredCat !== null && (subsByParent[hoveredCat]?.length ?? 0) > 0 && (
+                  <div className="max-h-96 w-72 overflow-y-auto border-s border-border bg-white">
+                    {(subsByParent[hoveredCat] ?? []).map((s) => (
+                      <Link
+                        key={s.id}
+                        to="/{-$lang}/products"
+                        search={{}}
+                        onClick={() => setCatOpen(false)}
+                        className="flex items-center gap-3 border-b border-border px-4 py-3 text-sm text-foreground transition-colors last:border-0 hover:bg-secondary hover:text-primary"
+                      >
+                        {s.name}
+                      </Link>
+                    ))}
+                  </div>
                 )}
               </div>
             )}
