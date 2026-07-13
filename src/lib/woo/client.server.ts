@@ -1,5 +1,3 @@
-import { setResponseStatus } from "@tanstack/react-start/server";
-
 function requireEnv(name: string): string {
   const v = process.env[name];
   if (!v) throw new Error(`Missing required server env var ${name}`);
@@ -72,7 +70,6 @@ export async function wcFetch<T>(
       (parsed && typeof parsed === "object" && "message" in parsed && typeof (parsed as { message: unknown }).message === "string"
         ? (parsed as { message: string }).message
         : `WooCommerce request failed (${res.status})`);
-    setResponseStatus(502);
     throw new Error(`Woo ${path}: ${msg}`);
   }
 
