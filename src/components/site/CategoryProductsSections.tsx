@@ -137,7 +137,26 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
 
           {/* Right column: auto-scrolling products with arrows */}
           <div className="relative min-w-0 flex-1">
-            <div className="mb-4 flex h-10 items-center justify-center gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            {/* Mobile: dropdown filter */}
+            <div className="mb-4 flex h-10 items-center md:hidden">
+              <select
+                value={String(activeTabId)}
+                onChange={(e) =>
+                  setActiveTabId(e.target.value === "all" ? "all" : Number(e.target.value))
+                }
+                className="w-full rounded-full bg-white px-4 py-2 text-sm font-bold uppercase tracking-wide text-black ring-1 ring-black/10"
+                aria-label="Filter subcategory"
+              >
+                <option value="all">All</option>
+                {tabs.map((tb) => (
+                  <option key={tb.id} value={tb.id}>
+                    {tb.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {/* Desktop: right-aligned tabs */}
+            <div className="mb-4 hidden h-10 items-center justify-end gap-2 overflow-x-auto md:flex [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               <TabButton active={activeTabId === "all"} onClick={() => setActiveTabId("all")}>
                 All
               </TabButton>
@@ -157,7 +176,7 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
               aria-label="Scroll left"
               onClick={() => stepScroll(-1)}
               disabled={!canLeft}
-              className="absolute left-1 top-[260px] z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:h-10 sm:w-10"
+              className="absolute left-1 top-[55%] z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:h-10 sm:w-10"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -176,14 +195,15 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
                     <div
                       key={i}
                       data-card
-                      className="h-[400px] w-[calc((100%-20px)/2)] shrink-0 animate-pulse rounded-xl bg-card md:w-[calc((100%-40px)/3)] lg:w-[calc((100%-60px)/4)]"
+                      className="w-[calc((100%-20px)/2)] shrink-0 animate-pulse rounded-xl bg-card md:w-[calc((100%-20px)/2)] lg:w-[calc((100%-40px)/3)]"
+                      style={{ minHeight: 380 }}
                     />
                   ))
                 : products.map((p) => (
                     <div
                       key={p.id}
                       data-card
-                      className="h-[400px] w-[calc((100%-20px)/2)] shrink-0 snap-start md:w-[calc((100%-40px)/3)] lg:w-[calc((100%-60px)/4)]"
+                      className="w-[calc((100%-20px)/2)] shrink-0 snap-start md:w-[calc((100%-20px)/2)] lg:w-[calc((100%-40px)/3)]"
                     >
                       <ProductCard product={p} />
                     </div>
@@ -195,7 +215,7 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
               aria-label="Scroll right"
               onClick={() => stepScroll(1)}
               disabled={!canRight}
-              className="absolute right-1 top-[260px] z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:h-10 sm:w-10"
+              className="absolute right-1 top-[55%] z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:h-10 sm:w-10"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
