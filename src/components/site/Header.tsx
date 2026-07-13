@@ -382,7 +382,7 @@ export function Header() {
               <p className="mt-5 px-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 {t("common.categories")}
               </p>
-              {categories.map((c) => (
+              {topCategories.map((c) => (
                 <Link
                   key={c.id}
                   to="/{-$lang}/products"
