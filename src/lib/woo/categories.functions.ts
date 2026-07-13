@@ -29,8 +29,8 @@ export const listCategories = createServerFn({ method: "GET" })
         per_page: data.perPage,
         parent: data.parent,
         hide_empty: data.hideEmpty,
-        orderby: "count",
-        order: "desc",
+        orderby: "id",
+        order: "asc",
       },
     });
     return (res.data ?? [])
