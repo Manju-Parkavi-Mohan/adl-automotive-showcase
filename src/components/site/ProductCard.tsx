@@ -103,7 +103,15 @@ export function ProductCard({ product }: { product: Product }) {
           <span><Num>({product.reviewCount})</Num></span>
         </div>
 
-        <div className="mt-auto flex items-end justify-between pt-1 sm:pt-2">
+        <p
+          className={`text-[10px] font-semibold sm:text-xs ${
+            product.inStock ? "text-emerald-600" : "text-destructive"
+          }`}
+        >
+          {product.inStock ? t("product.inStock") : t("product.outOfStock")}
+        </p>
+
+        <div className="mt-auto flex items-end justify-between gap-2 pt-1 sm:pt-2">
           <div className="flex flex-col">
             {product.oldPrice && (
               <Money usd={product.oldPrice} strike className="text-[10px] text-muted-foreground sm:text-xs" />
