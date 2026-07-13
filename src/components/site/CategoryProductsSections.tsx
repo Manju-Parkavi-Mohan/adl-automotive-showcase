@@ -15,7 +15,7 @@ const ALT_TILE_IMAGES = [catBgA.url, catBgB.url];
 export function CategoryProductsSections() {
   const { data: categories } = useQuery({
     queryKey: ["wc-categories-sections"],
-    queryFn: () => listCategories({ data: { perPage: 50, hideEmpty: true } }),
+    queryFn: () => listCategories({ data: { perPage: 50, parent: 0, hideEmpty: true } }),
     staleTime: 5 * 60_000,
   });
 
@@ -43,13 +43,9 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
     staleTime: 5 * 60_000,
   });
   const tabs = useMemo(() => (subCats ?? []) as WooCategory[], [subCats]);
-  const hasTabs = tabs.length > 0;
-  const [activeTabId, setActiveTabId] = useState<number | null>(null);
-  useEffect(() => {
-    if (hasTabs && activeTabId === null) setActiveTabId(tabs[0].id);
-  }, [hasTabs, tabs, activeTabId]);
-
-  const productCatId = hasTabs && activeTabId ? activeTabId : category.id;
+  // "All" tab is always present; extra tabs come from subcategories.
+  const [activeTabId, setActiveTabId] = useState<number | "all">("all");
+  const productCatId = activeTabId === "all" ? category.id : activeTabId;
   const { data, isLoading } = useQuery({
     queryKey: ["wc-cat-row", productCatId],
     queryFn: () => listProducts({ data: { category: String(productCatId), perPage: 12 } }),
@@ -122,7 +118,7 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
           <Link
             to="/{-$lang}/products"
             search={{}}
-            className="group relative hidden shrink-0 overflow-hidden rounded-xl bg-black shadow-[var(--shadow-card)] md:block md:h-[400px] md:w-[280px]"
+            className="group relative hidden shrink-0 self-stretch overflow-hidden rounded-xl bg-black shadow-[var(--shadow-card)] md:block md:min-h-[460px] md:w-[280px]"
             aria-label={category.name}
           >
             <img
@@ -141,34 +137,27 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
 
           {/* Right column: auto-scrolling products with arrows */}
           <div className="relative min-w-0 flex-1">
-            {hasTabs && (
-              <div className="mb-4 flex items-center justify-center gap-2">
-                {tabs.map((t) => {
-                  const active = t.id === activeTabId;
-                  return (
-                    <button
-                      key={t.id}
-                      type="button"
-                      onClick={() => setActiveTabId(t.id)}
-                      className={`rounded-full px-6 py-2 text-sm font-bold uppercase tracking-wide transition ${
-                        active
-                          ? "bg-black text-white shadow-md"
-                          : "bg-white text-black ring-1 ring-black/10 hover:bg-neutral-100"
-                      }`}
-                    >
-                      {t.name}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+            <div className="mb-4 flex h-10 items-center justify-center gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+              <TabButton active={activeTabId === "all"} onClick={() => setActiveTabId("all")}>
+                All
+              </TabButton>
+              {tabs.map((tb) => (
+                <TabButton
+                  key={tb.id}
+                  active={tb.id === activeTabId}
+                  onClick={() => setActiveTabId(tb.id)}
+                >
+                  {tb.name}
+                </TabButton>
+              ))}
+            </div>
 
             <button
               type="button"
               aria-label="Scroll left"
               onClick={() => stepScroll(-1)}
               disabled={!canLeft}
-              className="absolute left-1 top-[200px] z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:h-10 sm:w-10"
+              className="absolute left-1 top-[260px] z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:h-10 sm:w-10"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -206,7 +195,7 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
               aria-label="Scroll right"
               onClick={() => stepScroll(1)}
               disabled={!canRight}
-              className="absolute right-1 top-[200px] z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:h-10 sm:w-10"
+              className="absolute right-1 top-[260px] z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:h-10 sm:w-10"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
@@ -214,5 +203,29 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
         </div>
       </div>
     </section>
+  );
+}
+
+function TabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`shrink-0 rounded-full px-5 py-2 text-sm font-bold uppercase tracking-wide transition ${
+        active
+          ? "bg-black text-white shadow-md"
+          : "bg-white text-black ring-1 ring-black/10 hover:bg-neutral-100"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
