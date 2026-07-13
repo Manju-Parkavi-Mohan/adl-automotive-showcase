@@ -7,8 +7,9 @@ export function BrandsMarquee() {
   const { t } = useLocale();
   const { data } = useQuery({
     queryKey: ["wc-brands"],
-    queryFn: () => listBrands(),
+    queryFn: async () => (await listBrands()) ?? [],
     staleTime: 10 * 60_000,
+    retry: false,
   });
   const brandNames = (data && data.length > 0 ? data.map((b) => b.name) : BRANDS) as string[];
   const items = [...brandNames, ...brandNames];
