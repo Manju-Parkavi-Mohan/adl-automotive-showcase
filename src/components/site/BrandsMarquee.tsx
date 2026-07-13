@@ -1,9 +1,17 @@
+import { useQuery } from "@tanstack/react-query";
 import { BRANDS } from "@/data/products";
 import { useLocale } from "@/i18n/LocaleProvider";
+import { listBrands } from "@/lib/woo/brands.functions";
 
 export function BrandsMarquee() {
   const { t } = useLocale();
-  const items = [...BRANDS, ...BRANDS];
+  const { data } = useQuery({
+    queryKey: ["wc-brands"],
+    queryFn: () => listBrands(),
+    staleTime: 10 * 60_000,
+  });
+  const brandNames = (data && data.length > 0 ? data.map((b) => b.name) : BRANDS) as string[];
+  const items = [...brandNames, ...brandNames];
   return (
     <section aria-label="Trusted brands" className="bg-[#0B2742] py-12">
       <div className="container-px mx-auto max-w-[1400px]">

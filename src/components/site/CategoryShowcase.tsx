@@ -32,7 +32,7 @@ export function CategoryShowcase() {
   const { t } = useLocale();
   const { data, isLoading } = useQuery({
     queryKey: ["wc-categories-showcase"],
-    queryFn: () => listCategories({ data: { perPage: 50, hideEmpty: true } }),
+    queryFn: () => listCategories({ data: { perPage: 50, parent: 0, hideEmpty: true } }),
     staleTime: 5 * 60_000,
   });
   const categories = data ?? [];
