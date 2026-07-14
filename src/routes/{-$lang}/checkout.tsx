@@ -314,10 +314,12 @@ type OrderPayload = {
 
 function PayPalButtons({
   buildOrder,
+  total,
   onCaptured,
   onReady,
 }: {
   buildOrder: () => OrderPayload;
+  total: number;
   onCaptured: (res: { wcOrderId: number; paypalOrderId: string }) => void;
   onReady: () => void;
 }) {
@@ -329,6 +331,8 @@ function PayPalButtons({
   const [googlePayEligible, setGooglePayEligible] = useState(false);
   const buildOrderRef = useRef(buildOrder);
   buildOrderRef.current = buildOrder;
+  const totalRef = useRef(total);
+  totalRef.current = total;
 
   useEffect(() => {
     let cancelled = false;
@@ -403,7 +407,7 @@ function PayPalButtons({
                   merchantCapabilities: cfg.merchantCapabilities,
                   supportedNetworks: cfg.supportedNetworks,
                   requiredBillingContactFields: ["postalAddress", "name"],
-                  total: { label: "ADL Automotive", amount: String(0) },
+                  total: { label: "ADL Automotive", amount: totalRef.current.toFixed(2) },
                 };
                 const Session = window.ApplePaySession!;
                 const session = new Session(4, paymentRequest);
@@ -485,7 +489,7 @@ function PayPalButtons({
                       countryCode: cfg.countryCode || "US",
                       currencyCode: config.currency,
                       totalPriceStatus: "FINAL",
-                      totalPrice: "0.00",
+                      totalPrice: totalRef.current.toFixed(2),
                     },
                   });
                   const confirm = await googlepay.confirmOrder({
