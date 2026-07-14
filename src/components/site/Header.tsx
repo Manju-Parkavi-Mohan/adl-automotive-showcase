@@ -40,6 +40,7 @@ export function Header() {
   const [catOpen, setCatOpen] = useState(false);
   const [hoveredCat, setHoveredCat] = useState<number | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileExpandedCat, setMobileExpandedCat] = useState<number | null>(null);
   const [langOpen, setLangOpen] = useState(false);
   const [curOpen, setCurOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -382,17 +383,49 @@ export function Header() {
               <p className="mt-5 px-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 {t("common.categories")}
               </p>
-              {topCategories.map((c) => (
-                <Link
-                  key={c.id}
-                  to="/{-$lang}/products"
-                  search={{}}
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 border-b border-border px-1 py-2 text-xs font-semibold uppercase tracking-wide text-black hover:text-primary"
-                >
-                  <Tag className="h-3.5 w-3.5 text-primary" /> {c.name}
-                </Link>
-              ))}
+              {topCategories.map((c) => {
+                const subs = subsByParent[c.id] ?? [];
+                const hasSubs = subs.length > 0;
+                const expanded = mobileExpandedCat === c.id;
+                return (
+                  <div key={c.id} className="border-b border-border">
+                    <div className="flex items-center justify-between gap-2">
+                      <Link
+                        to="/{-$lang}/products"
+                        search={{}}
+                        onClick={() => setMobileOpen(false)}
+                        className="flex flex-1 items-center gap-2 px-1 py-2 text-xs font-semibold uppercase tracking-wide text-black hover:text-primary"
+                      >
+                        <Tag className="h-3.5 w-3.5 text-primary" /> {c.name}
+                      </Link>
+                      {hasSubs && (
+                        <button
+                          aria-label={expanded ? "Collapse" : "Expand"}
+                          onClick={() => setMobileExpandedCat(expanded ? null : c.id)}
+                          className="grid h-7 w-7 place-items-center rounded text-muted-foreground hover:text-primary"
+                        >
+                          <ChevronDown className={`h-4 w-4 transition-transform ${expanded ? "rotate-180" : ""}`} />
+                        </button>
+                      )}
+                    </div>
+                    {hasSubs && expanded && (
+                      <div className="mb-1 flex flex-col ps-6">
+                        {subs.map((s) => (
+                          <Link
+                            key={s.id}
+                            to="/{-$lang}/products"
+                            search={{}}
+                            onClick={() => setMobileOpen(false)}
+                            className="border-t border-border px-1 py-2 text-xs font-medium text-foreground hover:text-primary"
+                          >
+                            {s.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </nav>
           </div>
         </div>
