@@ -178,31 +178,77 @@ function Field({ label, required, children, className }: { label: string; requir
 type PayPalNamespace = {
   Buttons: (opts: {
     style?: Record<string, unknown>;
+    fundingSource?: unknown;
     createOrder: () => Promise<string>;
     onApprove: (data: { orderID: string }) => Promise<void>;
     onCancel?: () => void;
     onError?: (err: unknown) => void;
   }) => { render: (el: HTMLElement) => Promise<void>; close?: () => Promise<void> };
+  FUNDING?: Record<string, unknown>;
+  Applepay?: () => {
+    config: () => Promise<{ isEligible: boolean; merchantCapabilities: string[]; supportedNetworks: string[]; countryCode: string; currencyCode: string }>;
+    validateMerchant: (opts: { validationUrl: string; displayName?: string }) => Promise<unknown>;
+    confirmOrder: (opts: { orderId: string; token: unknown; billingContact?: unknown; shippingContact?: unknown }) => Promise<unknown>;
+  };
+  Googlepay?: () => {
+    config: () => Promise<{ isEligible?: boolean; allowedPaymentMethods: unknown[]; merchantInfo: unknown; apiVersion: number; apiVersionMinor: number; countryCode?: string }>;
+    confirmOrder: (opts: { orderId: string; paymentMethodData: unknown }) => Promise<{ status?: string }>;
+  };
 };
 
 declare global {
   interface Window {
     paypal?: PayPalNamespace;
+    ApplePaySession?: {
+      new (version: number, req: unknown): ApplePaySessionInstance;
+      canMakePayments: () => boolean;
+      supportsVersion: (v: number) => boolean;
+      STATUS_SUCCESS: number;
+      STATUS_FAILURE: number;
+    };
+    google?: {
+      payments?: {
+        api?: {
+          PaymentsClient: new (opts: { environment: "TEST" | "PRODUCTION" }) => {
+            isReadyToPay: (req: unknown) => Promise<{ result: boolean }>;
+            createButton: (opts: { onClick: () => void; buttonSizeMode?: string; buttonType?: string; buttonColor?: string }) => HTMLElement;
+            loadPaymentData: (req: unknown) => Promise<unknown>;
+          };
+        };
+      };
+    };
   }
 }
+
+type ApplePaySessionInstance = {
+  onvalidatemerchant: (event: { validationURL: string }) => void;
+  onpaymentauthorized: (event: { payment: { token: unknown; billingContact?: unknown; shippingContact?: unknown } }) => void;
+  oncancel: () => void;
+  completeMerchantValidation: (session: unknown) => void;
+  completePayment: (status: number) => void;
+  begin: () => void;
+  abort: () => void;
+};
 
 let sdkPromise: Promise<PayPalNamespace> | null = null;
 let sdkKey: string | null = null;
 
 function loadPayPalSdk(clientId: string, currency: string): Promise<PayPalNamespace> {
-  const key = `${clientId}:${currency}`;
+  const key = `${clientId}:${currency}:apm`;
   if (sdkPromise && sdkKey === key) return sdkPromise;
   sdkKey = key;
   sdkPromise = new Promise((resolve, reject) => {
     if (typeof window === "undefined") return reject(new Error("no window"));
     if (window.paypal) return resolve(window.paypal);
     const script = document.createElement("script");
-    script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=${encodeURIComponent(currency)}&intent=capture`;
+    const params = new URLSearchParams({
+      "client-id": clientId,
+      currency: "USD",
+      intent: "capture",
+      components: "buttons,applepay,googlepay",
+      "enable-funding": "venmo",
+    });
+    script.src = `https://www.paypal.com/sdk/js?${params.toString()}`;
     script.async = true;
     script.onload = () => {
       if (window.paypal) resolve(window.paypal);
@@ -212,6 +258,38 @@ function loadPayPalSdk(clientId: string, currency: string): Promise<PayPalNamesp
     document.head.appendChild(script);
   });
   return sdkPromise;
+}
+
+let googlePaySdkPromise: Promise<void> | null = null;
+function loadGooglePaySdk(): Promise<void> {
+  if (googlePaySdkPromise) return googlePaySdkPromise;
+  googlePaySdkPromise = new Promise((resolve, reject) => {
+    if (typeof window === "undefined") return reject(new Error("no window"));
+    if (window.google?.payments?.api) return resolve();
+    const s = document.createElement("script");
+    s.src = "https://pay.google.com/gp/p/js/pay.js";
+    s.async = true;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error("Failed to load Google Pay SDK"));
+    document.head.appendChild(s);
+  });
+  return googlePaySdkPromise;
+}
+
+let applePaySdkPromise: Promise<void> | null = null;
+function loadApplePaySdk(): Promise<void> {
+  if (applePaySdkPromise) return applePaySdkPromise;
+  applePaySdkPromise = new Promise((resolve, reject) => {
+    if (typeof window === "undefined") return reject(new Error("no window"));
+    if (window.ApplePaySession) return resolve();
+    const s = document.createElement("script");
+    s.src = "https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js";
+    s.async = true;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error("Failed to load Apple Pay SDK"));
+    document.head.appendChild(s);
+  });
+  return applePaySdkPromise;
 }
 
 type OrderPayload = {
@@ -242,8 +320,12 @@ function PayPalButtons({
   onCaptured: (res: { wcOrderId: number; paypalOrderId: string }) => void;
   onReady: () => void;
 }) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const paypalRef = useRef<HTMLDivElement | null>(null);
+  const applePayRef = useRef<HTMLDivElement | null>(null);
+  const googlePayRef = useRef<HTMLDivElement | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [applePayEligible, setApplePayEligible] = useState(false);
+  const [googlePayEligible, setGooglePayEligible] = useState(false);
   const buildOrderRef = useRef(buildOrder);
   buildOrderRef.current = buildOrder;
 
@@ -256,37 +338,180 @@ function PayPalButtons({
         const config = await getPayPalConfig();
         if (cancelled) return;
         const paypal = await loadPayPalSdk(config.clientId, config.currency);
-        if (cancelled || !containerRef.current) return;
+        if (cancelled) return;
 
-        const b = paypal.Buttons({
-          style: { layout: "vertical", shape: "rect", label: "paypal" },
-          createOrder: async () => {
-            setError(null);
-            const res = await createPaymentOrder({ data: buildOrderRef.current() });
-            return res.paypalOrderId;
-          },
-          onApprove: async (data) => {
-            const res = await captureOrder({ data: { paypalOrderId: data.orderID } });
-            if (!res.ok) {
-              setError(res.error);
-              toast.error(res.error);
-              return;
-            }
-            onCaptured({ wcOrderId: res.wcOrderId, paypalOrderId: res.paypalOrderId });
-          },
-          onCancel: () => {
-            // Keep the customer on the checkout page; do NOT mark the Woo order failed.
-            toast.message("Payment cancelled. You can try again when you're ready.");
-          },
-          onError: (err) => {
-            const msg = err instanceof Error ? err.message : "Payment failed. Please try again.";
-            setError(msg);
-            toast.error(msg);
-          },
-        });
-        await b.render(containerRef.current);
-        buttons = b;
+        const createOrder = async () => {
+          setError(null);
+          const res = await createPaymentOrder({ data: buildOrderRef.current() });
+          return res.paypalOrderId;
+        };
+        const doCapture = async (paypalOrderId: string) => {
+          const res = await captureOrder({ data: { paypalOrderId } });
+          if (!res.ok) {
+            setError(res.error);
+            toast.error(res.error);
+            return;
+          }
+          onCaptured({ wcOrderId: res.wcOrderId, paypalOrderId: res.paypalOrderId });
+        };
+        const handleError = (err: unknown) => {
+          const msg = err instanceof Error ? err.message : "Payment failed. Please try again.";
+          setError(msg);
+          toast.error(msg);
+        };
+
+        // Main PayPal (renders Venmo automatically when eligible)
+        if (paypalRef.current) {
+          const b = paypal.Buttons({
+            style: { layout: "vertical", shape: "rect", label: "paypal" },
+            createOrder,
+            onApprove: async (data) => doCapture(data.orderID),
+            onCancel: () => toast.message("Payment cancelled. You can try again when you're ready."),
+            onError: handleError,
+          });
+          await b.render(paypalRef.current);
+          buttons = b;
+        }
         if (!cancelled) onReady();
+
+        // Apple Pay
+        (async () => {
+          try {
+            if (!paypal.Applepay) return;
+            if (typeof window === "undefined" || !window.ApplePaySession) {
+              await loadApplePaySdk().catch(() => {});
+            }
+            if (!window.ApplePaySession || !window.ApplePaySession.canMakePayments()) return;
+            const applepay = paypal.Applepay();
+            const cfg = await applepay.config();
+            if (cancelled || !cfg.isEligible || !applePayRef.current) return;
+            setApplePayEligible(true);
+
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.setAttribute("aria-label", "Pay with Apple Pay");
+            btn.style.cssText =
+              "-webkit-appearance:-apple-pay-button;-apple-pay-button-type:pay;-apple-pay-button-style:black;width:100%;height:44px;border-radius:6px;border:0;cursor:pointer;";
+            btn.addEventListener("click", async () => {
+              try {
+                const orderId = await createOrder();
+                const billing = buildOrderRef.current().billing;
+                const paymentRequest = {
+                  countryCode: cfg.countryCode || (billing.country || "US"),
+                  currencyCode: cfg.currencyCode || config.currency,
+                  merchantCapabilities: cfg.merchantCapabilities,
+                  supportedNetworks: cfg.supportedNetworks,
+                  requiredBillingContactFields: ["postalAddress", "name"],
+                  total: { label: "ADL Automotive", amount: String(0) },
+                };
+                const Session = window.ApplePaySession!;
+                const session = new Session(4, paymentRequest);
+                session.onvalidatemerchant = async (event) => {
+                  try {
+                    const merchantSession = await applepay.validateMerchant({
+                      validationUrl: event.validationURL,
+                      displayName: "ADL Automotive",
+                    });
+                    session.completeMerchantValidation(merchantSession);
+                  } catch (err) {
+                    session.abort();
+                    handleError(err);
+                  }
+                };
+                session.onpaymentauthorized = async (event) => {
+                  try {
+                    await applepay.confirmOrder({
+                      orderId,
+                      token: event.payment.token,
+                      billingContact: event.payment.billingContact,
+                      shippingContact: event.payment.shippingContact,
+                    });
+                    session.completePayment(Session.STATUS_SUCCESS);
+                    await doCapture(orderId);
+                  } catch (err) {
+                    session.completePayment(Session.STATUS_FAILURE);
+                    handleError(err);
+                  }
+                };
+                session.oncancel = () =>
+                  toast.message("Payment cancelled. You can try again when you're ready.");
+                session.begin();
+              } catch (err) {
+                handleError(err);
+              }
+            });
+            applePayRef.current.innerHTML = "";
+            applePayRef.current.appendChild(btn);
+          } catch {
+            // silently skip if Apple Pay init fails
+          }
+        })();
+
+        // Google Pay
+        (async () => {
+          try {
+            if (!paypal.Googlepay) return;
+            await loadGooglePaySdk();
+            const googlepay = paypal.Googlepay();
+            const cfg = await googlepay.config();
+            if (cancelled) return;
+            const PaymentsClient = window.google?.payments?.api?.PaymentsClient;
+            if (!PaymentsClient) return;
+            const client = new PaymentsClient({
+              environment: config.env === "live" ? "PRODUCTION" : "TEST",
+            });
+            const ready = await client.isReadyToPay({
+              apiVersion: cfg.apiVersion,
+              apiVersionMinor: cfg.apiVersionMinor,
+              allowedPaymentMethods: cfg.allowedPaymentMethods,
+            });
+            if (!ready.result || !googlePayRef.current) return;
+            setGooglePayEligible(true);
+
+            const btn = client.createButton({
+              buttonSizeMode: "fill",
+              buttonType: "pay",
+              buttonColor: "black",
+              onClick: async () => {
+                try {
+                  const orderId = await createOrder();
+                  const paymentData = await client.loadPaymentData({
+                    apiVersion: cfg.apiVersion,
+                    apiVersionMinor: cfg.apiVersionMinor,
+                    allowedPaymentMethods: cfg.allowedPaymentMethods,
+                    merchantInfo: cfg.merchantInfo,
+                    transactionInfo: {
+                      countryCode: cfg.countryCode || "US",
+                      currencyCode: config.currency,
+                      totalPriceStatus: "FINAL",
+                      totalPrice: "0.00",
+                    },
+                  });
+                  const confirm = await googlepay.confirmOrder({
+                    orderId,
+                    paymentMethodData: (paymentData as { paymentMethodData: unknown }).paymentMethodData,
+                  });
+                  if (confirm.status && confirm.status !== "APPROVED") {
+                    handleError(new Error(`Google Pay: ${confirm.status}`));
+                    return;
+                  }
+                  await doCapture(orderId);
+                } catch (err) {
+                  const anyErr = err as { statusCode?: string };
+                  if (anyErr && anyErr.statusCode === "CANCELED") {
+                    toast.message("Payment cancelled.");
+                    return;
+                  }
+                  handleError(err);
+                }
+              },
+            });
+            googlePayRef.current.innerHTML = "";
+            googlePayRef.current.appendChild(btn);
+          } catch {
+            // silently skip if Google Pay init fails
+          }
+        })();
       } catch (err) {
         if (cancelled) return;
         const msg = err instanceof Error ? err.message : "Could not initialise PayPal";
@@ -307,7 +532,9 @@ function PayPalButtons({
 
   return (
     <div className="space-y-3">
-      <div ref={containerRef} />
+      <div ref={paypalRef} />
+      <div ref={applePayRef} style={{ display: applePayEligible ? "block" : "none" }} />
+      <div ref={googlePayRef} style={{ display: googlePayEligible ? "block" : "none" }} />
       {error && (
         <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
           {error}
