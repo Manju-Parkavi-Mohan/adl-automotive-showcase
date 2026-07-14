@@ -141,6 +141,7 @@ function CheckoutPage() {
                   },
                   customer_note: form.note || undefined,
                 })}
+                total={subtotal}
                 onCaptured={(res) => {
                   clear();
                   navigate({
