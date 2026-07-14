@@ -214,7 +214,24 @@ function loadPayPalSdk(clientId: string, currency: string): Promise<PayPalNamesp
   return sdkPromise;
 }
 
-type OrderPayload = Parameters<typeof createPaymentOrder>[0] extends { data: infer D } ? D : never;
+type OrderPayload = {
+  items: Array<{ product_id: number; quantity: number; variation_id?: number }>;
+  billing: {
+    first_name: string;
+    last_name: string;
+    address_1: string;
+    address_2?: string;
+    city: string;
+    state?: string;
+    postcode: string;
+    country: string;
+    email?: string;
+    phone?: string;
+  };
+  shipping?: OrderPayload["billing"];
+  customer_note?: string;
+  currency?: string;
+};
 
 function PayPalButtons({
   buildOrder,
