@@ -8,15 +8,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCart } from "@/components/site/CartProvider";
 import { useAuth } from "@/components/site/AuthProvider";
-import { createOrder } from "@/lib/woo/orders.functions";
+import {
+  createPaymentOrder,
+  captureOrder,
+  getPayPalConfig,
+} from "@/lib/paypal/paypal.functions";
 import { toast } from "sonner";
 import { seoToMeta } from "@/lib/seo";
 import { Money } from "@/components/site/Money";
 import { useLocale } from "@/i18n/LocaleProvider";
-import type { WooOrderSummary } from "@/lib/woo/types";
-
-const CKO_SESSION_ENDPOINT =
-  "https://api.adlautomotive.com/wp-json/cko/v1/payment-session";
 
 export const Route = createFileRoute("/{-$lang}/checkout")({
   head: () => ({
@@ -34,7 +34,7 @@ function CheckoutPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t } = useLocale();
-  const [order, setOrder] = useState<WooOrderSummary | null>(null);
+  const [ready, setReady] = useState(false);
 
   const [form, setForm] = useState({
     first_name: user?.firstName ?? "",
@@ -53,39 +53,16 @@ function CheckoutPage() {
   const update = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  const mutation = useMutation({
-    mutationFn: () =>
-      createOrder({
-        data: {
-          items: items.map((i) => ({ product_id: i.productId, quantity: i.quantity })),
-          billing: {
-            first_name: form.first_name,
-            last_name: form.last_name,
-            address_1: form.address_1,
-            address_2: form.address_2,
-            city: form.city,
-            state: form.state,
-            postcode: form.postcode,
-            country: form.country,
-            email: form.email,
-            phone: form.phone,
-          },
-          customer_note: form.note || undefined,
-        },
-      }),
-    onSuccess: (order) => {
-      setOrder(order);
-    },
-    onError: (err) => {
-      toast.error(
-        err instanceof Error
-          ? err.message
-          : "We couldn't start your order, please check your details and try again",
-      );
-    },
-  });
+  const missing =
+    !form.first_name ||
+    !form.last_name ||
+    !form.email ||
+    !form.address_1 ||
+    !form.city ||
+    !form.postcode ||
+    form.country.length !== 2;
 
-  if (items.length === 0 && !mutation.isPending && !order) {
+  if (items.length === 0) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -98,53 +75,13 @@ function CheckoutPage() {
     );
   }
 
-  if (order) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container-px mx-auto max-w-[1400px] py-12">
-          <h1 className="text-3xl font-bold tracking-tight">{t("checkout.title")}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Order #{order.number} — complete your payment below.
-          </p>
-          <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
-            <PaymentStep
-              order={order}
-              onSuccess={() => {
-                clear();
-                navigate({
-                  to: "/{-$lang}/checkout/return",
-                  search: { status: "success", order_id: order.id, order_key: order.order_key ?? "" },
-                }).catch(() => {});
-              }}
-            />
-            <aside className="h-fit space-y-4 rounded-xl border border-border bg-secondary p-6">
-              <h2 className="text-lg font-bold">{t("checkout.yourOrder")}</h2>
-              <div className="flex justify-between text-base font-bold">
-                <span>{t("cart.total")}</span>
-                <Money usd={subtotal} />
-              </div>
-            </aside>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container-px mx-auto max-w-[1400px] py-12">
         <h1 className="text-3xl font-bold tracking-tight">{t("checkout.title")}</h1>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            mutation.mutate();
-          }}
-          className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]"
-        >
+        <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
           <div className="space-y-6 rounded-xl border border-border bg-white p-6">
             <h2 className="text-lg font-semibold">{t("checkout.billing")}</h2>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -167,11 +104,6 @@ function CheckoutPage() {
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary"
               />
             </Field>
-            {mutation.isError && (
-              <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
-                We couldn't start your order, please check your details and try again.
-              </div>
-            )}
           </div>
 
           <aside className="h-fit space-y-4 rounded-xl border border-border bg-secondary p-6">
@@ -187,11 +119,43 @@ function CheckoutPage() {
             <div className="my-2 h-px bg-border" />
             <div className="flex justify-between text-sm"><span className="text-muted-foreground">{t("cart.subtotal")}</span><Money usd={subtotal} className="font-medium" /></div>
             <div className="flex justify-between text-base font-bold"><span>{t("cart.total")}</span><Money usd={subtotal} /></div>
-            <Button type="submit" className="w-full" disabled={mutation.isPending}>
-              {mutation.isPending ? t("checkout.placing") : t("checkout.place")}
-            </Button>
+            {missing ? (
+              <p className="text-xs text-muted-foreground">
+                Please complete the billing details to enable payment.
+              </p>
+            ) : (
+              <PayPalButtons
+                buildOrder={() => ({
+                  items: items.map((i) => ({ product_id: i.productId, quantity: i.quantity })),
+                  billing: {
+                    first_name: form.first_name,
+                    last_name: form.last_name,
+                    address_1: form.address_1,
+                    address_2: form.address_2,
+                    city: form.city,
+                    state: form.state,
+                    postcode: form.postcode,
+                    country: form.country,
+                    email: form.email,
+                    phone: form.phone,
+                  },
+                  customer_note: form.note || undefined,
+                })}
+                onCaptured={(res) => {
+                  clear();
+                  navigate({
+                    to: "/{-$lang}/checkout/return",
+                    search: { status: "success", order_id: res.wcOrderId, order_key: "" },
+                  }).catch(() => {});
+                }}
+                onReady={() => setReady(true)}
+              />
+            )}
+            {!ready && !missing && (
+              <p className="text-xs text-muted-foreground">Loading PayPal…</p>
+            )}
           </aside>
-        </form>
+        </div>
       </main>
       <Footer />
     </div>
@@ -209,114 +173,146 @@ function Field({ label, required, children, className }: { label: string; requir
   );
 }
 
-function PaymentStep({
-  order,
-  onSuccess,
+// ------------- PayPal Buttons -------------
+
+type PayPalNamespace = {
+  Buttons: (opts: {
+    style?: Record<string, unknown>;
+    createOrder: () => Promise<string>;
+    onApprove: (data: { orderID: string }) => Promise<void>;
+    onCancel?: () => void;
+    onError?: (err: unknown) => void;
+  }) => { render: (el: HTMLElement) => Promise<void>; close?: () => Promise<void> };
+};
+
+declare global {
+  interface Window {
+    paypal?: PayPalNamespace;
+  }
+}
+
+let sdkPromise: Promise<PayPalNamespace> | null = null;
+let sdkKey: string | null = null;
+
+function loadPayPalSdk(clientId: string, currency: string): Promise<PayPalNamespace> {
+  const key = `${clientId}:${currency}`;
+  if (sdkPromise && sdkKey === key) return sdkPromise;
+  sdkKey = key;
+  sdkPromise = new Promise((resolve, reject) => {
+    if (typeof window === "undefined") return reject(new Error("no window"));
+    if (window.paypal) return resolve(window.paypal);
+    const script = document.createElement("script");
+    script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=${encodeURIComponent(currency)}&intent=capture`;
+    script.async = true;
+    script.onload = () => {
+      if (window.paypal) resolve(window.paypal);
+      else reject(new Error("PayPal SDK failed to initialise"));
+    };
+    script.onerror = () => reject(new Error("Failed to load PayPal SDK"));
+    document.head.appendChild(script);
+  });
+  return sdkPromise;
+}
+
+type OrderPayload = {
+  items: Array<{ product_id: number; quantity: number; variation_id?: number }>;
+  billing: {
+    first_name: string;
+    last_name: string;
+    address_1: string;
+    address_2?: string;
+    city: string;
+    state?: string;
+    postcode: string;
+    country: string;
+    email?: string;
+    phone?: string;
+  };
+  shipping?: OrderPayload["billing"];
+  customer_note?: string;
+  currency?: string;
+};
+
+function PayPalButtons({
+  buildOrder,
+  onCaptured,
+  onReady,
 }: {
-  order: WooOrderSummary;
-  onSuccess: () => void;
+  buildOrder: () => OrderPayload;
+  onCaptured: (res: { wcOrderId: number; paypalOrderId: string }) => void;
+  onReady: () => void;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [attempt, setAttempt] = useState(0);
+  const buildOrderRef = useRef(buildOrder);
+  buildOrderRef.current = buildOrder;
 
   useEffect(() => {
     let cancelled = false;
-    let componentInstance: { unmount?: () => void } | null = null;
-    setLoading(true);
-    setError(null);
+    let buttons: { close?: () => Promise<void> } | null = null;
 
     (async () => {
       try {
-        const res = await fetch(CKO_SESSION_ENDPOINT, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ order_id: order.id, order_key: order.order_key }),
-        });
-        if (!res.ok) throw new Error(`Failed to start payment session (${res.status})`);
-        const data = (await res.json()) as {
-          payment_session_token: string;
-          public_key: string;
-          environment: "sandbox" | "production";
-          payment_session_id: string;
-        };
+        const config = await getPayPalConfig();
         if (cancelled) return;
+        const paypal = await loadPayPalSdk(config.clientId, config.currency);
+        if (cancelled || !containerRef.current) return;
 
-        const { loadCheckoutWebComponents } = await import(
-          "@checkout.com/checkout-web-components"
-        );
-        if (cancelled) return;
-
-        const checkout = await loadCheckoutWebComponents({
-          publicKey: data.public_key,
-          environment: data.environment,
-          paymentSession: {
-            id: data.payment_session_id,
-            payment_session_token: data.payment_session_token,
+        const b = paypal.Buttons({
+          style: { layout: "vertical", shape: "rect", label: "paypal" },
+          createOrder: async () => {
+            setError(null);
+            const res = await createPaymentOrder({ data: buildOrderRef.current() });
+            return res.paypalOrderId;
           },
-          appearance: {
-            colorAction: "#0F4C81",
-            colorPrimary: "#0F4C81",
-            borderRadius: ["8px", "8px"] as [string, string],
+          onApprove: async (data) => {
+            const res = await captureOrder({ data: { paypalOrderId: data.orderID } });
+            if (!res.ok) {
+              setError(res.error);
+              toast.error(res.error);
+              return;
+            }
+            onCaptured({ wcOrderId: res.wcOrderId, paypalOrderId: res.paypalOrderId });
           },
-          onPaymentCompleted: () => {
-            onSuccess();
+          onCancel: () => {
+            // Keep the customer on the checkout page; do NOT mark the Woo order failed.
+            toast.message("Payment cancelled. You can try again when you're ready.");
           },
-          onError: (_component, err) => {
-            const msg =
-              (err && typeof err === "object" && "message" in err && typeof (err as { message: unknown }).message === "string"
-                ? (err as { message: string }).message
-                : "Payment failed. Please try again.");
+          onError: (err) => {
+            const msg = err instanceof Error ? err.message : "Payment failed. Please try again.";
             setError(msg);
+            toast.error(msg);
           },
         });
-
-        if (cancelled) return;
-        const flow = checkout.create("flow");
-        if (containerRef.current) {
-          flow.mount(containerRef.current);
-          componentInstance = flow as unknown as { unmount?: () => void };
-        }
-        setLoading(false);
+        await b.render(containerRef.current);
+        buttons = b;
+        if (!cancelled) onReady();
       } catch (err) {
         if (cancelled) return;
-        setError(err instanceof Error ? err.message : "Could not initialise payment");
-        setLoading(false);
+        const msg = err instanceof Error ? err.message : "Could not initialise PayPal";
+        setError(msg);
       }
     })();
 
     return () => {
       cancelled = true;
       try {
-        componentInstance?.unmount?.();
+        void buttons?.close?.();
       } catch {
         // ignore
       }
     };
-  }, [order.id, order.order_key, attempt, onSuccess]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <div className="space-y-4 rounded-xl border border-border bg-white p-6">
-      <h2 className="text-lg font-semibold">Payment</h2>
-      {loading && !error && (
-        <p className="text-sm text-muted-foreground">Loading secure payment form…</p>
-      )}
+    <div className="space-y-3">
+      <div ref={containerRef} />
       {error && (
         <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
-          <p className="font-medium">{error}</p>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="mt-3"
-            onClick={() => setAttempt((n) => n + 1)}
-          >
-            Try again
-          </Button>
+          {error}
         </div>
       )}
-      <div ref={containerRef} />
     </div>
   );
 }

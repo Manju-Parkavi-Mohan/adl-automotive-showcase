@@ -51,8 +51,8 @@ export const createOrder = createServerFn({ method: "POST" })
     }>("/orders", {
       method: "POST",
       body: {
-        payment_method: "cko_gateway",
-        payment_method_title: "Checkout.com",
+        payment_method: "paypal",
+        payment_method_title: "PayPal",
         set_paid: false,
         status: "pending",
         customer_id: customerId ?? 0,

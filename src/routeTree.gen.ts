@@ -29,6 +29,7 @@ import { Route as Char123LangChar125AccountRegisterRouteImport } from './routes/
 import { Route as Char123LangChar125AccountLoginRouteImport } from './routes/{-$lang}/account.login'
 import { Route as Char123LangChar125AccountForgotPasswordRouteImport } from './routes/{-$lang}/account.forgot-password'
 import { Route as Char123LangChar125AccountOrdersOrderIdRouteImport } from './routes/{-$lang}/account.orders.$orderId'
+import { Route as ApiPublicWebhooksPaypalRouteImport } from './routes/api/public/webhooks/paypal'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -143,6 +144,11 @@ const Char123LangChar125AccountOrdersOrderIdRoute =
     path: '/orders/$orderId',
     getParentRoute: () => Char123LangChar125AccountRoute,
   } as any)
+const ApiPublicWebhooksPaypalRoute = ApiPublicWebhooksPaypalRouteImport.update({
+  id: '/api/public/webhooks/paypal',
+  path: '/api/public/webhooks/paypal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/robots.txt': typeof RobotsDottxtRoute
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/{-$lang}/account/': typeof Char123LangChar125AccountIndexRoute
   '/{-$lang}/blog/': typeof Char123LangChar125BlogIndexRoute
   '/{-$lang}/products/': typeof Char123LangChar125ProductsIndexRoute
+  '/api/public/webhooks/paypal': typeof ApiPublicWebhooksPaypalRoute
   '/{-$lang}/account/orders/$orderId': typeof Char123LangChar125AccountOrdersOrderIdRoute
 }
 export interface FileRoutesByTo {
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/{-$lang}/account': typeof Char123LangChar125AccountIndexRoute
   '/{-$lang}/blog': typeof Char123LangChar125BlogIndexRoute
   '/{-$lang}/products': typeof Char123LangChar125ProductsIndexRoute
+  '/api/public/webhooks/paypal': typeof ApiPublicWebhooksPaypalRoute
   '/{-$lang}/account/orders/$orderId': typeof Char123LangChar125AccountOrdersOrderIdRoute
 }
 export interface FileRoutesById {
@@ -206,6 +214,7 @@ export interface FileRoutesById {
   '/{-$lang}/account/': typeof Char123LangChar125AccountIndexRoute
   '/{-$lang}/blog/': typeof Char123LangChar125BlogIndexRoute
   '/{-$lang}/products/': typeof Char123LangChar125ProductsIndexRoute
+  '/api/public/webhooks/paypal': typeof ApiPublicWebhooksPaypalRoute
   '/{-$lang}/account/orders/$orderId': typeof Char123LangChar125AccountOrdersOrderIdRoute
 }
 export interface FileRouteTypes {
@@ -230,6 +239,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/account/'
     | '/{-$lang}/blog/'
     | '/{-$lang}/products/'
+    | '/api/public/webhooks/paypal'
     | '/{-$lang}/account/orders/$orderId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/account'
     | '/{-$lang}/blog'
     | '/{-$lang}/products'
+    | '/api/public/webhooks/paypal'
     | '/{-$lang}/account/orders/$orderId'
   id:
     | '__root__'
@@ -271,6 +282,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/account/'
     | '/{-$lang}/blog/'
     | '/{-$lang}/products/'
+    | '/api/public/webhooks/paypal'
     | '/{-$lang}/account/orders/$orderId'
   fileRoutesById: FileRoutesById
 }
@@ -286,6 +298,7 @@ export interface RootRouteChildren {
   Char123LangChar125ProductsRoute: typeof Char123LangChar125ProductsRouteWithChildren
   Char123LangChar125IndexRoute: typeof Char123LangChar125IndexRoute
   Char123LangChar125CheckoutReturnRoute: typeof Char123LangChar125CheckoutReturnRoute
+  ApiPublicWebhooksPaypalRoute: typeof ApiPublicWebhooksPaypalRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -430,6 +443,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LangChar125AccountOrdersOrderIdRouteImport
       parentRoute: typeof Char123LangChar125AccountRoute
     }
+    '/api/public/webhooks/paypal': {
+      id: '/api/public/webhooks/paypal'
+      path: '/api/public/webhooks/paypal'
+      fullPath: '/api/public/webhooks/paypal'
+      preLoaderRoute: typeof ApiPublicWebhooksPaypalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -503,6 +523,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char123LangChar125ProductsRoute: Char123LangChar125ProductsRouteWithChildren,
   Char123LangChar125IndexRoute: Char123LangChar125IndexRoute,
   Char123LangChar125CheckoutReturnRoute: Char123LangChar125CheckoutReturnRoute,
+  ApiPublicWebhooksPaypalRoute: ApiPublicWebhooksPaypalRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
