@@ -3,9 +3,19 @@ import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import bannerAutodome from "@/assets/banner-adl-autodome.jpg.asset.json";
 import bannerDiagnostic from "@/assets/banner-diagnostic.jpg.asset.json";
 import bannerScanner from "@/assets/banner-scanner.jpg.asset.json";
+import bannerFlexboxOpen from "@/assets/banner-flexbox-open.jpg.asset.json";
+import bannerFlexbox from "@/assets/banner-flexbox.jpg.asset.json";
+import bannerEngineDance from "@/assets/banner-enginedance.jpg.asset.json";
 import { useLocale } from "@/i18n/LocaleProvider";
 
-const SLIDE_IMAGES = [bannerAutodome.url, bannerScanner.url, bannerDiagnostic.url];
+const SLIDE_IMAGES = [
+  bannerAutodome.url,
+  bannerFlexboxOpen.url,
+  bannerFlexbox.url,
+  bannerEngineDance.url,
+  bannerScanner.url,
+  bannerDiagnostic.url,
+];
 
 export function HeroCarousel() {
   const { t } = useLocale();
@@ -13,6 +23,9 @@ export function HeroCarousel() {
     { eyebrow: t("hero.s1e"), title: t("hero.s1t"), description: t("hero.s1d"), cta: t("hero.s1c"), image: SLIDE_IMAGES[0] },
     { eyebrow: t("hero.s2e"), title: t("hero.s2t"), description: t("hero.s2d"), cta: t("hero.s2c"), image: SLIDE_IMAGES[1] },
     { eyebrow: t("hero.s3e"), title: t("hero.s3t"), description: t("hero.s3d"), cta: t("hero.s3c"), image: SLIDE_IMAGES[2] },
+    { eyebrow: t("hero.s1e"), title: t("hero.s1t"), description: t("hero.s1d"), cta: t("hero.s1c"), image: SLIDE_IMAGES[3] },
+    { eyebrow: t("hero.s2e"), title: t("hero.s2t"), description: t("hero.s2d"), cta: t("hero.s2c"), image: SLIDE_IMAGES[4] },
+    { eyebrow: t("hero.s3e"), title: t("hero.s3t"), description: t("hero.s3d"), cta: t("hero.s3c"), image: SLIDE_IMAGES[5] },
   ];
   const [i, setI] = useState(0);
   useEffect(() => {
