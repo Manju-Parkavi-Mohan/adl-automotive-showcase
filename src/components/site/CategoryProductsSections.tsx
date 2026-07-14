@@ -127,7 +127,7 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
               className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
             />
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/35 to-transparent" />
             <div className="relative flex h-full flex-col items-center justify-start p-6 text-center">
               <h2 className="text-2xl font-extrabold uppercase leading-tight tracking-tight text-white drop-shadow-lg">
                 {category.name}
