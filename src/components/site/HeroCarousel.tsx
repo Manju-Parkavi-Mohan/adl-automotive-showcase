@@ -53,7 +53,7 @@ export function HeroCarousel() {
               className="h-full w-full object-cover object-[80%_center] md:object-center"
             />
             {/* Mobile: full dark scrim so text is always legible over any part of the photo */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/55 to-black/80 md:hidden" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/50 to-black/60 md:hidden" />
             {/* Desktop: original side gradient, image has room on the right for the product */}
             <div className="absolute inset-0 hidden md:block bg-[linear-gradient(to_right,rgba(11,39,66,0.85)_0%,rgba(11,39,66,0.5)_30%,transparent_55%)]" />
           </div>
