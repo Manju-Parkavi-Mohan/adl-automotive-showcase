@@ -377,7 +377,7 @@ function ProductDetailPage() {
             </div>
           </div>
           <div className="py-8">
-            {tab === "features" && <DescriptionPanel woo={woo} />}
+            {tab === "features" && <FeaturesPanel woo={woo} />}
             {tab === "specs" && <SpecsPanel woo={woo} />}
             {tab === "coverage" && hasCoverage && <CoveragePanel text={coverageText} />}
             {tab === "downloads" && hasDownloads && <DownloadsPanel downloads={woo.downloads} />}
@@ -413,7 +413,7 @@ function ProductDetailPage() {
   );
 }
 
-function DescriptionPanel({ woo }: { woo: WooProduct }) {
+function FeaturesPanel({ woo }: { woo: WooProduct }) {
   const html = woo.description || woo.short_description;
   return (
     <div className="grid gap-10 lg:grid-cols-[1fr_320px]">
@@ -447,10 +447,7 @@ function DescriptionPanel({ woo }: { woo: WooProduct }) {
 function SpecsPanel({ woo }: { woo: WooProduct }) {
   const baseRows: Array<[string, string]> = [
     ["SKU", woo.sku || "—"],
-    ["Brand", woo.brand ?? "—"],
-    ["Categories", woo.categories.map((c) => c.name).join(", ") || "—"],
-    ["Stock status", woo.stock_status],
-    ["Total sales", String(woo.total_sales)],
+    ["Brand", woo.brand ?? "—"]
   ];
   const attrRows: Array<[string, string]> = woo.attributes.map((a) => [a.name, a.options.join(", ")]);
   const rows = [...baseRows, ...attrRows];
@@ -468,6 +465,51 @@ function SpecsPanel({ woo }: { woo: WooProduct }) {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+function CoveragePanel({ text }: { text: string }) {
+  return (
+    <div className="prose prose-slate max-w-none rounded-xl border border-border bg-secondary p-6 text-foreground/85">
+      <p className="whitespace-pre-line leading-relaxed">{text}</p>
+    </div>
+  );
+}
+
+function DownloadsPanel({ downloads }: { downloads: WooProduct["downloads"] }) {
+  const [selectedId, setSelectedId] = useState(downloads[0]?.id ?? "");
+  const selected = downloads.find((d) => d.id === selectedId) ?? downloads[0];
+
+  return (
+    <div className="max-w-md rounded-xl border border-border bg-secondary p-6">
+      <label htmlFor="download-select" className="mb-2 block text-sm font-semibold text-foreground">
+        Select a file
+      </label>
+      <select
+        id="download-select"
+        value={selectedId}
+        onChange={(e) => setSelectedId(e.target.value)}
+        className="w-full rounded-md border border-border bg-white px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary"
+      >
+        {downloads.map((d) => (
+          <option key={d.id} value={d.id}>
+            {d.name}
+          </option>
+        ))}
+      </select>
+
+      {selected && (
+        
+          href={selected.file}
+          target="_blank"
+          rel="noopener noreferrer"
+          download
+          className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-md bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+        >
+          Download {selected.name}
+        </a>
+      )}
     </div>
   );
 }
