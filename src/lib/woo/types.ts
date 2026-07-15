@@ -41,7 +41,14 @@ export interface WooProduct {
   images: WooImage[];
   attributes: WooAttribute[];
   permalink: string;
+  downloads: WooDownload[];
   seo?: SeoMeta;
+}
+
+export interface WooDownload {
+  id: string;
+  name: string;
+  file: string;
 }
 
 export interface WooCategory {
@@ -232,6 +239,7 @@ export interface RawWooProduct {
   images: WooImage[];
   attributes: Array<{ id: number; name: string; options: string[] }>;
   brands?: WooCategoryRef[];
+  downloads?: Array<{ id: string; name: string; file: string }>;
   yoast_head_json?: YoastHeadJson;
 }
 
@@ -278,6 +286,7 @@ export function adaptProduct(raw: RawWooProduct): WooProduct {
     images: (raw.images || []).map((i) => ({ src: i.src, alt: i.alt })),
     attributes: (raw.attributes || []).map((a) => ({ id: a.id, name: a.name, options: a.options })),
     permalink: raw.permalink,
+    downloads: (raw.downloads || []).map((d) => ({ id: d.id, name: decodeHtml(d.name), file: d.file })),
     seo: adaptYoast(raw.yoast_head_json),
   };
 }
