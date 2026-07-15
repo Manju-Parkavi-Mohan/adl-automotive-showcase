@@ -48,7 +48,7 @@ export function HeroCarousel() {
             className={`absolute inset-0 transition-opacity duration-700 ${idx === i ? "opacity-100" : "opacity-0"}`}
           >
             <img src={s.image} alt={s.title} className="h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0B2742]/85 via-[#0B2742]/55 to-transparent" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(11,39,66,0.85)_0%,rgba(11,39,66,0.5)_30%,transparent_55%)]" />
           </div>
         ))}
 
