@@ -445,12 +445,10 @@ function FeaturesPanel({ woo }: { woo: WooProduct }) {
 }
 
 function SpecsPanel({ woo }: { woo: WooProduct }) {
-  const baseRows: Array<[string, string]> = [
+  const rows: Array<[string, string]> = [
     ["SKU", woo.sku || "—"],
     ["Brand", woo.brand ?? "—"],
   ];
-  const attrRows: Array<[string, string]> = woo.attributes.map((a) => [a.name, a.options.join(", ")]);
-  const rows = [...baseRows, ...attrRows];
   return (
     <div className="overflow-hidden rounded-xl border border-border">
       <table className="w-full text-sm">
