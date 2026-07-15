@@ -50,19 +50,23 @@ export function HeroCarousel() {
             <img
               src={s.image}
               alt={s.title}
-              className="h-full w-full object-cover object-[80%_center] md:object-center"
+              className="h-full w-full object-cover object-[65%_center] md:object-center"
             />
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(11,39,66,0.85)_0%,rgba(11,39,66,0.5)_30%,transparent_55%)]" />
+            {/* Mobile: full dark scrim so text is always legible over any part of the photo */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/55 to-black/80 md:hidden" />
+            {/* Desktop: original side gradient, image has room on the right for the product */}
+            <div className="absolute inset-0 hidden md:block bg-[linear-gradient(to_right,rgba(11,39,66,0.85)_0%,rgba(11,39,66,0.5)_30%,transparent_55%)]" />
           </div>
         ))}
 
         <div className="container-px relative z-10 mx-auto flex h-full max-w-[1400px] items-center">
-          <div className="max-w-xl text-white">
+          <div className="max-w-xl text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.25em] text-[var(--accent-blue)]">
               {slide.eyebrow}
             </p>
             <h1 className="text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl">{slide.title}</h1>
-            <p className="mt-5 text-base leading-relaxed text-white/85 md:text-lg">{slide.description}</p>
+            <p className="mt-5 text-base leading-relaxed text-white/90 md:text-lg">{slide.description}</p>
+            ...
             <div className="mt-8 flex flex-wrap gap-3">
               <button className="inline-flex items-center gap-2 rounded-md bg-[var(--accent-blue)] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--accent-blue)]/90">
                 {slide.cta} <ArrowRight className="h-4 w-4" />
