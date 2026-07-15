@@ -1,31 +1,36 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import bannerAutodome from "@/assets/banner-adl-autodome.jpg.asset.json";
-import bannerDiagnostic from "@/assets/banner-diagnostic.jpg.asset.json";
-import bannerScanner from "@/assets/banner-scanner.jpg.asset.json";
-import bannerFlexboxOpen from "@/assets/banner-flexbox-open.jpg.asset.json";
-import bannerFlexbox from "@/assets/banner-flexbox.jpg.asset.json";
-import bannerEngineDance from "@/assets/banner-enginedance.jpg.asset.json";
+import bannerCustom1 from "@/assets/banner_engine_dance.jpg";
+import bannerCustom2 from "@/assets/banner_flex.jpg";
+import bannerCustom3 from "@/assets/banner_flex_open.jpg";
 import { useLocale } from "@/i18n/LocaleProvider";
 
-const SLIDE_IMAGES = [
-  bannerAutodome.url,
-  bannerFlexboxOpen.url,
-  bannerFlexbox.url,
-  bannerEngineDance.url,
-  bannerScanner.url,
-  bannerDiagnostic.url,
-];
+const SLIDE_IMAGES = [bannerCustom1, bannerCustom2, bannerCustom3];
 
 export function HeroCarousel() {
   const { t } = useLocale();
   const SLIDES = [
-    { eyebrow: t("hero.s1e"), title: t("hero.s1t"), description: t("hero.s1d"), cta: t("hero.s1c"), image: SLIDE_IMAGES[0] },
-    { eyebrow: t("hero.s2e"), title: t("hero.s2t"), description: t("hero.s2d"), cta: t("hero.s2c"), image: SLIDE_IMAGES[1] },
-    { eyebrow: t("hero.s3e"), title: t("hero.s3t"), description: t("hero.s3d"), cta: t("hero.s3c"), image: SLIDE_IMAGES[2] },
-    { eyebrow: t("hero.s1e"), title: t("hero.s1t"), description: t("hero.s1d"), cta: t("hero.s1c"), image: SLIDE_IMAGES[3] },
-    { eyebrow: t("hero.s2e"), title: t("hero.s2t"), description: t("hero.s2d"), cta: t("hero.s2c"), image: SLIDE_IMAGES[4] },
-    { eyebrow: t("hero.s3e"), title: t("hero.s3t"), description: t("hero.s3d"), cta: t("hero.s3c"), image: SLIDE_IMAGES[5] },
+    {
+      eyebrow: t("hero.s1e"),
+      title: t("hero.s1t"),
+      description: t("hero.s1d"),
+      cta: t("hero.s1c"),
+      image: SLIDE_IMAGES[0],
+    },
+    {
+      eyebrow: t("hero.s2e"),
+      title: t("hero.s2t"),
+      description: t("hero.s2d"),
+      cta: t("hero.s2c"),
+      image: SLIDE_IMAGES[1],
+    },
+    {
+      eyebrow: t("hero.s3e"),
+      title: t("hero.s3t"),
+      description: t("hero.s3d"),
+      cta: t("hero.s3c"),
+      image: SLIDE_IMAGES[2],
+    },
   ];
   const [i, setI] = useState(0);
   useEffect(() => {
@@ -52,12 +57,8 @@ export function HeroCarousel() {
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.25em] text-[var(--accent-blue)]">
               {slide.eyebrow}
             </p>
-            <h1 className="text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl">
-              {slide.title}
-            </h1>
-            <p className="mt-5 text-base leading-relaxed text-white/85 md:text-lg">
-              {slide.description}
-            </p>
+            <h1 className="text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl">{slide.title}</h1>
+            <p className="mt-5 text-base leading-relaxed text-white/85 md:text-lg">{slide.description}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <button className="inline-flex items-center gap-2 rounded-md bg-[var(--accent-blue)] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--accent-blue)]/90">
                 {slide.cta} <ArrowRight className="h-4 w-4" />
