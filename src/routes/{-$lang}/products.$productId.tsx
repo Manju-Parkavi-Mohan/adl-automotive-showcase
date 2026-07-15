@@ -2,8 +2,19 @@ import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
-  ChevronRight, Heart, Minus, Plus, Share2, ShoppingCart, Star, Check, ZoomIn,
-  Truck, ShieldCheck, RotateCcw, Headphones,
+  ChevronRight,
+  Heart,
+  Minus,
+  Plus,
+  Share2,
+  ShoppingCart,
+  Star,
+  Check,
+  ZoomIn,
+  Truck,
+  ShieldCheck,
+  RotateCcw,
+  Headphones,
 } from "lucide-react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -61,7 +72,11 @@ function NotFoundView() {
       <div>
         <h1 className="text-3xl font-bold">Product not found</h1>
         <p className="mt-2 text-muted-foreground">The product you are looking for is unavailable.</p>
-        <Link to="/{-$lang}/products" search={{}} className="mt-6 inline-flex rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground">
+        <Link
+          to="/{-$lang}/products"
+          search={{}}
+          className="mt-6 inline-flex rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground"
+        >
           Browse all products
         </Link>
       </div>
@@ -69,15 +84,24 @@ function NotFoundView() {
   );
 }
 
-const TAB_IDS = ["description", "specs", "reviews"] as const;
+const TAB_IDS = ["features", "specs", "coverage", "downloads", "reviews"] as const;
 
 function ProductDetailPage() {
   const { productId } = Route.useParams();
   const { addItem } = useCart();
   const { t } = useLocale();
+  // Find the COVERAGE attribute (case-insensitive), if present
+  const coverageAttr = woo?.attributes.find((a) => a.name?.trim().toLowerCase() === "coverage");
+  const coverageText = coverageAttr?.options?.[0]?.trim() || "";
+
+  const hasCoverage = !!coverageText;
+  const hasDownloads = !!(woo?.downloads && woo.downloads.length > 0);
+
   const TABS = [
-    { id: "description" as const, label: t("product.tabDescription") },
+    { id: "features" as const, label: t("product.tabDescription") },
     { id: "specs" as const, label: t("product.tabSpecs") },
+    ...(hasCoverage ? [{ id: "coverage" as const, label: t("product.tabCoverage") }] : []),
+    ...(hasDownloads ? [{ id: "downloads" as const, label: t("product.tabDownloads") }] : []),
     { id: "reviews" as const, label: t("product.tabReviews") },
   ];
 
@@ -102,7 +126,7 @@ function ProductDetailPage() {
 
   const [imageIndex, setImageIndex] = useState(0);
   const [qty, setQty] = useState(1);
-  const [tab, setTab] = useState<(typeof TAB_IDS)[number]>("description");
+  const [tab, setTab] = useState<(typeof TAB_IDS)[number]>("features");
 
   if (productQuery.isLoading) {
     return (
@@ -121,9 +145,7 @@ function ProductDetailPage() {
   const gallery = woo.images.length > 0 ? woo.images.map((i) => i.src) : [product.image];
   const safeIndex = Math.min(imageIndex, gallery.length - 1);
 
-  const discount = product.oldPrice
-    ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
-    : 0;
+  const discount = product.oldPrice ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100) : 0;
 
   const handleAdd = () => {
     addItem(
@@ -150,12 +172,28 @@ function ProductDetailPage() {
         <div className="container-px mx-auto max-w-[1400px] py-4">
           <nav aria-label="Breadcrumb">
             <ol className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
-              <li><Link to="/{-$lang}" className="hover:text-primary">{t("common.home")}</Link></li>
-              <li><ChevronRight className="h-3.5 w-3.5" /></li>
-              <li><Link to="/{-$lang}/products" search={{}} className="hover:text-primary">{t("nav.products")}</Link></li>
-              <li><ChevronRight className="h-3.5 w-3.5" /></li>
-              <li><span className="text-muted-foreground">{categoryLabel}</span></li>
-              <li><ChevronRight className="h-3.5 w-3.5" /></li>
+              <li>
+                <Link to="/{-$lang}" className="hover:text-primary">
+                  {t("common.home")}
+                </Link>
+              </li>
+              <li>
+                <ChevronRight className="h-3.5 w-3.5" />
+              </li>
+              <li>
+                <Link to="/{-$lang}/products" search={{}} className="hover:text-primary">
+                  {t("nav.products")}
+                </Link>
+              </li>
+              <li>
+                <ChevronRight className="h-3.5 w-3.5" />
+              </li>
+              <li>
+                <span className="text-muted-foreground">{categoryLabel}</span>
+              </li>
+              <li>
+                <ChevronRight className="h-3.5 w-3.5" />
+              </li>
               <li className="line-clamp-1 max-w-xs font-medium text-foreground">{product.name}</li>
             </ol>
           </nav>
@@ -187,10 +225,14 @@ function ProductDetailPage() {
               />
               <div className="absolute start-4 top-4 flex flex-col gap-2">
                 {product.badge === "new" && (
-                  <span className="rounded-full bg-[var(--accent-blue)] px-3 py-1 text-xs font-semibold text-white">{t("product.new")}</span>
+                  <span className="rounded-full bg-[var(--accent-blue)] px-3 py-1 text-xs font-semibold text-white">
+                    {t("product.new")}
+                  </span>
                 )}
                 {discount > 0 && (
-                  <span className="rounded-full bg-destructive px-3 py-1 text-xs font-semibold text-white"><Percent value={discount} sign="-" /> {t("product.off")}</span>
+                  <span className="rounded-full bg-destructive px-3 py-1 text-xs font-semibold text-white">
+                    <Percent value={discount} sign="-" /> {t("product.off")}
+                  </span>
                 )}
               </div>
               <div className="absolute end-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white/95 text-foreground shadow-sm">
@@ -211,14 +253,28 @@ function ProductDetailPage() {
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-0.5 text-amber-500">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className={`h-4 w-4 ${i < Math.round(product.rating) ? "fill-current" : "text-muted-foreground/30"}`} />
+                    <Star
+                      key={i}
+                      className={`h-4 w-4 ${i < Math.round(product.rating) ? "fill-current" : "text-muted-foreground/30"}`}
+                    />
                   ))}
                 </div>
-                <span className="font-semibold text-foreground"><Num>{product.rating.toFixed(1)}</Num></span>
-                <span className="text-muted-foreground">({t("product.reviewsCount", { count: product.reviewCount })})</span>
+                <span className="font-semibold text-foreground">
+                  <Num>{product.rating.toFixed(1)}</Num>
+                </span>
+                <span className="text-muted-foreground">
+                  ({t("product.reviewsCount", { count: product.reviewCount })})
+                </span>
               </div>
-              <span className="text-muted-foreground">{t("product.sku")}: <span className="font-medium text-foreground"><Num>{product.sku}</Num></span></span>
-              <span className={`inline-flex items-center gap-1.5 font-medium ${product.inStock ? "text-emerald-600" : "text-destructive"}`}>
+              <span className="text-muted-foreground">
+                {t("product.sku")}:{" "}
+                <span className="font-medium text-foreground">
+                  <Num>{product.sku}</Num>
+                </span>
+              </span>
+              <span
+                className={`inline-flex items-center gap-1.5 font-medium ${product.inStock ? "text-emerald-600" : "text-destructive"}`}
+              >
                 <Check className="h-4 w-4" /> {product.inStock ? t("product.inStock") : t("product.outOfStock")}
               </span>
             </div>
@@ -243,15 +299,34 @@ function ProductDetailPage() {
 
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <div className="inline-flex h-12 items-center rounded-md border border-border bg-white">
-                  <button aria-label={t("product.decrease")} onClick={() => setQty((q) => Math.max(1, q - 1))} className="grid h-full w-11 place-items-center text-muted-foreground hover:text-primary">
+                  <button
+                    aria-label={t("product.decrease")}
+                    onClick={() => setQty((q) => Math.max(1, q - 1))}
+                    className="grid h-full w-11 place-items-center text-muted-foreground hover:text-primary"
+                  >
                     <Minus className="h-4 w-4" />
                   </button>
-                  <input aria-label={t("product.quantity")} type="number" min={1} value={qty} onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))} className="h-full w-12 border-x border-border bg-transparent text-center text-sm font-semibold outline-none" />
-                  <button aria-label={t("product.increase")} onClick={() => setQty((q) => q + 1)} className="grid h-full w-11 place-items-center text-muted-foreground hover:text-primary">
+                  <input
+                    aria-label={t("product.quantity")}
+                    type="number"
+                    min={1}
+                    value={qty}
+                    onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))}
+                    className="h-full w-12 border-x border-border bg-transparent text-center text-sm font-semibold outline-none"
+                  />
+                  <button
+                    aria-label={t("product.increase")}
+                    onClick={() => setQty((q) => q + 1)}
+                    className="grid h-full w-11 place-items-center text-muted-foreground hover:text-primary"
+                  >
                     <Plus className="h-4 w-4" />
                   </button>
                 </div>
-                <button onClick={handleAdd} disabled={!product.inStock} className="inline-flex h-12 flex-1 min-w-[200px] items-center justify-center gap-2 rounded-md bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60">
+                <button
+                  onClick={handleAdd}
+                  disabled={!product.inStock}
+                  className="inline-flex h-12 flex-1 min-w-[200px] items-center justify-center gap-2 rounded-md bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+                >
                   <ShoppingCart className="h-4 w-4" />
                   {product.inStock ? t("product.addToCart") : t("product.outOfStock")}
                 </button>
@@ -274,7 +349,10 @@ function ProductDetailPage() {
                 { icon: RotateCcw, label: t("product.features.returns") },
                 { icon: Headphones, label: t("product.features.support") },
               ].map((f) => (
-                <li key={f.label} className="flex items-center gap-2.5 rounded-md border border-border bg-white px-3 py-2.5">
+                <li
+                  key={f.label}
+                  className="flex items-center gap-2.5 rounded-md border border-border bg-white px-3 py-2.5"
+                >
                   <f.icon className="h-4 w-4 shrink-0 text-primary" />
                   <span className="text-foreground/80">{f.label}</span>
                 </li>
@@ -287,9 +365,13 @@ function ProductDetailPage() {
           <div className="border-b border-border">
             <div className="flex flex-wrap gap-1">
               {TABS.map((t) => (
-                <button key={t.id} onClick={() => setTab(t.id)} className={`relative px-5 py-3 text-sm font-semibold transition-colors ${tab === t.id ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}>
+                <button
+                  key={t.id}
+                  onClick={() => setTab(t.id)}
+                  className={`relative px-5 py-3 text-sm font-semibold transition-colors ${tab === t.id ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
+                >
                   {t.label}
-                  {tab === t.id && (<span className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-primary" />)}
+                  {tab === t.id && <span className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-primary" />}
                 </button>
               ))}
             </div>
@@ -304,13 +386,22 @@ function ProductDetailPage() {
         </section>
 
         <section className="mt-16">
-          <SectionHeader eyebrow={t("product.relatedEyebrow")} title={t("product.relatedTitle")}
-            action={<Link to="/{-$lang}/products" search={{}} className="text-sm font-semibold text-primary hover:underline">{t("common.viewAllArrow")}</Link>} />
+          <SectionHeader
+            eyebrow={t("product.relatedEyebrow")}
+            title={t("product.relatedTitle")}
+            action={
+              <Link to="/{-$lang}/products" search={{}} className="text-sm font-semibold text-primary hover:underline">
+                {t("common.viewAllArrow")}
+              </Link>
+            }
+          />
           {related.length === 0 ? (
             <p className="mt-6 text-sm text-muted-foreground">{t("product.noRelated")}</p>
           ) : (
             <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {related.map((p) => <ProductCard key={p.id} product={p} />)}
+              {related.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
             </div>
           )}
         </section>
@@ -324,14 +415,27 @@ function DescriptionPanel({ woo }: { woo: WooProduct }) {
   const html = woo.description || woo.short_description;
   return (
     <div className="grid gap-10 lg:grid-cols-[1fr_320px]">
-      <div className="prose prose-slate max-w-none text-foreground/85" dangerouslySetInnerHTML={{ __html: html || "<p>No description provided.</p>" }} />
+      <div
+        className="prose prose-slate max-w-none text-foreground/85"
+        dangerouslySetInnerHTML={{ __html: html || "<p>No description provided.</p>" }}
+      />
       <aside className="h-fit rounded-xl border border-border bg-secondary p-6">
         <h4 className="text-sm font-bold uppercase tracking-wider text-foreground">Quick facts</h4>
         <ul className="mt-3 space-y-2 text-sm text-foreground/80">
-          <li>• SKU: <span className="font-medium text-foreground">{woo.sku}</span></li>
-          {woo.brand && <li>• Brand: <span className="font-medium text-foreground">{woo.brand}</span></li>}
-          <li>• Total sales: <span className="font-medium text-foreground">{woo.total_sales}</span></li>
-          <li>• Stock: <span className="font-medium text-foreground">{woo.stock_status}</span></li>
+          <li>
+            • SKU: <span className="font-medium text-foreground">{woo.sku}</span>
+          </li>
+          {woo.brand && (
+            <li>
+              • Brand: <span className="font-medium text-foreground">{woo.brand}</span>
+            </li>
+          )}
+          <li>
+            • Total sales: <span className="font-medium text-foreground">{woo.total_sales}</span>
+          </li>
+          <li>
+            • Stock: <span className="font-medium text-foreground">{woo.stock_status}</span>
+          </li>
         </ul>
       </aside>
     </div>
@@ -354,7 +458,9 @@ function SpecsPanel({ woo }: { woo: WooProduct }) {
         <tbody>
           {rows.map((row, i) => (
             <tr key={`${row[0]}-${i}`} className={i % 2 === 0 ? "bg-secondary" : "bg-white"}>
-              <th scope="row" className="w-1/3 px-5 py-3.5 text-start font-semibold text-foreground">{row[0]}</th>
+              <th scope="row" className="w-1/3 px-5 py-3.5 text-start font-semibold text-foreground">
+                {row[0]}
+              </th>
               <td className="px-5 py-3.5 text-foreground/80">{row[1]}</td>
             </tr>
           ))}
@@ -363,4 +469,3 @@ function SpecsPanel({ woo }: { woo: WooProduct }) {
     </div>
   );
 }
-
