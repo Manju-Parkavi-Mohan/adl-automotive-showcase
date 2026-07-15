@@ -70,8 +70,10 @@
     "notFound": "Product not found",
     "notFoundBody": "The product you are looking for is unavailable.",
     "browseAll": "Browse all products",
-    "tabDescription": "Description",
+    "tabDescription": "Features",
+    "tabCoverage": "Coverage",
     "tabSpecs": "Specifications",
+    "tabDownloads": "Downloads"
     "tabReviews": "Reviews",
     "quickFacts": "Quick facts",
     "totalSales": "Total sales",
