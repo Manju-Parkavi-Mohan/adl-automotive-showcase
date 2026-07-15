@@ -377,8 +377,10 @@ function ProductDetailPage() {
             </div>
           </div>
           <div className="py-8">
-            {tab === "description" && <DescriptionPanel woo={woo} />}
+            {tab === "features" && <DescriptionPanel woo={woo} />}
             {tab === "specs" && <SpecsPanel woo={woo} />}
+            {tab === "coverage" && hasCoverage && <CoveragePanel text={coverageText} />}
+            {tab === "downloads" && hasDownloads && <DownloadsPanel downloads={woo.downloads} />}
             {tab === "reviews" && (
               <ProductReviews productId={woo.id} rating={product.rating} reviewCount={product.reviewCount} />
             )}
