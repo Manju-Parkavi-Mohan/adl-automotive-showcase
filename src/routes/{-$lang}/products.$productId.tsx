@@ -447,7 +447,7 @@ function FeaturesPanel({ woo }: { woo: WooProduct }) {
 function SpecsPanel({ woo }: { woo: WooProduct }) {
   const baseRows: Array<[string, string]> = [
     ["SKU", woo.sku || "—"],
-    ["Brand", woo.brand ?? "—"]
+    ["Brand", woo.brand ?? "—"],
   ];
   const attrRows: Array<[string, string]> = woo.attributes.map((a) => [a.name, a.options.join(", ")]);
   const rows = [...baseRows, ...attrRows];
@@ -500,7 +500,7 @@ function DownloadsPanel({ downloads }: { downloads: WooProduct["downloads"] }) {
       </select>
 
       {selected && (
-        
+        <a
           href={selected.file}
           target="_blank"
           rel="noopener noreferrer"
