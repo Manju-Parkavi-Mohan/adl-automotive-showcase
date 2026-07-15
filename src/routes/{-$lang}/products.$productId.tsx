@@ -90,6 +90,14 @@ function ProductDetailPage() {
   const { productId } = Route.useParams();
   const { addItem } = useCart();
   const { t } = useLocale();
+  const productQuery = useQuery({
+    queryKey: ["wc-product", productId],
+    queryFn: () => getProduct({ data: { idOrSlug: productId } }),
+    staleTime: 60_000,
+  });
+
+  const woo = productQuery.data ?? null;
+
   // Find the COVERAGE attribute (case-insensitive), if present
   const coverageAttr = woo?.attributes.find((a) => a.name?.trim().toLowerCase() === "coverage");
   const coverageText = coverageAttr?.options?.[0]?.trim() || "";
@@ -104,14 +112,6 @@ function ProductDetailPage() {
     ...(hasDownloads ? [{ id: "downloads" as const, label: t("product.tabDownloads") }] : []),
     { id: "reviews" as const, label: t("product.tabReviews") },
   ];
-
-  const productQuery = useQuery({
-    queryKey: ["wc-product", productId],
-    queryFn: () => getProduct({ data: { idOrSlug: productId } }),
-    staleTime: 60_000,
-  });
-
-  const woo = productQuery.data ?? null;
 
   useEffect(() => {
     if (woo?.id) pushRecentlyViewed(woo.id);
