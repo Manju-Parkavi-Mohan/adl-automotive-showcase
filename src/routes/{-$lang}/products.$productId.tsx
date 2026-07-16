@@ -427,6 +427,21 @@ function SpecsPanel({ woo }: { woo: WooProduct }) {
     ["SKU", woo.sku || "—"],
     ["Brand", woo.brand ?? "—"],
   ];
+  // Add every WooCommerce attribute except Coverage (shown in its own tab).
+  for (const attr of woo.attributes ?? []) {
+    const name = attr.name?.trim();
+    if (!name) continue;
+    if (name.toLowerCase() === "coverage") continue;
+    const value = (attr.options ?? []).filter(Boolean).join(", ").trim();
+    if (!value) continue;
+    rows.push([name, value]);
+  }
+  if (woo.weight) rows.push(["Weight", woo.weight]);
+  if (woo.dimensions) {
+    const { length, width, height } = woo.dimensions;
+    const dim = [length, width, height].filter(Boolean).join(" × ");
+    if (dim) rows.push(["Dimensions", dim]);
+  }
   return (
     <div className="overflow-hidden rounded-xl border border-border">
       <table className="w-full text-sm">
