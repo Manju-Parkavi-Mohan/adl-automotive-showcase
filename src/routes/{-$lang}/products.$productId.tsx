@@ -8,7 +8,6 @@ import {
   Plus,
   Share2,
   ShoppingCart,
-  Star,
   Check,
   ZoomIn,
   Truck,
@@ -28,7 +27,6 @@ import { CATEGORY_META } from "@/data/products";
 import type { WooProduct } from "@/lib/woo/types";
 import { pushRecentlyViewed } from "@/lib/recently-viewed";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
-import { ProductReviews } from "@/components/site/ProductReviews";
 import { Money, Percent, Num } from "@/components/site/Money";
 import { useLocale } from "@/i18n/LocaleProvider";
 
@@ -84,7 +82,7 @@ function NotFoundView() {
   );
 }
 
-const TAB_IDS = ["features", "specs", "coverage", "downloads", "reviews"] as const;
+const TAB_IDS = ["features", "specs", "coverage", "downloads"] as const;
 
 function ProductDetailPage() {
   const { productId } = Route.useParams();
@@ -110,7 +108,6 @@ function ProductDetailPage() {
     { id: "specs" as const, label: t("product.tabSpecs") },
     ...(hasCoverage ? [{ id: "coverage" as const, label: t("product.tabCoverage") }] : []),
     ...(hasDownloads ? [{ id: "downloads" as const, label: t("product.tabDownloads") }] : []),
-    { id: "reviews" as const, label: t("product.tabReviews") },
   ];
 
   useEffect(() => {
@@ -250,22 +247,6 @@ function ProductDetailPage() {
             </h1>
 
             <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-0.5 text-amber-500">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-4 w-4 ${i < Math.round(product.rating) ? "fill-current" : "text-muted-foreground/30"}`}
-                    />
-                  ))}
-                </div>
-                <span className="font-semibold text-foreground">
-                  <Num>{product.rating.toFixed(1)}</Num>
-                </span>
-                <span className="text-muted-foreground">
-                  ({t("product.reviewsCount", { count: product.reviewCount })})
-                </span>
-              </div>
               <span className="text-muted-foreground">
                 {t("product.sku")}:{" "}
                 <span className="font-medium text-foreground">
@@ -381,9 +362,6 @@ function ProductDetailPage() {
             {tab === "specs" && <SpecsPanel woo={woo} />}
             {tab === "coverage" && hasCoverage && <CoveragePanel text={coverageText} />}
             {tab === "downloads" && hasDownloads && <DownloadsPanel downloads={woo.downloads} />}
-            {tab === "reviews" && (
-              <ProductReviews productId={woo.id} rating={product.rating} reviewCount={product.reviewCount} />
-            )}
           </div>
         </section>
 
