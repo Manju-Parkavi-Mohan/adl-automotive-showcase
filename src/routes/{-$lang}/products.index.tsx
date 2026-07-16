@@ -155,7 +155,16 @@ function ProductsPage() {
   const safePage = page;
 
   const allBrands = brandsQuery.data ?? [];
-  const allCategories = (categoriesQuery.data ?? []).filter((c) => c.parent === 0);
+  const categoriesData = categoriesQuery.data ?? [];
+  const topCategories = categoriesData.filter((c) => c.parent === 0);
+  const categoryTree = topCategories.map((parent) => ({
+    value: String(parent.id),
+    label: parent.name,
+    count: parent.count,
+    children: categoriesData
+      .filter((c) => c.parent === parent.id)
+      .map((c) => ({ value: String(c.id), label: c.name, count: c.count })),
+  }));
 
   const clearSearch = () => {
     navigate({
@@ -326,7 +335,7 @@ function ProductsPage() {
               categorySlugs={categorySlugs}
               brands={brands}
               priceIds={priceIds}
-              allCategories={allCategories.map((c) => ({ value: String(c.id), label: c.name, count: c.count }))}
+              categoryTree={categoryTree}
               allBrands={allBrands.map((b) => ({ value: String(b.id), label: b.name, count: b.count }))}
               inStockOnly={inStockOnly}
               onSaleOnly={onSaleOnly}
@@ -367,7 +376,7 @@ function ProductsPage() {
                   categorySlugs={categorySlugs}
                   brands={brands}
                   priceIds={priceIds}
-                  allCategories={allCategories.map((c) => ({ value: String(c.id), label: c.name, count: c.count }))}
+                  categoryTree={categoryTree}
                   allBrands={allBrands.map((b) => ({ value: String(b.id), label: b.name, count: b.count }))}
                   inStockOnly={inStockOnly}
                   onSaleOnly={onSaleOnly}
@@ -448,7 +457,12 @@ function FiltersPanel(props: {
   categorySlugs: string[];
   brands: string[];
   priceIds: string[];
-  allCategories: Array<{ value: string; label: string; count: number }>;
+  categoryTree: Array<{
+    value: string;
+    label: string;
+    count: number;
+    children: Array<{ value: string; label: string; count: number }>;
+  }>;
   allBrands: Array<{ value: string; label: string; count: number }>;
   inStockOnly: boolean;
   onSaleOnly: boolean;
@@ -483,17 +497,31 @@ function FiltersPanel(props: {
       )}
 
       <FilterGroup title="Categories">
-        {props.allCategories.length === 0 ? (
+        {props.categoryTree.length === 0 ? (
           <p className="px-2 text-xs text-muted-foreground">Loading…</p>
         ) : (
-          props.allCategories.map((c) => (
-            <Checkbox
-              key={c.value}
-              label={c.label}
-              count={c.count}
-              checked={props.categorySlugs.includes(c.value)}
-              onChange={() => props.onToggleCategory(c.value)}
-            />
+          props.categoryTree.map((c) => (
+            <div key={c.value}>
+              <Checkbox
+                label={c.label}
+                count={c.count}
+                checked={props.categorySlugs.includes(c.value)}
+                onChange={() => props.onToggleCategory(c.value)}
+              />
+              {c.children.length > 0 && (
+                <div className="ms-5 border-s border-border ps-2">
+                  {c.children.map((sub) => (
+                    <Checkbox
+                      key={sub.value}
+                      label={sub.label}
+                      count={sub.count}
+                      checked={props.categorySlugs.includes(sub.value)}
+                      onChange={() => props.onToggleCategory(sub.value)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           ))
         )}
       </FilterGroup>
