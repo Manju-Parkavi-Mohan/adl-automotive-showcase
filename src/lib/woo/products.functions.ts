@@ -16,6 +16,8 @@ const listSchema = z.object({
   featured: z.boolean().optional(),
   include: z.array(z.number()).optional(),
   exclude: z.array(z.number()).optional(),
+  brand: z.string().optional(), // comma-joined brand term IDs
+  inStock: z.boolean().optional(),
 });
 
 export const listProducts = createServerFn({ method: "GET" })
@@ -35,6 +37,8 @@ export const listProducts = createServerFn({ method: "GET" })
         featured: data.featured,
         include: data.include?.join(","),
         exclude: data.exclude?.join(","),
+        brand: data.brand,
+        stock_status: data.inStock ? "instock" : undefined,
         status: "publish",
       },
     });
@@ -47,10 +51,15 @@ export const listProducts = createServerFn({ method: "GET" })
     };
   });
 
+export const listBrands = createServerFn({ method: "GET" }).handler(async () => {
+  const res = await wcFetch<{ id: number; name: string; slug: string; count: number }[]>("/products/brands", {
+    query: { per_page: 100, hide_empty: true },
+  });
+  return res.data ?? [];
+});
+
 export const getProduct = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) =>
-    z.object({ idOrSlug: z.string().min(1) }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ idOrSlug: z.string().min(1) }).parse(input))
   .handler(async ({ data }): Promise<WooProduct | null> => {
     const key = data.idOrSlug;
     // numeric → direct id lookup
@@ -71,7 +80,9 @@ export const getProduct = createServerFn({ method: "GET" })
 
 export const getRelatedProducts = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) =>
-    z.object({ productId: z.number().int().positive(), limit: z.number().int().min(1).max(12).default(4) }).parse(input),
+    z
+      .object({ productId: z.number().int().positive(), limit: z.number().int().min(1).max(12).default(4) })
+      .parse(input),
   )
   .handler(async ({ data }): Promise<WooProduct[]> => {
     // Fetch the product to get its category ids
