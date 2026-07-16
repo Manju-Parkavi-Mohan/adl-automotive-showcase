@@ -76,7 +76,7 @@ function sortToWoo(id: (typeof SORT_OPTIONS)[number]["id"]) {
 
 function ProductsPage() {
   const { search: searchParam, category: categoryParam } = Route.useSearch();
-  const navigate = useNavigate({ from: "/products" });
+  const navigate = Route.useNavigate();
   const [view, setView] = useState<"grid" | "list">("grid");
   const [sort, setSort] = useState<(typeof SORT_OPTIONS)[number]["id"]>("featured");
   const [page, setPage] = useState(1);
@@ -113,10 +113,13 @@ function ProductsPage() {
   });
 
   const toggleCategory = (slug: string) => {
-    const next = categorySlugs.includes(slug) ? categorySlugs.filter((v) => v !== slug) : [...categorySlugs, slug];
+    const next: string[] = categorySlugs.includes(slug)
+      ? categorySlugs.filter((v: string) => v !== slug)
+      : [...categorySlugs, slug];
     setPage(1);
     navigate({
-      search: (prev) => ({ ...prev, category: next.length ? next.join(",") : undefined }),
+      to: ".",
+      search: (prev: Record<string, unknown>) => ({ ...prev, category: next.length ? next.join(",") : undefined }),
     });
   };
 
@@ -155,7 +158,10 @@ function ProductsPage() {
   const allCategories = (categoriesQuery.data ?? []).filter((c) => c.parent === 0);
 
   const clearSearch = () => {
-    navigate({ search: (prev) => ({ ...prev, search: undefined, category: undefined }) });
+    navigate({
+      to: ".",
+      search: (prev: Record<string, unknown>) => ({ ...prev, search: undefined, category: undefined }),
+    });
   };
 
   const resetAll = () => {
