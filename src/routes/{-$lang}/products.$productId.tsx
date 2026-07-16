@@ -436,12 +436,6 @@ function SpecsPanel({ woo }: { woo: WooProduct }) {
     if (!value) continue;
     rows.push([name, value]);
   }
-  if (woo.weight) rows.push(["Weight", woo.weight]);
-  if (woo.dimensions) {
-    const { length, width, height } = woo.dimensions;
-    const dim = [length, width, height].filter(Boolean).join(" × ");
-    if (dim) rows.push(["Dimensions", dim]);
-  }
   return (
     <div className="overflow-hidden rounded-xl border border-border">
       <table className="w-full text-sm">
