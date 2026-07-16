@@ -212,6 +212,7 @@ function ProductsPage() {
             <p className="text-sm text-muted-foreground">
               Showing <span className="font-semibold text-foreground">{pageItems.length}</span> of{" "}
               <span className="font-semibold text-foreground">{totalCount}</span> products
+              {productsQuery.isFetching && <span className="ml-2 text-primary">Updating…</span>}
             </p>
           </div>
         </div>
@@ -391,7 +392,9 @@ function ProductsPage() {
                 </button>
               </div>
             ) : view === "grid" ? (
-              <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
+              <div
+                className={`grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3 transition-opacity ${productsQuery.isFetching ? "opacity-50" : "opacity-100"}`}
+              >
                 {pageItems.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
