@@ -105,7 +105,10 @@ function ProductsPage() {
   });
 
   const productsQuery = useQuery({
-    queryKey: ["wc-products", { page, sort, categorySlugs, priceIds, onSaleOnly, search: searchParam }],
+    queryKey: [
+      "wc-products",
+      { page, sort, categorySlugs, brands, priceIds, onSaleOnly, inStockOnly, search: searchParam },
+    ],
     queryFn: () =>
       listProducts({
         data: {
