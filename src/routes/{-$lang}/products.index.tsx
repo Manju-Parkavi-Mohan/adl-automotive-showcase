@@ -6,7 +6,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { ProductCard } from "@/components/site/ProductCard";
 import { ProductListItem } from "@/components/site/ProductListItem";
-import { listProducts } from "@/lib/woo/products.functions";
+import { listProducts, listBrands } from "@/lib/woo/products.functions";
 import { listCategories } from "@/lib/woo/categories.functions";
 import { wooToDisplay } from "@/lib/woo/adapter";
 import { getYoastForUrl } from "@/lib/wp/yoast.functions";
@@ -98,6 +98,12 @@ function ProductsPage() {
     staleTime: 5 * 60_000,
   });
 
+  const brandsQuery = useQuery({
+    queryKey: ["wc-brands"],
+    queryFn: () => listBrands(),
+    staleTime: 5 * 60_000,
+  });
+
   const productsQuery = useQuery({
     queryKey: ["wc-products", { page, sort, categorySlugs, priceIds, onSaleOnly, search: searchParam }],
     queryFn: () =>
@@ -112,26 +118,21 @@ function ProductsPage() {
           minPrice: priceRange.minPrice,
           maxPrice: priceRange.maxPrice === 999999 ? undefined : priceRange.maxPrice,
           onSale: onSaleOnly || undefined,
+          brand: brands.length ? brands.join(",") : undefined,
+          inStock: inStockOnly || undefined,
         },
       }),
     placeholderData: keepPreviousData,
   });
 
   const rawItems = productsQuery.data?.items ?? [];
-  const display = rawItems.map(wooToDisplay);
-
-  // Client-side fine filters (brand / inStock / minRating) over fetched page
-  const pageItems = display.filter((p) => {
-    if (brands.length && !brands.includes(p.brand)) return false;
-    if (inStockOnly && !p.inStock) return false;
-    return true;
-  });
+  const pageItems = rawItems.map(wooToDisplay);
 
   const totalCount = productsQuery.data?.total ?? 0;
   const totalPages = productsQuery.data?.totalPages ?? 1;
   const safePage = page;
 
-  const allBrands = Array.from(new Set(display.map((p) => p.brand))).sort();
+  const allBrands = brandsQuery.data ?? [];
   const allCategories = (categoriesQuery.data ?? []).filter((c) => c.parent === 0);
 
   const clearSearch = () => {
@@ -301,7 +302,7 @@ function ProductsPage() {
               brands={brands}
               priceIds={priceIds}
               allCategories={allCategories.map((c) => ({ value: String(c.id), label: c.name, count: c.count }))}
-              allBrands={allBrands}
+              allBrands={allBrands.map((b) => ({ value: String(b.id), label: b.name, count: b.count }))}
               inStockOnly={inStockOnly}
               onSaleOnly={onSaleOnly}
               minRating={minRating}
@@ -342,7 +343,7 @@ function ProductsPage() {
                   brands={brands}
                   priceIds={priceIds}
                   allCategories={allCategories.map((c) => ({ value: String(c.id), label: c.name, count: c.count }))}
-                  allBrands={allBrands}
+                  allBrands={allBrands.map((b) => ({ value: String(b.id), label: b.name, count: b.count }))}
                   inStockOnly={inStockOnly}
                   onSaleOnly={onSaleOnly}
                   minRating={minRating}
@@ -421,7 +422,7 @@ function FiltersPanel(props: {
   brands: string[];
   priceIds: string[];
   allCategories: Array<{ value: string; label: string; count: number }>;
-  allBrands: string[];
+  allBrands: Array<{ value: string; label: string; count: number }>;
   inStockOnly: boolean;
   onSaleOnly: boolean;
   minRating: number;
@@ -472,9 +473,15 @@ function FiltersPanel(props: {
 
       <FilterGroup title="Brands">
         <div className="max-h-56 space-y-1 overflow-y-auto pe-1">
-          {props.allBrands.length === 0 && <p className="px-2 text-xs text-muted-foreground">No brands on this page</p>}
+          {props.allBrands.length === 0 && <p className="px-2 text-xs text-muted-foreground">Loading..</p>}
           {props.allBrands.map((b) => (
-            <Checkbox key={b} label={b} checked={props.brands.includes(b)} onChange={() => props.onToggleBrand(b)} />
+            <Checkbox
+              key={b.value}
+              label={b.label}
+              count={b.count}
+              checked={props.brands.includes(b.value)}
+              onChange={() => props.onToggleBrand(b.value)}
+            />
           ))}
         </div>
       </FilterGroup>
