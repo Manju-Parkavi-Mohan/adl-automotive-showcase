@@ -439,24 +439,6 @@ function FiltersPanel(props: {
         <Checkbox label="On sale" checked={props.onSaleOnly} onChange={() => props.setOnSaleOnly(!props.onSaleOnly)} />
       </FilterGroup>
 
-      <FilterGroup title="Rating">
-        {[4, 3, 2, 1].map((r) => (
-          <button
-            key={r}
-            onClick={() => props.setMinRating(props.minRating === r ? 0 : r)}
-            className={`flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors ${
-              props.minRating === r ? "bg-primary/5 text-primary" : "text-foreground hover:bg-secondary"
-            }`}
-          >
-            <span className="flex items-center gap-1 text-amber-500">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} className={`h-3.5 w-3.5 ${i < r ? "fill-current" : "text-muted-foreground/30"}`} />
-              ))}
-              <span className="ms-1 text-xs text-foreground">& up</span>
-            </span>
-          </button>
-        ))}
-      </FilterGroup>
     </div>
   );
 }
