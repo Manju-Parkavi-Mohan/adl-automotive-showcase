@@ -1,9 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import {
-  ChevronRight, LayoutGrid, List, SlidersHorizontal, X, ChevronDown,
-} from "lucide-react";
+import { ChevronRight, LayoutGrid, List, SlidersHorizontal, X, ChevronDown } from "lucide-react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { ProductCard } from "@/components/site/ProductCard";
@@ -16,9 +14,7 @@ import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
 
 export const Route = createFileRoute("/{-$lang}/products/")({
   validateSearch: (search) =>
-    typeof search.search === "string" && search.search.trim()
-      ? { search: search.search }
-      : {},
+    typeof search.search === "string" && search.search.trim() ? { search: search.search } : {},
   loader: ({ context }) =>
     context.queryClient.ensureQueryData({
       queryKey: ["yoast", "/shop"],
@@ -58,11 +54,15 @@ const PER_PAGE = 12;
 
 function sortToWoo(id: (typeof SORT_OPTIONS)[number]["id"]) {
   switch (id) {
-    case "price-asc": return { orderby: "price" as const, order: "asc" as const };
-    case "price-desc": return { orderby: "price" as const, order: "desc" as const };
-    case "newest": return { orderby: "date" as const, order: "desc" as const };
+    case "price-asc":
+      return { orderby: "price" as const, order: "asc" as const };
+    case "price-desc":
+      return { orderby: "price" as const, order: "desc" as const };
+    case "newest":
+      return { orderby: "date" as const, order: "desc" as const };
     case "featured":
-    default: return { orderby: "popularity" as const, order: "desc" as const };
+    default:
+      return { orderby: "popularity" as const, order: "desc" as const };
   }
 }
 
@@ -82,7 +82,8 @@ function ProductsPage() {
 
   const wooSort = sortToWoo(sort);
   const priceRange = useMemo(() => {
-    if (!priceIds.length) return { minPrice: undefined as number | undefined, maxPrice: undefined as number | undefined };
+    if (!priceIds.length)
+      return { minPrice: undefined as number | undefined, maxPrice: undefined as number | undefined };
     const selected = PRICE_RANGES.filter((r) => priceIds.includes(r.id));
     if (!selected.length) return { minPrice: undefined, maxPrice: undefined };
     return {
@@ -98,10 +99,7 @@ function ProductsPage() {
   });
 
   const productsQuery = useQuery({
-    queryKey: [
-      "wc-products",
-      { page, sort, categorySlugs, priceIds, onSaleOnly, search: searchParam },
-    ],
+    queryKey: ["wc-products", { page, sort, categorySlugs, priceIds, onSaleOnly, search: searchParam }],
     queryFn: () =>
       listProducts({
         data: {
@@ -141,8 +139,13 @@ function ProductsPage() {
   };
 
   const resetAll = () => {
-    setCategorySlugs([]); setBrands([]); setPriceIds([]);
-    setInStockOnly(false); setOnSaleOnly(false); setMinRating(0); setPage(1);
+    setCategorySlugs([]);
+    setBrands([]);
+    setPriceIds([]);
+    setInStockOnly(false);
+    setOnSaleOnly(false);
+    setMinRating(0);
+    setPage(1);
     clearSearch();
   };
 
@@ -152,8 +155,12 @@ function ProductsPage() {
   };
 
   const activeCount =
-    categorySlugs.length + brands.length + priceIds.length +
-    (inStockOnly ? 1 : 0) + (onSaleOnly ? 1 : 0) + (minRating > 0 ? 1 : 0) +
+    categorySlugs.length +
+    brands.length +
+    priceIds.length +
+    (inStockOnly ? 1 : 0) +
+    (onSaleOnly ? 1 : 0) +
+    (minRating > 0 ? 1 : 0) +
     (searchParam ? 1 : 0);
 
   const isSearching = Boolean(searchParam);
@@ -167,12 +174,24 @@ function ProductsPage() {
         <div className="container-px mx-auto max-w-[1400px] py-10">
           <nav aria-label="Breadcrumb" className="mb-5">
             <ol className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <li><Link to="/{-$lang}" className="hover:text-primary">Home</Link></li>
-              <li><ChevronRight className="h-3.5 w-3.5" /></li>
-              <li><Link to="/{-$lang}/products" search={{}} className="hover:text-primary">Shop</Link></li>
+              <li>
+                <Link to="/{-$lang}" className="hover:text-primary">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <ChevronRight className="h-3.5 w-3.5" />
+              </li>
+              <li>
+                <Link to="/{-$lang}/products" search={{}} className="hover:text-primary">
+                  Shop
+                </Link>
+              </li>
               {isSearching && (
                 <>
-                  <li><ChevronRight className="h-3.5 w-3.5" /></li>
+                  <li>
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </li>
                   <li className="font-medium text-foreground">Search</li>
                 </>
               )}
@@ -205,7 +224,12 @@ function ProductsPage() {
             className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium lg:hidden"
           >
             <SlidersHorizontal className="h-4 w-4" />
-            Filters {activeCount > 0 && <span className="rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">{activeCount}</span>}
+            Filters{" "}
+            {activeCount > 0 && (
+              <span className="rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+                {activeCount}
+              </span>
+            )}
           </button>
 
           <div className="hidden flex-wrap items-center gap-2 text-sm text-muted-foreground lg:flex">
@@ -230,11 +254,18 @@ function ProductsPage() {
             <div className="relative">
               <select
                 value={sort}
-                onChange={(e) => { setSort(e.target.value as typeof sort); setPage(1); }}
+                onChange={(e) => {
+                  setSort(e.target.value as typeof sort);
+                  setPage(1);
+                }}
                 className="h-10 appearance-none rounded-md border border-border bg-white ps-3 pe-9 text-sm font-medium outline-none focus:border-primary"
                 aria-label="Sort by"
               >
-                {SORT_OPTIONS.map((o) => <option key={o.id} value={o.id}>Sort: {o.label}</option>)}
+                {SORT_OPTIONS.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    Sort: {o.label}
+                  </option>
+                ))}
               </select>
               <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             </div>
@@ -266,16 +297,29 @@ function ProductsPage() {
             <FiltersPanel
               searchParam={searchParam}
               onClearSearch={clearSearch}
-              categorySlugs={categorySlugs} brands={brands} priceIds={priceIds}
+              categorySlugs={categorySlugs}
+              brands={brands}
+              priceIds={priceIds}
               allCategories={allCategories.map((c) => ({ slug: c.slug, label: c.name, count: c.count }))}
               allBrands={allBrands}
-              inStockOnly={inStockOnly} onSaleOnly={onSaleOnly} minRating={minRating}
+              inStockOnly={inStockOnly}
+              onSaleOnly={onSaleOnly}
+              minRating={minRating}
               onToggleCategory={(c) => toggle(c, categorySlugs, setCategorySlugs)}
               onToggleBrand={(b) => toggle(b, brands, setBrands)}
               onTogglePrice={(p) => toggle(p, priceIds, setPriceIds)}
-              setInStockOnly={(v) => { setInStockOnly(v); setPage(1); }}
-              setOnSaleOnly={(v) => { setOnSaleOnly(v); setPage(1); }}
-              setMinRating={(v) => { setMinRating(v); setPage(1); }}
+              setInStockOnly={(v) => {
+                setInStockOnly(v);
+                setPage(1);
+              }}
+              setOnSaleOnly={(v) => {
+                setOnSaleOnly(v);
+                setPage(1);
+              }}
+              setMinRating={(v) => {
+                setMinRating(v);
+                setPage(1);
+              }}
               onReset={resetAll}
             />
           </aside>
@@ -294,16 +338,29 @@ function ProductsPage() {
                 <FiltersPanel
                   searchParam={searchParam}
                   onClearSearch={clearSearch}
-                  categorySlugs={categorySlugs} brands={brands} priceIds={priceIds}
+                  categorySlugs={categorySlugs}
+                  brands={brands}
+                  priceIds={priceIds}
                   allCategories={allCategories.map((c) => ({ slug: c.slug, label: c.name, count: c.count }))}
                   allBrands={allBrands}
-                  inStockOnly={inStockOnly} onSaleOnly={onSaleOnly} minRating={minRating}
+                  inStockOnly={inStockOnly}
+                  onSaleOnly={onSaleOnly}
+                  minRating={minRating}
                   onToggleCategory={(c) => toggle(c, categorySlugs, setCategorySlugs)}
                   onToggleBrand={(b) => toggle(b, brands, setBrands)}
                   onTogglePrice={(p) => toggle(p, priceIds, setPriceIds)}
-                  setInStockOnly={(v) => { setInStockOnly(v); setPage(1); }}
-                  setOnSaleOnly={(v) => { setOnSaleOnly(v); setPage(1); }}
-                  setMinRating={(v) => { setMinRating(v); setPage(1); }}
+                  setInStockOnly={(v) => {
+                    setInStockOnly(v);
+                    setPage(1);
+                  }}
+                  setOnSaleOnly={(v) => {
+                    setOnSaleOnly(v);
+                    setPage(1);
+                  }}
+                  setMinRating={(v) => {
+                    setMinRating(v);
+                    setPage(1);
+                  }}
                   onReset={resetAll}
                 />
               </div>
@@ -334,18 +391,20 @@ function ProductsPage() {
               </div>
             ) : view === "grid" ? (
               <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
-                {pageItems.map((p) => <ProductCard key={p.id} product={p} />)}
+                {pageItems.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
               </div>
             ) : (
               <div className="flex flex-col gap-4">
-                {pageItems.map((p) => <ProductListItem key={p.id} product={p} />)}
+                {pageItems.map((p) => (
+                  <ProductListItem key={p.id} product={p} />
+                ))}
               </div>
             )}
 
             {/* Pagination */}
-            {totalPages > 1 && (
-              <Pagination page={safePage} total={totalPages} onChange={setPage} />
-            )}
+            {totalPages > 1 && <Pagination page={safePage} total={totalPages} onChange={setPage} />}
           </div>
         </div>
       </div>
@@ -358,10 +417,14 @@ function ProductsPage() {
 function FiltersPanel(props: {
   searchParam?: string;
   onClearSearch: () => void;
-  categorySlugs: string[]; brands: string[]; priceIds: string[];
+  categorySlugs: string[];
+  brands: string[];
+  priceIds: string[];
   allCategories: Array<{ slug: string; label: string; count: number }>;
   allBrands: string[];
-  inStockOnly: boolean; onSaleOnly: boolean; minRating: number;
+  inStockOnly: boolean;
+  onSaleOnly: boolean;
+  minRating: number;
   onToggleCategory: (slug: string) => void;
   onToggleBrand: (b: string) => void;
   onTogglePrice: (id: string) => void;
@@ -397,11 +460,11 @@ function FiltersPanel(props: {
         ) : (
           props.allCategories.map((c) => (
             <Checkbox
-              key={c.slug}
+              key={c.id}
               label={c.label}
               count={c.count}
-              checked={props.categorySlugs.includes(c.slug)}
-              onChange={() => props.onToggleCategory(c.slug)}
+              checked={props.categorySlugs.includes(c.id)}
+              onChange={() => props.onToggleCategory(c.id)}
             />
           ))
         )}
@@ -409,16 +472,9 @@ function FiltersPanel(props: {
 
       <FilterGroup title="Brands">
         <div className="max-h-56 space-y-1 overflow-y-auto pe-1">
-          {props.allBrands.length === 0 && (
-            <p className="px-2 text-xs text-muted-foreground">No brands on this page</p>
-          )}
+          {props.allBrands.length === 0 && <p className="px-2 text-xs text-muted-foreground">No brands on this page</p>}
           {props.allBrands.map((b) => (
-            <Checkbox
-              key={b}
-              label={b}
-              checked={props.brands.includes(b)}
-              onChange={() => props.onToggleBrand(b)}
-            />
+            <Checkbox key={b} label={b} checked={props.brands.includes(b)} onChange={() => props.onToggleBrand(b)} />
           ))}
         </div>
       </FilterGroup>
@@ -435,10 +491,13 @@ function FiltersPanel(props: {
       </FilterGroup>
 
       <FilterGroup title="Availability">
-        <Checkbox label="In stock" checked={props.inStockOnly} onChange={() => props.setInStockOnly(!props.inStockOnly)} />
+        <Checkbox
+          label="In stock"
+          checked={props.inStockOnly}
+          onChange={() => props.setInStockOnly(!props.inStockOnly)}
+        />
         <Checkbox label="On sale" checked={props.onSaleOnly} onChange={() => props.setOnSaleOnly(!props.onSaleOnly)} />
       </FilterGroup>
-
     </div>
   );
 }
@@ -452,8 +511,16 @@ function FilterGroup({ title, children }: { title: string; children: React.React
   );
 }
 
-function Checkbox({ label, count, checked, onChange }: {
-  label: string; count?: number; checked: boolean; onChange: () => void;
+function Checkbox({
+  label,
+  count,
+  checked,
+  onChange,
+}: {
+  label: string;
+  count?: number;
+  checked: boolean;
+  onChange: () => void;
 }) {
   return (
     <label className="flex cursor-pointer items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-secondary">
