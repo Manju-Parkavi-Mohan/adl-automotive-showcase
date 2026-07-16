@@ -20,7 +20,14 @@ import {
 import adlLogo from "@/assets/adl-logo-new.png.asset.json";
 import { listCategories } from "@/lib/woo/categories.functions";
 import { useLocale } from "@/i18n/LocaleProvider";
-import { LOCALE_META, SUPPORTED_LOCALES, SUPPORTED_CURRENCIES, CURRENCY_META, type Locale, type Currency } from "@/i18n/config";
+import {
+  LOCALE_META,
+  SUPPORTED_LOCALES,
+  SUPPORTED_CURRENCIES,
+  CURRENCY_META,
+  type Locale,
+  type Currency,
+} from "@/i18n/config";
 
 const NAV_LINKS = [
   { key: "home", to: "/{-$lang}" as const },
@@ -75,9 +82,15 @@ export function Header() {
         <div className="container-px mx-auto flex h-9 max-w-[1400px] items-center justify-between text-xs">
           <p>{t("topbar.tagline")}</p>
           <div className="flex items-center gap-4">
-            <a href="#" className="hover:text-white/80">{t("topbar.support")}</a>
-            <a href="#" className="hover:text-white/80">{t("topbar.trackOrder")}</a>
-            <a href="#" className="hover:text-white/80">{t("topbar.b2b")}</a>
+            <a href="#" className="hover:text-white/80">
+              {t("topbar.support")}
+            </a>
+            <a href="#" className="hover:text-white/80">
+              {t("topbar.trackOrder")}
+            </a>
+            <a href="#" className="hover:text-white/80">
+              {t("topbar.b2b")}
+            </a>
           </div>
         </div>
       </div>
@@ -130,14 +143,19 @@ export function Header() {
             className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-2 text-xs font-semibold uppercase tracking-wide text-foreground transition-colors hover:border-primary hover:text-primary lg:hidden"
           >
             <User className="h-4 w-4" />
-            <span className="hidden xs:inline sm:inline">{user?.firstName || (user ? t("common.account") : t("common.login"))}</span>
+            <span className="hidden xs:inline sm:inline">
+              {user?.firstName || (user ? t("common.account") : t("common.login"))}
+            </span>
           </Link>
 
           {/* Account icons — desktop only (mobile uses fixed bottom nav) */}
           <div className="hidden shrink-0 items-center gap-1 sm:gap-3 lg:flex">
             <div className="relative">
               <button
-                onClick={() => { setLangOpen(v => !v); setCurOpen(false); }}
+                onClick={() => {
+                  setLangOpen((v) => !v);
+                  setCurOpen(false);
+                }}
                 className="flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-semibold uppercase text-muted-foreground transition-colors hover:text-primary"
                 aria-haspopup="true"
                 aria-expanded={langOpen}
@@ -151,7 +169,10 @@ export function Header() {
                   {SUPPORTED_LOCALES.map((l) => (
                     <button
                       key={l}
-                      onClick={() => { setLangOpen(false); setLocale(l as Locale); }}
+                      onClick={() => {
+                        setLangOpen(false);
+                        setLocale(l as Locale);
+                      }}
                       className={`flex w-full items-center justify-between px-3 py-2 text-sm hover:bg-secondary ${l === locale ? "font-semibold text-primary" : "text-foreground"}`}
                     >
                       <span>{LOCALE_META[l as Locale].nativeLabel}</span>
@@ -163,7 +184,10 @@ export function Header() {
             </div>
             <div className="relative">
               <button
-                onClick={() => { setCurOpen(v => !v); setLangOpen(false); }}
+                onClick={() => {
+                  setCurOpen((v) => !v);
+                  setLangOpen(false);
+                }}
                 className="flex items-center gap-1 rounded-md px-2 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-primary"
                 aria-haspopup="true"
                 aria-expanded={curOpen}
@@ -176,7 +200,10 @@ export function Header() {
                   {SUPPORTED_CURRENCIES.map((c) => (
                     <button
                       key={c}
-                      onClick={() => { setCurOpen(false); setCurrency(c as Currency); }}
+                      onClick={() => {
+                        setCurOpen(false);
+                        setCurrency(c as Currency);
+                      }}
                       className={`flex w-full items-center justify-between px-3 py-2 text-sm hover:bg-secondary ${c === currency ? "font-semibold text-primary" : "text-foreground"}`}
                     >
                       <span>{CURRENCY_META[c as Currency].label}</span>
@@ -257,7 +284,7 @@ export function Header() {
                         >
                           <Link
                             to="/{-$lang}/products"
-                            search={{}}
+                            search={{ category: String(c.id) }}
                             onClick={() => setCatOpen(false)}
                             className={`flex items-center justify-between gap-3 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-primary ${hoveredCat === c.id ? "bg-secondary text-primary" : ""}`}
                           >
@@ -278,7 +305,7 @@ export function Header() {
                       <Link
                         key={s.id}
                         to="/{-$lang}/products"
-                        search={{}}
+                        search={{ category: String(s.id) }}
                         onClick={() => setCatOpen(false)}
                         className="flex items-center gap-3 border-b border-border px-4 py-3 text-sm text-foreground transition-colors last:border-0 hover:bg-secondary hover:text-primary"
                       >
@@ -392,7 +419,7 @@ export function Header() {
                     <div className="flex items-center justify-between gap-2">
                       <Link
                         to="/{-$lang}/products"
-                        search={{}}
+                        search={{ category: String(c.id) }}
                         onClick={() => setMobileOpen(false)}
                         className="flex flex-1 items-center gap-2 px-1 py-2 text-xs font-semibold uppercase tracking-wide text-black hover:text-primary"
                       >
@@ -414,7 +441,7 @@ export function Header() {
                           <Link
                             key={s.id}
                             to="/{-$lang}/products"
-                            search={{}}
+                            search={{ category: String(s.id) }}
                             onClick={() => setMobileOpen(false)}
                             className="border-t border-border px-1 py-2 text-xs font-medium text-foreground hover:text-primary"
                           >
