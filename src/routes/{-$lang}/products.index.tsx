@@ -13,8 +13,16 @@ import { getYoastForUrl } from "@/lib/wp/yoast.functions";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
 
 export const Route = createFileRoute("/{-$lang}/products/")({
-  validateSearch: (search) =>
-    typeof search.search === "string" && search.search.trim() ? { search: search.search } : {},
+  validateSearch: (search) => {
+    const result: { search?: string; category?: string } = {};
+    if (typeof search.search === "string" && search.search.trim()) {
+      result.search = search.search;
+    }
+    if (typeof search.category === "string" && search.category.trim()) {
+      result.category = search.category;
+    }
+    return result;
+  },
   loader: ({ context }) =>
     context.queryClient.ensureQueryData({
       queryKey: ["yoast", "/shop"],
@@ -67,12 +75,12 @@ function sortToWoo(id: (typeof SORT_OPTIONS)[number]["id"]) {
 }
 
 function ProductsPage() {
-  const { search: searchParam } = Route.useSearch();
+  const { search: searchParam, category: categoryParam } = Route.useSearch();
   const navigate = useNavigate({ from: "/products" });
   const [view, setView] = useState<"grid" | "list">("grid");
   const [sort, setSort] = useState<(typeof SORT_OPTIONS)[number]["id"]>("featured");
   const [page, setPage] = useState(1);
-  const [categorySlugs, setCategorySlugs] = useState<string[]>([]);
+  const categorySlugs = useMemo(() => categoryParam?.split(",").filter(Boolean) ?? [], [categoryParam]);
   const [brands, setBrands] = useState<string[]>([]);
   const [priceIds, setPriceIds] = useState<string[]>([]);
   const [inStockOnly, setInStockOnly] = useState(false);
@@ -103,6 +111,14 @@ function ProductsPage() {
     queryFn: () => listBrands(),
     staleTime: 5 * 60_000,
   });
+
+  const toggleCategory = (slug: string) => {
+    const next = categorySlugs.includes(slug) ? categorySlugs.filter((v) => v !== slug) : [...categorySlugs, slug];
+    setPage(1);
+    navigate({
+      search: (prev) => ({ ...prev, category: next.length ? next.join(",") : undefined }),
+    });
+  };
 
   const productsQuery = useQuery({
     queryKey: [
@@ -143,14 +159,13 @@ function ProductsPage() {
   };
 
   const resetAll = () => {
-    setCategorySlugs([]);
     setBrands([]);
     setPriceIds([]);
     setInStockOnly(false);
     setOnSaleOnly(false);
     setMinRating(0);
     setPage(1);
-    clearSearch();
+    navigate({ search: () => ({}) });
   };
 
   const toggle = <T,>(value: T, list: T[], set: (v: T[]) => void) => {
@@ -310,7 +325,7 @@ function ProductsPage() {
               inStockOnly={inStockOnly}
               onSaleOnly={onSaleOnly}
               minRating={minRating}
-              onToggleCategory={(c) => toggle(c, categorySlugs, setCategorySlugs)}
+              onToggleCategory={toggleCategory}
               onToggleBrand={(b) => toggle(b, brands, setBrands)}
               onTogglePrice={(p) => toggle(p, priceIds, setPriceIds)}
               setInStockOnly={(v) => {
@@ -351,7 +366,7 @@ function ProductsPage() {
                   inStockOnly={inStockOnly}
                   onSaleOnly={onSaleOnly}
                   minRating={minRating}
-                  onToggleCategory={(c) => toggle(c, categorySlugs, setCategorySlugs)}
+                  onToggleCategory={toggleCategory}
                   onToggleBrand={(b) => toggle(b, brands, setBrands)}
                   onTogglePrice={(p) => toggle(p, priceIds, setPriceIds)}
                   setInStockOnly={(v) => {
