@@ -300,7 +300,7 @@ function ProductsPage() {
               categorySlugs={categorySlugs}
               brands={brands}
               priceIds={priceIds}
-              allCategories={allCategories.map((c) => ({ slug: c.slug, label: c.name, count: c.count }))}
+              allCategories={allCategories.map((c) => ({ value: String(c.id), label: c.name, count: c.count }))}
               allBrands={allBrands}
               inStockOnly={inStockOnly}
               onSaleOnly={onSaleOnly}
@@ -341,7 +341,7 @@ function ProductsPage() {
                   categorySlugs={categorySlugs}
                   brands={brands}
                   priceIds={priceIds}
-                  allCategories={allCategories.map((c) => ({ slug: c.slug, label: c.name, count: c.count }))}
+                  allCategories={allCategories.map((c) => ({ value: String(c.id), label: c.name, count: c.count }))}
                   allBrands={allBrands}
                   inStockOnly={inStockOnly}
                   onSaleOnly={onSaleOnly}
@@ -420,7 +420,7 @@ function FiltersPanel(props: {
   categorySlugs: string[];
   brands: string[];
   priceIds: string[];
-  allCategories: Array<{ slug: string; label: string; count: number }>;
+  allCategories: Array<{ value: string; label: string; count: number }>;
   allBrands: string[];
   inStockOnly: boolean;
   onSaleOnly: boolean;
@@ -460,11 +460,11 @@ function FiltersPanel(props: {
         ) : (
           props.allCategories.map((c) => (
             <Checkbox
-              key={c.id}
+              key={c.value}
               label={c.label}
               count={c.count}
-              checked={props.categorySlugs.includes(c.id)}
-              onChange={() => props.onToggleCategory(c.id)}
+              checked={props.categorySlugs.includes(c.value)}
+              onChange={() => props.onToggleCategory(c.value)}
             />
           ))
         )}
