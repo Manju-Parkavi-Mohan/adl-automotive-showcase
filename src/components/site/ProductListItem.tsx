@@ -1,4 +1,4 @@
-import { Heart, ShoppingCart, Star, Eye, Check } from "lucide-react";
+import { Heart, ShoppingCart, Eye, Check } from "lucide-react";
 import type { Product } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/site/CartProvider";
@@ -57,16 +57,6 @@ export function ProductListItem({ product }: { product: Product }) {
           {product.brand} · {product.categoryLabel}
         </p>
         <h3 className="text-lg font-semibold leading-snug text-foreground">{product.name}</h3>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <div className="flex items-center gap-0.5 text-amber-500">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} className={`h-3.5 w-3.5 ${i < Math.round(product.rating) ? "fill-current" : ""}`} />
-            ))}
-          </div>
-          <span>
-            <Num>{product.rating.toFixed(1)}</Num> ({t("product.reviewsCount", { count: product.reviewCount })})
-          </span>
-        </div>
         <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
           {product.description}
         </p>

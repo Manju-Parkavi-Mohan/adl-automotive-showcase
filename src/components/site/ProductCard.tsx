@@ -1,11 +1,11 @@
-import { Heart, ShoppingCart, Star, Eye } from "lucide-react";
+import { Heart, ShoppingCart, Eye } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import type { Product } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/site/CartProvider";
 import { toast } from "sonner";
 import { useLocale } from "@/i18n/LocaleProvider";
-import { Money, Percent, Num } from "@/components/site/Money";
+import { Money, Percent } from "@/components/site/Money";
 
 export function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart();
@@ -90,18 +90,6 @@ export function ProductCard({ product }: { product: Product }) {
         >
           {product.name}
         </Link>
-
-        <div className="flex items-center gap-1 text-[10px] text-muted-foreground sm:text-xs">
-          <div className="flex items-center gap-0.5 text-amber-500">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star
-                key={i}
-                className={`h-3 w-3 sm:h-3.5 sm:w-3.5 ${i < Math.round(product.rating) ? "fill-current" : ""}`}
-              />
-            ))}
-          </div>
-          <span><Num>({product.reviewCount})</Num></span>
-        </div>
 
         <p
           className={`text-[10px] font-semibold sm:text-xs ${
