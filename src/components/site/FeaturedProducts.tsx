@@ -7,7 +7,7 @@ import { listProducts } from "@/lib/woo/products.functions";
 import { wooToDisplay } from "@/lib/woo/adapter";
 import { useLocale } from "@/i18n/LocaleProvider";
 
-type TabId = "featured" | "popular" | "best" | "rated";
+type TabId = "featured" | "popular" | "best";
 
 type ListInput = {
   featured?: boolean;
@@ -19,7 +19,6 @@ type ListInput = {
 const TABS_META: { id: TabId; labelKey: string; query: ListInput }[] = [
   { id: "featured", labelKey: "home.featuredTab", query: { featured: true, perPage: 8 } },
   { id: "best", labelKey: "home.bestSellingTab", query: { orderby: "popularity", perPage: 8 } },
-  { id: "rated", labelKey: "home.topRatedTab", query: { orderby: "rating", perPage: 8 } },
 ];
 
 export function FeaturedProducts() {
