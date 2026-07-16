@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import {
-  ChevronRight, LayoutGrid, List, SlidersHorizontal, Star, X, ChevronDown,
+  ChevronRight, LayoutGrid, List, SlidersHorizontal, X, ChevronDown,
 } from "lucide-react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -44,7 +44,6 @@ const SORT_OPTIONS = [
   { id: "featured", label: "Featured" },
   { id: "price-asc", label: "Price: Low to High" },
   { id: "price-desc", label: "Price: High to Low" },
-  { id: "rating", label: "Top Rated" },
   { id: "newest", label: "Newest" },
 ] as const;
 
@@ -61,7 +60,6 @@ function sortToWoo(id: (typeof SORT_OPTIONS)[number]["id"]) {
   switch (id) {
     case "price-asc": return { orderby: "price" as const, order: "asc" as const };
     case "price-desc": return { orderby: "price" as const, order: "desc" as const };
-    case "rating": return { orderby: "rating" as const, order: "desc" as const };
     case "newest": return { orderby: "date" as const, order: "desc" as const };
     case "featured":
     default: return { orderby: "popularity" as const, order: "desc" as const };
@@ -128,7 +126,6 @@ function ProductsPage() {
   const pageItems = display.filter((p) => {
     if (brands.length && !brands.includes(p.brand)) return false;
     if (inStockOnly && !p.inStock) return false;
-    if (minRating > 0 && p.rating < minRating) return false;
     return true;
   });
 
