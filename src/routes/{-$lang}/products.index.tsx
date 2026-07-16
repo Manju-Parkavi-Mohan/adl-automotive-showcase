@@ -113,11 +113,13 @@ function ProductsPage() {
   });
 
   const toggleCategory = (slug: string) => {
-    const next = categorySlugs.includes(slug) ? categorySlugs.filter((v) => v !== slug) : [...categorySlugs, slug];
+    const next: string[] = categorySlugs.includes(slug)
+      ? categorySlugs.filter((v: string) => v !== slug)
+      : [...categorySlugs, slug];
     setPage(1);
     navigate({
       to: ".",
-      search: (prev) => ({ ...prev, category: next.length ? next.join(",") : undefined }),
+      search: (prev: Record<string, unknown>) => ({ ...prev, category: next.length ? next.join(",") : undefined }),
     });
   };
 
@@ -156,7 +158,10 @@ function ProductsPage() {
   const allCategories = (categoriesQuery.data ?? []).filter((c) => c.parent === 0);
 
   const clearSearch = () => {
-    navigate({ to: ".", search: (prev) => ({ ...prev, search: undefined, category: undefined }) });
+    navigate({
+      to: ".",
+      search: (prev: Record<string, unknown>) => ({ ...prev, search: undefined, category: undefined }),
+    });
   };
 
   const resetAll = () => {
