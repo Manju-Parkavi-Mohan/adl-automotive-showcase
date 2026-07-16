@@ -25,9 +25,9 @@ export function Footer() {
               required
               placeholder={t("footer.emailPlaceholder")}
               aria-label="Email"
-              className="h-14 min-w-0 flex-1 rounded-md border border-white/15 bg-white/5 px-4 text-base text-white placeholder:text-white/40 outline-none focus:border-[var(--accent-blue)] lg:w-96"
+              className="h-16 min-h-16 min-w-0 flex-1 rounded-md border border-white/15 bg-white/5 px-4 text-base text-white placeholder:text-white/40 outline-none focus:border-[var(--accent-blue)] lg:w-96"
             />
-            <button className="h-14 w-full shrink-0 rounded-md bg-[var(--accent-blue)] px-8 text-sm font-semibold text-white transition-colors hover:bg-[var(--accent-blue)]/90 sm:w-auto">
+            <button className="h-16 min-h-16 w-full shrink-0 rounded-md bg-[var(--accent-blue)] px-8 text-sm font-semibold text-white transition-colors hover:bg-[var(--accent-blue)]/90 sm:w-auto">
               {t("footer.subscribe")}
             </button>
           </form>
