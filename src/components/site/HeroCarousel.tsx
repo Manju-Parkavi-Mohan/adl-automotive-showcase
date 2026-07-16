@@ -50,7 +50,7 @@ export function HeroCarousel() {
             <img
               src={s.image}
               alt={s.title}
-              className="h-full w-full object-cover object-[80%_center] md:object-center"
+              className="h-full w-full object-cover object-[60%_center] md:object-center"
             />
             {/* Mobile: full dark scrim so text is always legible over any part of the photo */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/50 to-black/60 md:hidden" />
