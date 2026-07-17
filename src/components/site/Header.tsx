@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useCart } from "@/components/site/CartProvider";
 import { useAuth } from "@/components/site/AuthProvider";
+import { useWishlist } from "@/hooks/use-wishlist";
 import {
   Search,
   Heart,
@@ -54,6 +55,7 @@ export function Header() {
   const navigate = useNavigate();
   const { count, openCart } = useCart();
   const { user } = useAuth();
+  const { count: wishlistCount } = useWishlist();
   const { t, locale, currency, setLocale, setCurrency } = useLocale();
   const { data: wcCategories } = useQuery({
     queryKey: ["wc-categories-nav"],
@@ -212,7 +214,18 @@ export function Header() {
                 </div>
               )}
             </div>
-            <IconButton label="Wishlist" icon={Heart} />
+            <Link
+              to="/{-$lang}/account/wishlist"
+              aria-label={t("common.wishlist")}
+              className="relative grid h-9 w-9 place-items-center rounded-md text-foreground transition-colors hover:text-primary sm:h-10 sm:w-10"
+            >
+              <Heart className="h-[18px] w-[18px] sm:h-5 sm:w-5" />
+              {wishlistCount > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-blue)] px-1 text-[10px] font-bold text-white">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
             <button
               aria-label="Open cart"
               onClick={openCart}
@@ -463,13 +476,21 @@ export function Header() {
         aria-label="Mobile quick actions"
         className="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-4 border-t border-border bg-white shadow-[0_-4px_16px_-4px_rgba(0,0,0,0.08)] lg:hidden"
       >
-        <button
+        <Link
+          to="/{-$lang}/account/wishlist"
           aria-label={t("common.wishlist")}
-          className="flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary"
+          className="relative flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary"
         >
-          <Heart className="h-5 w-5" />
+          <span className="relative">
+            <Heart className="h-5 w-5" />
+            {wishlistCount > 0 && (
+              <span className="absolute -right-2 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-blue)] px-1 text-[10px] font-bold text-white">
+                {wishlistCount}
+              </span>
+            )}
+          </span>
           <span>{t("common.wishlist")}</span>
-        </button>
+        </Link>
         <button
           onClick={() => setMobileOpen(true)}
           className="flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold text-foreground hover:text-primary"
