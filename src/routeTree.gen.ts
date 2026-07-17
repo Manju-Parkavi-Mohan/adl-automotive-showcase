@@ -25,6 +25,7 @@ import { Route as Char123LangChar125AccountIndexRouteImport } from './routes/{-$
 import { Route as Char123LangChar125ProductsProductIdRouteImport } from './routes/{-$lang}/products.$productId'
 import { Route as Char123LangChar125CheckoutReturnRouteImport } from './routes/{-$lang}/checkout_.return'
 import { Route as Char123LangChar125BlogSlugRouteImport } from './routes/{-$lang}/blog.$slug'
+import { Route as Char123LangChar125AccountWishlistRouteImport } from './routes/{-$lang}/account.wishlist'
 import { Route as Char123LangChar125AccountRegisterRouteImport } from './routes/{-$lang}/account.register'
 import { Route as Char123LangChar125AccountLoginRouteImport } from './routes/{-$lang}/account.login'
 import { Route as Char123LangChar125AccountForgotPasswordRouteImport } from './routes/{-$lang}/account.forgot-password'
@@ -120,6 +121,12 @@ const Char123LangChar125BlogSlugRoute =
     path: '/$slug',
     getParentRoute: () => Char123LangChar125BlogRoute,
   } as any)
+const Char123LangChar125AccountWishlistRoute =
+  Char123LangChar125AccountWishlistRouteImport.update({
+    id: '/wishlist',
+    path: '/wishlist',
+    getParentRoute: () => Char123LangChar125AccountRoute,
+  } as any)
 const Char123LangChar125AccountRegisterRoute =
   Char123LangChar125AccountRegisterRouteImport.update({
     id: '/register',
@@ -164,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/{-$lang}/account/forgot-password': typeof Char123LangChar125AccountForgotPasswordRoute
   '/{-$lang}/account/login': typeof Char123LangChar125AccountLoginRoute
   '/{-$lang}/account/register': typeof Char123LangChar125AccountRegisterRoute
+  '/{-$lang}/account/wishlist': typeof Char123LangChar125AccountWishlistRoute
   '/{-$lang}/blog/$slug': typeof Char123LangChar125BlogSlugRoute
   '/{-$lang}/checkout/return': typeof Char123LangChar125CheckoutReturnRoute
   '/{-$lang}/products/$productId': typeof Char123LangChar125ProductsProductIdRoute
@@ -184,6 +192,7 @@ export interface FileRoutesByTo {
   '/{-$lang}/account/forgot-password': typeof Char123LangChar125AccountForgotPasswordRoute
   '/{-$lang}/account/login': typeof Char123LangChar125AccountLoginRoute
   '/{-$lang}/account/register': typeof Char123LangChar125AccountRegisterRoute
+  '/{-$lang}/account/wishlist': typeof Char123LangChar125AccountWishlistRoute
   '/{-$lang}/blog/$slug': typeof Char123LangChar125BlogSlugRoute
   '/{-$lang}/checkout/return': typeof Char123LangChar125CheckoutReturnRoute
   '/{-$lang}/products/$productId': typeof Char123LangChar125ProductsProductIdRoute
@@ -208,6 +217,7 @@ export interface FileRoutesById {
   '/{-$lang}/account/forgot-password': typeof Char123LangChar125AccountForgotPasswordRoute
   '/{-$lang}/account/login': typeof Char123LangChar125AccountLoginRoute
   '/{-$lang}/account/register': typeof Char123LangChar125AccountRegisterRoute
+  '/{-$lang}/account/wishlist': typeof Char123LangChar125AccountWishlistRoute
   '/{-$lang}/blog/$slug': typeof Char123LangChar125BlogSlugRoute
   '/{-$lang}/checkout_/return': typeof Char123LangChar125CheckoutReturnRoute
   '/{-$lang}/products/$productId': typeof Char123LangChar125ProductsProductIdRoute
@@ -233,6 +243,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/account/forgot-password'
     | '/{-$lang}/account/login'
     | '/{-$lang}/account/register'
+    | '/{-$lang}/account/wishlist'
     | '/{-$lang}/blog/$slug'
     | '/{-$lang}/checkout/return'
     | '/{-$lang}/products/$productId'
@@ -253,6 +264,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/account/forgot-password'
     | '/{-$lang}/account/login'
     | '/{-$lang}/account/register'
+    | '/{-$lang}/account/wishlist'
     | '/{-$lang}/blog/$slug'
     | '/{-$lang}/checkout/return'
     | '/{-$lang}/products/$productId'
@@ -276,6 +288,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/account/forgot-password'
     | '/{-$lang}/account/login'
     | '/{-$lang}/account/register'
+    | '/{-$lang}/account/wishlist'
     | '/{-$lang}/blog/$slug'
     | '/{-$lang}/checkout_/return'
     | '/{-$lang}/products/$productId'
@@ -415,6 +428,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LangChar125BlogSlugRouteImport
       parentRoute: typeof Char123LangChar125BlogRoute
     }
+    '/{-$lang}/account/wishlist': {
+      id: '/{-$lang}/account/wishlist'
+      path: '/wishlist'
+      fullPath: '/{-$lang}/account/wishlist'
+      preLoaderRoute: typeof Char123LangChar125AccountWishlistRouteImport
+      parentRoute: typeof Char123LangChar125AccountRoute
+    }
     '/{-$lang}/account/register': {
       id: '/{-$lang}/account/register'
       path: '/register'
@@ -457,6 +477,7 @@ interface Char123LangChar125AccountRouteChildren {
   Char123LangChar125AccountForgotPasswordRoute: typeof Char123LangChar125AccountForgotPasswordRoute
   Char123LangChar125AccountLoginRoute: typeof Char123LangChar125AccountLoginRoute
   Char123LangChar125AccountRegisterRoute: typeof Char123LangChar125AccountRegisterRoute
+  Char123LangChar125AccountWishlistRoute: typeof Char123LangChar125AccountWishlistRoute
   Char123LangChar125AccountIndexRoute: typeof Char123LangChar125AccountIndexRoute
   Char123LangChar125AccountOrdersOrderIdRoute: typeof Char123LangChar125AccountOrdersOrderIdRoute
 }
@@ -468,6 +489,8 @@ const Char123LangChar125AccountRouteChildren: Char123LangChar125AccountRouteChil
     Char123LangChar125AccountLoginRoute: Char123LangChar125AccountLoginRoute,
     Char123LangChar125AccountRegisterRoute:
       Char123LangChar125AccountRegisterRoute,
+    Char123LangChar125AccountWishlistRoute:
+      Char123LangChar125AccountWishlistRoute,
     Char123LangChar125AccountIndexRoute: Char123LangChar125AccountIndexRoute,
     Char123LangChar125AccountOrdersOrderIdRoute:
       Char123LangChar125AccountOrdersOrderIdRoute,
