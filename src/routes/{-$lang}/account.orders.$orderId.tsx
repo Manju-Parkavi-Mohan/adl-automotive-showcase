@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Package, MapPin, CreditCard } from "lucide-react";
 import { Header } from "@/components/site/Header";
@@ -31,7 +31,7 @@ function money(value: number | string, currency = "USD", locale = "en") {
 }
 
 function OrderDetailPage() {
-  const { orderId } = useParams({ from: "/account/orders/$orderId" });
+  const { orderId } = Route.useParams();
   const { user, isLoading: authLoading } = useAuth();
   const { t } = useLocale();
   const id = Number(orderId);
