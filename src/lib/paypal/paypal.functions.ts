@@ -98,7 +98,6 @@ export const createPaymentOrder = createServerFn({ method: "POST" })
             {
               reference_id: String(wcOrder.id),
               custom_id: String(wcOrder.id),
-              invoice_id: wcOrder.number,
               amount: {
                 currency_code: wcOrder.currency || currency,
                 value: Number(wcOrder.total).toFixed(2),

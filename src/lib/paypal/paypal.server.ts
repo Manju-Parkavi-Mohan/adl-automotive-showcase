@@ -67,10 +67,23 @@ export async function paypalFetch<T>(
     // ignore
   }
   if (!res.ok) {
-    const msg =
-      parsed && typeof parsed === "object" && "message" in parsed
-        ? String((parsed as { message: unknown }).message)
-        : `PayPal ${path} failed (${res.status})`;
+    let msg = `PayPal ${path} failed (${res.status})`;
+    if (parsed && typeof parsed === "object") {
+      const p = parsed as {
+        message?: unknown;
+        name?: unknown;
+        details?: Array<{ issue?: string; description?: string; field?: string }>;
+      };
+      const base = p.message ? String(p.message) : msg;
+      const issues = Array.isArray(p.details)
+        ? p.details
+            .map((d) => [d.issue, d.field, d.description].filter(Boolean).join(" — "))
+            .filter(Boolean)
+            .join("; ")
+        : "";
+      msg = issues ? `${base} (${issues})` : base;
+    }
+    console.error(`[paypal] ${path} ${res.status}`, text);
     throw new Error(msg);
   }
   return { status: res.status, data: parsed as T };
