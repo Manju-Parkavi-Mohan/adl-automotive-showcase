@@ -6,10 +6,13 @@ import { useCart } from "@/components/site/CartProvider";
 import { toast } from "sonner";
 import { useLocale } from "@/i18n/LocaleProvider";
 import { Money, Percent } from "@/components/site/Money";
+import { useWishlist } from "@/hooks/use-wishlist";
 
 export function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart();
   const { t } = useLocale();
+  const { has, toggle } = useWishlist();
+  const inWishlist = product.wcId ? has(product.wcId) : false;
   const discount = product.oldPrice ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100) : 0;
 
   const handleAdd = (e: React.MouseEvent) => {
@@ -30,6 +33,17 @@ export function ProductCard({ product }: { product: Product }) {
       },
       1,
     );
+  };
+
+  const handleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!product.wcId) {
+      toast.error("Live product not available yet");
+      return;
+    }
+    const added = toggle(product.wcId);
+    toast.success(added ? "Added to wishlist" : "Removed from wishlist");
   };
 
   return (
@@ -62,16 +76,22 @@ export function ProductCard({ product }: { product: Product }) {
             </span>
           )}
         </div>
-        <div className="absolute right-3 top-3 flex flex-col gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+        <div className="absolute right-3 top-3 flex flex-col gap-2">
           <button
-            aria-label="Add to wishlist"
-            className="grid h-9 w-9 place-items-center rounded-full bg-white/95 text-foreground shadow-sm transition-colors hover:bg-white hover:text-primary"
+            onClick={handleWishlist}
+            aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+            aria-pressed={inWishlist}
+            className={`grid h-9 w-9 place-items-center rounded-full shadow-sm transition-all ${
+              inWishlist
+                ? "bg-primary text-primary-foreground"
+                : "bg-white/95 text-foreground opacity-0 group-hover:opacity-100 hover:bg-white hover:text-primary"
+            }`}
           >
-            <Heart className="h-4 w-4" />
+            <Heart className={`h-4 w-4 ${inWishlist ? "fill-current" : ""}`} />
           </button>
           <button
             aria-label="Quick view"
-            className="grid h-9 w-9 place-items-center rounded-full bg-white/95 text-foreground shadow-sm transition-colors hover:bg-white hover:text-primary"
+            className="grid h-9 w-9 place-items-center rounded-full bg-white/95 text-foreground opacity-0 shadow-sm transition-opacity group-hover:opacity-100 hover:bg-white hover:text-primary"
           >
             <Eye className="h-4 w-4" />
           </button>
