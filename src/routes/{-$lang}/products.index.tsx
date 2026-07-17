@@ -137,7 +137,7 @@ function ProductsPage() {
           order: wooSort.order,
           search: searchParam,
           category: categorySlugs.length ? categorySlugs.join(",") : undefined,
-          minPrice: priceRange.minPrice,
+          minPrice: priceRange.minPrice && priceRange.minPrice > 0 ? priceRange.minPrice : undefined,
           maxPrice: priceRange.maxPrice === 999999 ? undefined : priceRange.maxPrice,
           onSale: onSaleOnly || undefined,
           brand: brands.length ? brands.join(",") : undefined,
