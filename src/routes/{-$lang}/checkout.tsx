@@ -226,7 +226,7 @@ function CheckoutPage() {
                   email: user?.email ?? "",
                 }}
                 guestForm={form}
-                updateGuestForm={update}
+                updateGuestForm={(k) => update(k as keyof typeof form)}
                 setGuestCountry={(v) => setForm((f) => ({ ...f, country: v.toUpperCase() }))}
                 note={form.note}
                 onNoteChange={update("note")}
