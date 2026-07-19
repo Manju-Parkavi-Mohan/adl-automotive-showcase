@@ -5,6 +5,7 @@ import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
 import { seoToMeta } from "@/lib/seo";
 import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckoutSteps } from "@/components/site/CheckoutSteps";
 
 const searchSchema = z.object({
   status: z.enum(["success", "failed"]).catch("success"),
@@ -31,7 +32,8 @@ function CheckoutReturnPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container-px mx-auto max-w-2xl py-20">
+      <main className="container-px mx-auto max-w-2xl py-12">
+        <CheckoutSteps current={success ? "complete" : "payment"} />
         <div className="rounded-xl border border-border bg-white p-8 text-center shadow-sm">
           {success ? (
             <>

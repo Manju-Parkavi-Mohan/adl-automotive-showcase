@@ -14,6 +14,7 @@ import { Route as SitemapEnDotxmlRouteImport } from './routes/sitemap-en[.]xml'
 import { Route as SitemapArDotxmlRouteImport } from './routes/sitemap-ar[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as Char123LangChar125IndexRouteImport } from './routes/{-$lang}/index'
+import { Route as Char123LangChar125TermsRouteImport } from './routes/{-$lang}/terms'
 import { Route as Char123LangChar125ProductsRouteImport } from './routes/{-$lang}/products'
 import { Route as Char123LangChar125CheckoutRouteImport } from './routes/{-$lang}/checkout'
 import { Route as Char123LangChar125CartRouteImport } from './routes/{-$lang}/cart'
@@ -55,6 +56,11 @@ const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
 const Char123LangChar125IndexRoute = Char123LangChar125IndexRouteImport.update({
   id: '/{-$lang}/',
   path: '/{-$lang}/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Char123LangChar125TermsRoute = Char123LangChar125TermsRouteImport.update({
+  id: '/{-$lang}/terms',
+  path: '/{-$lang}/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Char123LangChar125ProductsRoute =
@@ -167,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/{-$lang}/cart': typeof Char123LangChar125CartRoute
   '/{-$lang}/checkout': typeof Char123LangChar125CheckoutRoute
   '/{-$lang}/products': typeof Char123LangChar125ProductsRouteWithChildren
+  '/{-$lang}/terms': typeof Char123LangChar125TermsRoute
   '/{-$lang}/': typeof Char123LangChar125IndexRoute
   '/{-$lang}/account/forgot-password': typeof Char123LangChar125AccountForgotPasswordRoute
   '/{-$lang}/account/login': typeof Char123LangChar125AccountLoginRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/{-$lang}/cart': typeof Char123LangChar125CartRoute
   '/{-$lang}/checkout': typeof Char123LangChar125CheckoutRoute
+  '/{-$lang}/terms': typeof Char123LangChar125TermsRoute
   '/{-$lang}': typeof Char123LangChar125IndexRoute
   '/{-$lang}/account/forgot-password': typeof Char123LangChar125AccountForgotPasswordRoute
   '/{-$lang}/account/login': typeof Char123LangChar125AccountLoginRoute
@@ -213,6 +221,7 @@ export interface FileRoutesById {
   '/{-$lang}/cart': typeof Char123LangChar125CartRoute
   '/{-$lang}/checkout': typeof Char123LangChar125CheckoutRoute
   '/{-$lang}/products': typeof Char123LangChar125ProductsRouteWithChildren
+  '/{-$lang}/terms': typeof Char123LangChar125TermsRoute
   '/{-$lang}/': typeof Char123LangChar125IndexRoute
   '/{-$lang}/account/forgot-password': typeof Char123LangChar125AccountForgotPasswordRoute
   '/{-$lang}/account/login': typeof Char123LangChar125AccountLoginRoute
@@ -239,6 +248,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/cart'
     | '/{-$lang}/checkout'
     | '/{-$lang}/products'
+    | '/{-$lang}/terms'
     | '/{-$lang}/'
     | '/{-$lang}/account/forgot-password'
     | '/{-$lang}/account/login'
@@ -260,6 +270,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/{-$lang}/cart'
     | '/{-$lang}/checkout'
+    | '/{-$lang}/terms'
     | '/{-$lang}'
     | '/{-$lang}/account/forgot-password'
     | '/{-$lang}/account/login'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/cart'
     | '/{-$lang}/checkout'
     | '/{-$lang}/products'
+    | '/{-$lang}/terms'
     | '/{-$lang}/'
     | '/{-$lang}/account/forgot-password'
     | '/{-$lang}/account/login'
@@ -309,6 +321,7 @@ export interface RootRouteChildren {
   Char123LangChar125CartRoute: typeof Char123LangChar125CartRoute
   Char123LangChar125CheckoutRoute: typeof Char123LangChar125CheckoutRoute
   Char123LangChar125ProductsRoute: typeof Char123LangChar125ProductsRouteWithChildren
+  Char123LangChar125TermsRoute: typeof Char123LangChar125TermsRoute
   Char123LangChar125IndexRoute: typeof Char123LangChar125IndexRoute
   Char123LangChar125CheckoutReturnRoute: typeof Char123LangChar125CheckoutReturnRoute
   ApiPublicWebhooksPaypalRoute: typeof ApiPublicWebhooksPaypalRoute
@@ -349,6 +362,13 @@ declare module '@tanstack/react-router' {
       path: '/{-$lang}'
       fullPath: '/{-$lang}/'
       preLoaderRoute: typeof Char123LangChar125IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/{-$lang}/terms': {
+      id: '/{-$lang}/terms'
+      path: '/{-$lang}/terms'
+      fullPath: '/{-$lang}/terms'
+      preLoaderRoute: typeof Char123LangChar125TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/{-$lang}/products': {
@@ -544,6 +564,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char123LangChar125CartRoute: Char123LangChar125CartRoute,
   Char123LangChar125CheckoutRoute: Char123LangChar125CheckoutRoute,
   Char123LangChar125ProductsRoute: Char123LangChar125ProductsRouteWithChildren,
+  Char123LangChar125TermsRoute: Char123LangChar125TermsRoute,
   Char123LangChar125IndexRoute: Char123LangChar125IndexRoute,
   Char123LangChar125CheckoutReturnRoute: Char123LangChar125CheckoutReturnRoute,
   ApiPublicWebhooksPaypalRoute: ApiPublicWebhooksPaypalRoute,
@@ -551,13 +572,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

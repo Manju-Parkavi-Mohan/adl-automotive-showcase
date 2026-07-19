@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { seoToMeta } from "@/lib/seo";
 import { Money, Num } from "@/components/site/Money";
 import { useLocale } from "@/i18n/LocaleProvider";
+import { CheckoutSteps } from "@/components/site/CheckoutSteps";
 
 export const Route = createFileRoute("/{-$lang}/cart")({
   head: () => ({
@@ -29,6 +30,7 @@ function CartPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container-px mx-auto max-w-[1400px] py-12">
+        <CheckoutSteps current="cart" />
         <h1 className="text-3xl font-bold tracking-tight">{t("cart.title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground"><Num>{items.length}</Num> {itemWord}</p>
 

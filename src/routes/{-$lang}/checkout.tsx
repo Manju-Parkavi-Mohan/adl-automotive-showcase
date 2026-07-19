@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCart } from "@/components/site/CartProvider";
 import { useAuth } from "@/components/site/AuthProvider";
+import { CheckoutSteps } from "@/components/site/CheckoutSteps";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   createPaymentOrder,
   captureOrder,
@@ -35,6 +37,7 @@ function CheckoutPage() {
   const navigate = useNavigate();
   const { t } = useLocale();
   const [ready, setReady] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const [form, setForm] = useState({
     first_name: user?.firstName ?? "",
@@ -79,6 +82,7 @@ function CheckoutPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container-px mx-auto max-w-[1400px] py-12">
+        <CheckoutSteps current="payment" />
         <h1 className="text-3xl font-bold tracking-tight">{t("checkout.title")}</h1>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
@@ -119,9 +123,28 @@ function CheckoutPage() {
             <div className="my-2 h-px bg-border" />
             <div className="flex justify-between text-sm"><span className="text-muted-foreground">{t("cart.subtotal")}</span><Money usd={subtotal} className="font-medium" /></div>
             <div className="flex justify-between text-base font-bold"><span>{t("cart.total")}</span><Money usd={subtotal} /></div>
+            <label className="flex items-start gap-2 rounded-md border border-border bg-white p-3 text-xs text-foreground">
+              <Checkbox
+                checked={termsAccepted}
+                onCheckedChange={(v) => setTermsAccepted(v === true)}
+                className="mt-0.5"
+                aria-label="Accept terms and conditions"
+              />
+              <span>
+                I have read and agree to the{" "}
+                <Link to="/{-$lang}/terms" target="_blank" className="font-medium text-primary underline underline-offset-2">
+                  Terms &amp; Conditions
+                </Link>
+                .
+              </span>
+            </label>
             {missing ? (
               <p className="text-xs text-muted-foreground">
                 Please complete the billing details to enable payment.
+              </p>
+            ) : !termsAccepted ? (
+              <p className="text-xs text-muted-foreground">
+                Please accept the Terms &amp; Conditions to continue with payment.
               </p>
             ) : (
               <PayPalButtons
