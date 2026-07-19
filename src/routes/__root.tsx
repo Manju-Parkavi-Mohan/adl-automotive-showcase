@@ -14,6 +14,7 @@ import { reportAppError } from "../lib/error-reporting";
 import { CartProvider } from "@/components/site/CartProvider";
 import { CartDrawer } from "@/components/site/CartDrawer";
 import { AuthProvider } from "@/components/site/AuthProvider";
+import { CookieBanner } from "@/components/site/CookieBanner";
 import { Toaster } from "@/components/ui/sonner";
 import { LocaleProvider } from "@/i18n/LocaleProvider";
 import { detectI18n } from "@/i18n/detect.functions";
@@ -183,6 +184,7 @@ function RootComponent() {
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
             <CartDrawer />
+            <CookieBanner />
             <Toaster richColors position="top-right" />
           </CartProvider>
         </AuthProvider>
