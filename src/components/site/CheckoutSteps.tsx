@@ -17,14 +17,14 @@ export function CheckoutSteps({ current }: { current: CheckoutStep }) {
   return (
     <nav
       aria-label="Checkout progress"
-      className="mb-6 rounded-xl border border-border bg-white px-4 py-3 shadow-sm"
+      className="mb-6 rounded-xl border border-border bg-white px-3 py-2.5 shadow-sm sm:px-4 sm:py-3"
     >
-      <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+      <ol className="flex flex-nowrap items-center gap-x-1.5 overflow-x-auto whitespace-nowrap text-[11px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-x-2 sm:text-sm">
         {STEPS.map((step, idx) => {
           const isCurrent = idx === currentIdx;
           const isDone = idx < currentIdx;
           return (
-            <li key={step.id} className="flex items-center gap-2">
+            <li key={step.id} className="flex shrink-0 items-center gap-1.5 sm:gap-2">
               <span
                 className={cn(
                   "font-medium",
@@ -37,7 +37,7 @@ export function CheckoutSteps({ current }: { current: CheckoutStep }) {
                 {step.label}
               </span>
               {idx < STEPS.length - 1 && (
-                <ChevronRight className="h-4 w-4 text-muted-foreground/60" aria-hidden />
+                <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60 sm:h-4 sm:w-4" aria-hidden />
               )}
             </li>
           );
