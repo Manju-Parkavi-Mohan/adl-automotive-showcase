@@ -1,101 +1,51 @@
+# Multi-step Checkout with Saved Addresses
 
-# Stage 2 — Subdirectory URLs, Per-Language SEO
+## Goals
 
-## Goal
+1. Let signed-in users save multiple billing/shipping addresses on their profile and reuse them at checkout instead of re-typing.
+2. Split checkout into three steps: **Address → Shipping → Payment** (still one page, state-driven).
+3. "Ship to same address" toggle; when off, pick a different saved address for shipping (no separate form to retype).
+4. Breadcrumb renders on a single line on mobile.
 
-Make `/en/*` and `/ar/*` real URLs (not just cookie state), while `/` still serves the default (English) with a canonical pointing to `/en`. Every page gets its own canonical + hreflang alternates + per-language sitemap.
+## Data Storage
 
-## Approach
+Addresses are stored on the WooCommerce customer via `meta_data` under a single key `adl_addresses` whose value is a JSON-serialised array of address objects, each with a stable `id` (uuid). This lets us keep multiple addresses without touching Woo's built-in single `billing`/`shipping` slots (those still get written on order creation for compatibility).
 
-Use TanStack Router's optional prefix segment `{-$lang}`. One route file serves all three shapes:
-- `/products` (root, resolves to detected locale)
-- `/en/products`
-- `/ar/products`
+On first load, if the meta key is empty but the customer has default `billing` populated, we seed the list with that entry so the address book is never blank.
 
-Every existing route moves under `src/routes/{-$lang}/…`. Route paths change from `"/products"` to `"/{-$lang}/products"`. `lang` is validated to `"en" | "ar" | undefined` in each route — anything else throws `notFound()`.
+## Server Functions (new `src/lib/woo/addresses.functions.ts`)
 
-## File moves (mechanical rename)
+- `listMyAddresses()` — returns `SavedAddress[]` for the current session's customer.
+- `saveAddress({ address })` — upserts (id present) or appends (no id); returns updated list.
+- `deleteAddress({ id })` — removes; returns updated list.
 
-```text
-src/routes/
-  __root.tsx                       (unchanged)
-  robots[.]txt.ts                  (unchanged path)
-  sitemap[.]xml.ts                 (rewritten: sitemap index)
-  sitemap-en[.]xml.ts              (new: per-locale)
-  sitemap-ar[.]xml.ts              (new: per-locale)
-  {-$lang}/
-    index.tsx                      (was routes/index.tsx)
-    cart.tsx
-    checkout.tsx
-    account.tsx / account.*.tsx
-    blog.tsx / blog.*.tsx
-    products.tsx / products.*.tsx
-```
+All read/write to `/customers/:id` `meta_data` and require an authenticated session.
 
-## Link + navigate rewrites
+## UI Changes
 
-Every `<Link to="/x">` becomes:
+### `src/components/site/CheckoutSteps.tsx`
+- Replace `flex-wrap` with `flex-nowrap overflow-x-auto` + `whitespace-nowrap` and shrink text/gap on mobile so all six steps fit one line (with hidden scrollbar).
 
-```tsx
-<Link to="/{-$lang}/x" params={(prev) => prev}>
-```
+### `src/routes/{-$lang}/checkout.tsx`
+- Introduce `step` state: `"address" | "shipping" | "payment"`.
+- **Address step**:
+  - Query `listMyAddresses` (only for signed-in users; guests fall back to the current single form).
+  - Render address cards in a 2-col grid with a "+" card to add new.
+  - Selected billing highlighted with primary ring; "Ship to same address" toggle; when off, second card grid to pick shipping.
+  - "Add new address" opens an inline dialog/section with the existing field set; on save calls `saveAddress`.
+  - `Continue to Shipping` disabled until billing (and shipping if separate) selected.
+- **Shipping step**:
+  - Shows chosen addresses (edit link → back to address step) plus a single "Standard Shipping" radio (free / calculated). Free-form since WC shipping-zone selection is out of scope for this iteration.
+  - Back / `Continue to Payment` buttons.
+- **Payment step**:
+  - Existing PayPal buttons; `buildOrder` now uses the selected saved addresses.
+- Guests (not signed in) see the existing single billing form on the address step — no address book.
 
-`params={(prev) => prev}` preserves the current `lang` (undefined at `/`, `"en"` at `/en`, `"ar"` at `/ar`) so the link stays in the same language subtree the user is already browsing. Same shape for `navigate({ to, params })`.
+## Breadcrumb Reference
 
-## Root shell
+Preserve current wording (`Cart › Address › Shipping › Payment › Confirm › Complete`); adjust styles only.
 
-- `RootShell` resolves locale from URL param first (`useParams({ strict: false }).lang`), falling back to loader's detected locale — this makes `<html lang dir>` and `<HeadContent>` match the URL immediately, no client flicker.
-- The root `head()` stops emitting site-wide hreflang links (moves to leaf routes so URLs are correct per page).
+## Out of Scope
 
-## Per-route SEO
-
-Each leaf route's `head()` emits:
-- `<link rel="canonical" href="https://adl.apaarr.com/{lang}{path}">` — canonical is always the language-prefixed URL, even when served at `/path`. Root `/` canonicals to `/en`.
-- `<link rel="alternate" hreflang="en" href=".../en{path}">`
-- `<link rel="alternate" hreflang="ar" href=".../ar{path}">`
-- `<link rel="alternate" hreflang="x-default" href=".../en{path}">`
-- `og:url` self-referencing the language-prefixed URL.
-
-A small helper `buildLocaleLinks(pathTemplate, params)` in `src/i18n/seo.ts` centralizes this so each route just calls it.
-
-## Sitemap
-
-- `sitemap.xml` becomes a **sitemap index** listing `sitemap-en.xml` and `sitemap-ar.xml`.
-- Each per-locale sitemap lists that locale's URLs (home, products index, cart, checkout, blog index, account pages) plus dynamic product / blog slugs pulled from WooCommerce and WordPress, with `<xhtml:link rel="alternate" hreflang="…" />` on every `<url>` entry.
-- The existing WordPress-sitemap proxy moves aside; if we want to keep it, we expose it at `/wp-sitemap.xml`. For now, replace with the app-generated one.
-
-## Language + currency switcher
-
-- Language switcher navigates to the same route with the new `lang` param instead of just writing a cookie (URL is now the source of truth).
-- Currency stays cookie-based (currency isn't a URL concern for SEO).
-
-## Root path (`/`) behavior
-
-Per your Q1 answer: keep serving default English content at `/` AND at `/en`, with `/` canonicalizing to `/en`. No redirect. Same HTML at both URLs; canonical dedupes for Google.
-
-## Out of scope for this pass
-
-- Translated product content (still English from WP until WPML is added).
-- Per-locale Yoast SEO (same reason).
-- 301 redirects for legacy `?lang=…` URLs — the site never used them.
-- Arabic-authored blog posts.
-
-## Risks I'm calling out up-front
-
-- **Bulk sed of Link/navigate calls**: 19 files touched. I'll batch-edit, then verify build + typecheck.
-- **`params={(prev) => prev}`** relies on the parent route also having a `lang` param, which it does with `{-$lang}` at the root of the optional prefix — so preservation works site-wide.
-- **`account.orders.$orderId.tsx`** now has two params (`lang`, `orderId`); the loader already reads `orderId`, that keeps working.
-
-## Delivery order (single turn if you approve)
-
-1. Create `{-$lang}` directory, move all page routes into it via `mv` — one shell call.
-2. sed `createFileRoute("/…")` → `createFileRoute("/{-$lang}/…")` across the moved files.
-3. sed `to="/…"` → `to="/{-$lang}/…"` and add `params={(prev) => prev}` across the 19 caller files.
-4. Add `src/i18n/seo.ts` with `buildLocaleLinks()` and `canonicalFor()`.
-5. Update each leaf route's `head()` to emit canonical + hreflang via the helper.
-6. Rewrite `sitemap[.]xml.ts` as an index; add `sitemap-en[.]xml.ts` and `sitemap-ar[.]xml.ts`.
-7. Update root shell to resolve locale from URL param first.
-8. Update Header language switcher to navigate instead of just cookie-set.
-9. Fix typecheck fallout, restart dev server, verify `/`, `/en`, `/ar/products`, and a product detail all render.
-
-Reply **"go"** to build, or tell me what to change.
+- Real WooCommerce shipping-zone/rate integration (kept as single flat option).
+- Editing an existing saved address inline (delete + add-new covers it for this pass).
