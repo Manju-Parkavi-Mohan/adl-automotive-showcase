@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,14 @@ import { useCart } from "@/components/site/CartProvider";
 import { useAuth } from "@/components/site/AuthProvider";
 import { CheckoutSteps } from "@/components/site/CheckoutSteps";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
+import { Plus, Trash2, Pencil, Check } from "lucide-react";
+import {
+  listMyAddresses,
+  saveAddress,
+  deleteAddress,
+  type SavedAddress,
+} from "@/lib/woo/addresses.functions";
 import {
   createPaymentOrder,
   captureOrder,
@@ -38,6 +46,31 @@ function CheckoutPage() {
   const { t } = useLocale();
   const [ready, setReady] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [step, setStep] = useState<"address" | "shipping" | "payment">("address");
+  const qc = useQueryClient();
+  const isSignedIn = !!user?.customerId;
+
+  // Address book (signed-in users only)
+  const { data: savedAddresses = [], isLoading: loadingAddresses } = useQuery({
+    queryKey: ["my-addresses", user?.customerId ?? 0],
+    queryFn: () => listMyAddresses(),
+    enabled: isSignedIn,
+    staleTime: 30_000,
+  });
+
+  const [selectedBillingId, setSelectedBillingId] = useState<string | null>(null);
+  const [selectedShippingId, setSelectedShippingId] = useState<string | null>(null);
+  const [shipToSame, setShipToSame] = useState(true);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [addTarget, setAddTarget] = useState<"billing" | "shipping">("billing");
+
+  // Auto-select first address once loaded
+  useEffect(() => {
+    if (!isSignedIn) return;
+    if (savedAddresses.length > 0 && !selectedBillingId) {
+      setSelectedBillingId(savedAddresses[0].id);
+    }
+  }, [isSignedIn, savedAddresses, selectedBillingId]);
 
   const [form, setForm] = useState({
     first_name: user?.firstName ?? "",
@@ -56,7 +89,7 @@ function CheckoutPage() {
   const update = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  const missing =
+  const guestFormMissing =
     !form.first_name ||
     !form.last_name ||
     !form.email ||
@@ -64,6 +97,78 @@ function CheckoutPage() {
     !form.city ||
     !form.postcode ||
     form.country.length !== 2;
+
+  // Selected billing / shipping address objects
+  const billingAddr = useMemo(
+    () => savedAddresses.find((a) => a.id === selectedBillingId) ?? null,
+    [savedAddresses, selectedBillingId],
+  );
+  const shippingAddr = useMemo(
+    () =>
+      shipToSame
+        ? billingAddr
+        : savedAddresses.find((a) => a.id === selectedShippingId) ?? null,
+    [savedAddresses, selectedShippingId, shipToSame, billingAddr],
+  );
+
+  const currentStep: "address" | "shipping" | "payment" = step;
+  const stepLabel = currentStep === "payment" ? "payment" : currentStep;
+
+  const addressStepValid = isSignedIn
+    ? !!billingAddr && (shipToSame || !!shippingAddr)
+    : !guestFormMissing;
+
+  // Build order payload from whichever mode is active
+  const buildOrderPayload = () => {
+    if (isSignedIn && billingAddr) {
+      const bill = {
+        first_name: billingAddr.first_name,
+        last_name: billingAddr.last_name,
+        address_1: billingAddr.address_1,
+        address_2: billingAddr.address_2 ?? "",
+        city: billingAddr.city,
+        state: billingAddr.state ?? "",
+        postcode: billingAddr.postcode,
+        country: billingAddr.country,
+        email: billingAddr.email || user?.email || "",
+        phone: billingAddr.phone ?? "",
+      };
+      const ship = shipToSame || !shippingAddr ? bill : {
+        first_name: shippingAddr.first_name,
+        last_name: shippingAddr.last_name,
+        address_1: shippingAddr.address_1,
+        address_2: shippingAddr.address_2 ?? "",
+        city: shippingAddr.city,
+        state: shippingAddr.state ?? "",
+        postcode: shippingAddr.postcode,
+        country: shippingAddr.country,
+        email: shippingAddr.email || user?.email || "",
+        phone: shippingAddr.phone ?? "",
+      };
+      return {
+        items: items.map((i) => ({ product_id: i.productId, quantity: i.quantity })),
+        billing: bill,
+        shipping: ship,
+        customer_note: form.note || undefined,
+      };
+    }
+    return {
+      items: items.map((i) => ({ product_id: i.productId, quantity: i.quantity })),
+      billing: {
+        first_name: form.first_name,
+        last_name: form.last_name,
+        address_1: form.address_1,
+        address_2: form.address_2,
+        city: form.city,
+        state: form.state,
+        postcode: form.postcode,
+        country: form.country,
+        email: form.email,
+        phone: form.phone,
+      },
+      customer_note: form.note || undefined,
+    };
+  };
 
   if (items.length === 0) {
     return (
@@ -82,32 +187,75 @@ function CheckoutPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container-px mx-auto max-w-[1400px] py-12">
-        <CheckoutSteps current="payment" />
+        <CheckoutSteps current={stepLabel} />
         <h1 className="text-3xl font-bold tracking-tight">{t("checkout.title")}</h1>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
-          <div className="space-y-6 rounded-xl border border-border bg-white p-6">
-            <h2 className="text-lg font-semibold">{t("checkout.billing")}</h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label={t("checkout.firstName")} required><Input required value={form.first_name} onChange={update("first_name")} /></Field>
-              <Field label={t("checkout.lastName")} required><Input required value={form.last_name} onChange={update("last_name")} /></Field>
-              <Field label={t("checkout.email")} required><Input type="email" required value={form.email} onChange={update("email")} /></Field>
-              <Field label={t("checkout.phone")}><Input value={form.phone} onChange={update("phone")} /></Field>
-              <Field label={t("checkout.address1")} required className="sm:col-span-2"><Input required value={form.address_1} onChange={update("address_1")} /></Field>
-              <Field label={t("checkout.address2")} className="sm:col-span-2"><Input value={form.address_2} onChange={update("address_2")} /></Field>
-              <Field label={t("checkout.city")} required><Input required value={form.city} onChange={update("city")} /></Field>
-              <Field label={t("checkout.state")}><Input value={form.state} onChange={update("state")} /></Field>
-              <Field label={t("checkout.postcode")} required><Input required value={form.postcode} onChange={update("postcode")} /></Field>
-              <Field label={t("checkout.country")} required><Input required maxLength={2} value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value.toUpperCase() }))} /></Field>
-            </div>
-            <Field label={t("checkout.note")}>
-              <textarea
-                value={form.note}
-                onChange={update("note")}
-                rows={3}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+          <div className="space-y-6">
+            {step === "address" && (
+              <AddressStep
+                isSignedIn={isSignedIn}
+                loading={loadingAddresses}
+                addresses={savedAddresses}
+                selectedBillingId={selectedBillingId}
+                setSelectedBillingId={setSelectedBillingId}
+                selectedShippingId={selectedShippingId}
+                setSelectedShippingId={setSelectedShippingId}
+                shipToSame={shipToSame}
+                setShipToSame={setShipToSame}
+                onAddClick={(target) => {
+                  setAddTarget(target);
+                  setShowAddForm(true);
+                }}
+                showAddForm={showAddForm}
+                onCloseForm={() => setShowAddForm(false)}
+                onSaved={(list, newest) => {
+                  qc.setQueryData(["my-addresses", user?.customerId ?? 0], list);
+                  if (newest) {
+                    if (addTarget === "billing") setSelectedBillingId(newest.id);
+                    else setSelectedShippingId(newest.id);
+                  }
+                  setShowAddForm(false);
+                }}
+                onDeleted={(list) =>
+                  qc.setQueryData(["my-addresses", user?.customerId ?? 0], list)
+                }
+                defaults={{
+                  first_name: user?.firstName ?? "",
+                  last_name: user?.lastName ?? "",
+                  email: user?.email ?? "",
+                }}
+                guestForm={form}
+                updateGuestForm={(k) => update(k as keyof typeof form)}
+                setGuestCountry={(v) => setForm((f) => ({ ...f, country: v.toUpperCase() }))}
+                note={form.note}
+                onNoteChange={update("note")}
               />
-            </Field>
+            )}
+
+            {step === "shipping" && (
+              <ShippingStep
+                billing={billingAddr}
+                shipping={shippingAddr}
+                shipToSame={shipToSame}
+                isSignedIn={isSignedIn}
+                guestForm={form}
+                onBack={() => setStep("address")}
+                note={form.note}
+                onNoteChange={update("note")}
+              />
+            )}
+
+            {step === "payment" && (
+              <PaymentSummary
+                billing={billingAddr}
+                shipping={shippingAddr}
+                shipToSame={shipToSame}
+                isSignedIn={isSignedIn}
+                guestForm={form}
+                onBack={() => setStep("shipping")}
+              />
+            )}
           </div>
 
           <aside className="h-fit space-y-4 rounded-xl border border-border bg-secondary p-6">
@@ -123,60 +271,62 @@ function CheckoutPage() {
             <div className="my-2 h-px bg-border" />
             <div className="flex justify-between text-sm"><span className="text-muted-foreground">{t("cart.subtotal")}</span><Money usd={subtotal} className="font-medium" /></div>
             <div className="flex justify-between text-base font-bold"><span>{t("cart.total")}</span><Money usd={subtotal} /></div>
-            <label className="flex items-start gap-2 rounded-md border border-border bg-white p-3 text-xs text-foreground">
-              <Checkbox
-                checked={termsAccepted}
-                onCheckedChange={(v) => setTermsAccepted(v === true)}
-                className="mt-0.5"
-                aria-label="Accept terms and conditions"
-              />
-              <span>
-                I have read and agree to the{" "}
-                <Link to="/{-$lang}/terms" target="_blank" className="font-medium text-primary underline underline-offset-2">
-                  Terms &amp; Conditions
-                </Link>
-                .
-              </span>
-            </label>
-            {missing ? (
-              <p className="text-xs text-muted-foreground">
-                Please complete the billing details to enable payment.
-              </p>
-            ) : !termsAccepted ? (
-              <p className="text-xs text-muted-foreground">
-                Please accept the Terms &amp; Conditions to continue with payment.
-              </p>
-            ) : (
-              <PayPalButtons
-                buildOrder={() => ({
-                  items: items.map((i) => ({ product_id: i.productId, quantity: i.quantity })),
-                  billing: {
-                    first_name: form.first_name,
-                    last_name: form.last_name,
-                    address_1: form.address_1,
-                    address_2: form.address_2,
-                    city: form.city,
-                    state: form.state,
-                    postcode: form.postcode,
-                    country: form.country,
-                    email: form.email,
-                    phone: form.phone,
-                  },
-                  customer_note: form.note || undefined,
-                })}
-                total={subtotal}
-                onCaptured={(res) => {
-                  clear();
-                  navigate({
-                    to: "/{-$lang}/checkout/return",
-                    search: { status: "success", order_id: res.wcOrderId, order_key: "" },
-                  }).catch(() => {});
-                }}
-                onReady={() => setReady(true)}
-              />
+
+            {step === "address" && (
+              <Button
+                className="mt-2 w-full"
+                disabled={!addressStepValid}
+                onClick={() => setStep("shipping")}
+              >
+                Continue to Shipping
+              </Button>
             )}
-            {!ready && !missing && (
-              <p className="text-xs text-muted-foreground">Loading PayPal…</p>
+
+            {step === "shipping" && (
+              <Button className="mt-2 w-full" onClick={() => setStep("payment")}>
+                Continue to Payment
+              </Button>
+            )}
+
+            {step === "payment" && (
+              <>
+                <label className="flex items-start gap-2 rounded-md border border-border bg-white p-3 text-xs text-foreground">
+                  <Checkbox
+                    checked={termsAccepted}
+                    onCheckedChange={(v) => setTermsAccepted(v === true)}
+                    className="mt-0.5"
+                    aria-label="Accept terms and conditions"
+                  />
+                  <span>
+                    I have read and agree to the{" "}
+                    <Link to="/{-$lang}/terms" target="_blank" className="font-medium text-primary underline underline-offset-2">
+                      Terms &amp; Conditions
+                    </Link>
+                    .
+                  </span>
+                </label>
+                {!termsAccepted ? (
+                  <p className="text-xs text-muted-foreground">
+                    Please accept the Terms &amp; Conditions to continue with payment.
+                  </p>
+                ) : (
+                  <PayPalButtons
+                    buildOrder={buildOrderPayload}
+                    total={subtotal}
+                    onCaptured={(res) => {
+                      clear();
+                      navigate({
+                        to: "/{-$lang}/checkout/return",
+                        search: { status: "success", order_id: res.wcOrderId, order_key: "" },
+                      }).catch(() => {});
+                    }}
+                    onReady={() => setReady(true)}
+                  />
+                )}
+                {!ready && termsAccepted && (
+                  <p className="text-xs text-muted-foreground">Loading PayPal…</p>
+                )}
+              </>
             )}
           </aside>
         </div>
@@ -193,6 +343,493 @@ function Field({ label, required, children, className }: { label: string; requir
         {label}{required && <span className="text-destructive"> *</span>}
       </Label>
       {children}
+    </div>
+  );
+}
+
+// ------------- Address Step -------------
+
+function AddressCard({
+  addr,
+  selected,
+  onSelect,
+  onDelete,
+  disabled,
+}: {
+  addr: SavedAddress;
+  selected: boolean;
+  onSelect: () => void;
+  onDelete: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={
+        "relative rounded-lg border p-4 text-left transition " +
+        (selected
+          ? "border-primary ring-2 ring-primary/40 bg-primary/5"
+          : "border-border bg-white hover:border-primary/60")
+      }
+      disabled={disabled}
+    >
+      {selected && (
+        <span className="absolute end-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
+          <Check className="h-3.5 w-3.5" />
+        </span>
+      )}
+      <p className="font-semibold">
+        {addr.first_name} {addr.last_name}
+      </p>
+      {addr.email && <p className="mt-0.5 text-xs text-muted-foreground">{addr.email}</p>}
+      {addr.phone && <p className="text-xs text-muted-foreground">{addr.phone}</p>}
+      <p className="mt-2 text-sm text-foreground/80">{addr.address_1}</p>
+      {addr.address_2 && <p className="text-sm text-foreground/80">{addr.address_2}</p>}
+      <p className="text-sm text-foreground/80">
+        {addr.city}
+        {addr.state ? `, ${addr.state}` : ""} {addr.postcode}
+      </p>
+      <p className="text-sm text-foreground/80">{addr.country}</p>
+      <span
+        role="button"
+        tabIndex={0}
+        aria-label="Delete address"
+        onClick={(e) => {
+          e.stopPropagation();
+          if (confirm("Delete this address?")) onDelete();
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.stopPropagation();
+            if (confirm("Delete this address?")) onDelete();
+          }
+        }}
+        className="absolute bottom-3 end-3 inline-flex cursor-pointer items-center rounded-md p-1.5 text-muted-foreground hover:bg-secondary hover:text-destructive"
+      >
+        <Trash2 className="h-3.5 w-3.5" />
+      </span>
+    </button>
+  );
+}
+
+function AddButtonCard({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="grid min-h-[140px] place-items-center rounded-lg border border-dashed border-border bg-white p-4 text-muted-foreground hover:border-primary hover:text-primary"
+    >
+      <div className="flex flex-col items-center gap-1">
+        <Plus className="h-6 w-6" />
+        <span className="text-sm font-medium">Add new address</span>
+      </div>
+    </button>
+  );
+}
+
+function AddressStep(props: {
+  isSignedIn: boolean;
+  loading: boolean;
+  addresses: SavedAddress[];
+  selectedBillingId: string | null;
+  setSelectedBillingId: (id: string) => void;
+  selectedShippingId: string | null;
+  setSelectedShippingId: (id: string) => void;
+  shipToSame: boolean;
+  setShipToSame: (v: boolean) => void;
+  onAddClick: (target: "billing" | "shipping") => void;
+  showAddForm: boolean;
+  onCloseForm: () => void;
+  onSaved: (list: SavedAddress[], newest?: SavedAddress) => void;
+  onDeleted: (list: SavedAddress[]) => void;
+  defaults: { first_name: string; last_name: string; email: string };
+  guestForm: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    address_1: string;
+    address_2: string;
+    city: string;
+    state: string;
+    postcode: string;
+    country: string;
+    phone: string;
+    note: string;
+  };
+  updateGuestForm: (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  setGuestCountry: (v: string) => void;
+  note: string;
+  onNoteChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+}) {
+  const {
+    isSignedIn,
+    loading,
+    addresses,
+    selectedBillingId,
+    setSelectedBillingId,
+    selectedShippingId,
+    setSelectedShippingId,
+    shipToSame,
+    setShipToSame,
+    onAddClick,
+    showAddForm,
+    onCloseForm,
+    onSaved,
+    onDeleted,
+    defaults,
+    guestForm,
+    updateGuestForm,
+    setGuestCountry,
+  } = props;
+
+  if (!isSignedIn) {
+    return (
+      <div className="space-y-6 rounded-xl border border-border bg-white p-6">
+        <div>
+          <h2 className="text-lg font-semibold">Billing details</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            <Link to="/{-$lang}/account/login" className="text-primary underline underline-offset-2">
+              Sign in
+            </Link>{" "}
+            to save this address to your profile for next time.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="First name" required><Input required value={guestForm.first_name} onChange={updateGuestForm("first_name")} /></Field>
+          <Field label="Last name" required><Input required value={guestForm.last_name} onChange={updateGuestForm("last_name")} /></Field>
+          <Field label="Email" required><Input type="email" required value={guestForm.email} onChange={updateGuestForm("email")} /></Field>
+          <Field label="Phone"><Input value={guestForm.phone} onChange={updateGuestForm("phone")} /></Field>
+          <Field label="Address" required className="sm:col-span-2"><Input required value={guestForm.address_1} onChange={updateGuestForm("address_1")} /></Field>
+          <Field label="Apartment, suite, etc." className="sm:col-span-2"><Input value={guestForm.address_2} onChange={updateGuestForm("address_2")} /></Field>
+          <Field label="City" required><Input required value={guestForm.city} onChange={updateGuestForm("city")} /></Field>
+          <Field label="State / Region"><Input value={guestForm.state} onChange={updateGuestForm("state")} /></Field>
+          <Field label="Postcode" required><Input required value={guestForm.postcode} onChange={updateGuestForm("postcode")} /></Field>
+          <Field label="Country (2-letter)" required>
+            <Input required maxLength={2} value={guestForm.country} onChange={(e) => setGuestCountry(e.target.value)} />
+          </Field>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-xl border border-border bg-white p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold">Select billing address</h2>
+          <label className="flex items-center gap-2 text-sm font-medium">
+            Ship to same address
+            <Switch checked={shipToSame} onCheckedChange={setShipToSame} />
+          </label>
+        </div>
+
+        {loading ? (
+          <p className="mt-4 text-sm text-muted-foreground">Loading your addresses…</p>
+        ) : (
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {addresses.map((a) => (
+              <AddressCard
+                key={a.id}
+                addr={a}
+                selected={selectedBillingId === a.id}
+                onSelect={() => setSelectedBillingId(a.id)}
+                onDelete={async () => {
+                  try {
+                    const list = await deleteAddress({ data: { id: a.id } });
+                    onDeleted(list);
+                    toast.success("Address removed");
+                  } catch (err) {
+                    toast.error(err instanceof Error ? err.message : "Failed to delete");
+                  }
+                }}
+              />
+            ))}
+            <AddButtonCard onClick={() => onAddClick("billing")} />
+          </div>
+        )}
+      </div>
+
+      {!shipToSame && (
+        <div className="rounded-xl border border-border bg-white p-6">
+          <h2 className="text-lg font-semibold">Select shipping address</h2>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {addresses.map((a) => (
+              <AddressCard
+                key={a.id}
+                addr={a}
+                selected={selectedShippingId === a.id}
+                onSelect={() => setSelectedShippingId(a.id)}
+                onDelete={async () => {
+                  try {
+                    const list = await deleteAddress({ data: { id: a.id } });
+                    onDeleted(list);
+                  } catch (err) {
+                    toast.error(err instanceof Error ? err.message : "Failed to delete");
+                  }
+                }}
+              />
+            ))}
+            <AddButtonCard onClick={() => onAddClick("shipping")} />
+          </div>
+        </div>
+      )}
+
+      {showAddForm && (
+        <AddAddressForm
+          defaults={defaults}
+          onCancel={onCloseForm}
+          onSaved={onSaved}
+        />
+      )}
+    </div>
+  );
+}
+
+function AddAddressForm({
+  defaults,
+  onCancel,
+  onSaved,
+}: {
+  defaults: { first_name: string; last_name: string; email: string };
+  onCancel: () => void;
+  onSaved: (list: SavedAddress[], newest?: SavedAddress) => void;
+}) {
+  const [f, setF] = useState({
+    label: "",
+    first_name: defaults.first_name || "",
+    last_name: defaults.last_name || "",
+    email: defaults.email || "",
+    phone: "",
+    address_1: "",
+    address_2: "",
+    city: "",
+    state: "",
+    postcode: "",
+    country: "US",
+  });
+  const mut = useMutation({
+    mutationFn: async () => saveAddress({ data: { address: f } }),
+    onSuccess: (list) => {
+      const newest = list[list.length - 1];
+      toast.success("Address saved");
+      onSaved(list, newest);
+    },
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Failed to save"),
+  });
+  const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setF((prev) => ({ ...prev, [k]: k === "country" ? e.target.value.toUpperCase() : e.target.value }));
+
+  return (
+    <div className="rounded-xl border border-border bg-white p-6">
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold">Add new address</h3>
+        <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>
+      </div>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <Field label="Label (optional)" className="sm:col-span-2"><Input placeholder="Home, Office…" value={f.label} onChange={set("label")} /></Field>
+        <Field label="First name" required><Input value={f.first_name} onChange={set("first_name")} /></Field>
+        <Field label="Last name" required><Input value={f.last_name} onChange={set("last_name")} /></Field>
+        <Field label="Email"><Input type="email" value={f.email} onChange={set("email")} /></Field>
+        <Field label="Phone"><Input value={f.phone} onChange={set("phone")} /></Field>
+        <Field label="Address" required className="sm:col-span-2"><Input value={f.address_1} onChange={set("address_1")} /></Field>
+        <Field label="Apartment, suite, etc." className="sm:col-span-2"><Input value={f.address_2} onChange={set("address_2")} /></Field>
+        <Field label="City" required><Input value={f.city} onChange={set("city")} /></Field>
+        <Field label="State / Region"><Input value={f.state} onChange={set("state")} /></Field>
+        <Field label="Postcode" required><Input value={f.postcode} onChange={set("postcode")} /></Field>
+        <Field label="Country (2-letter)" required><Input maxLength={2} value={f.country} onChange={set("country")} /></Field>
+      </div>
+      <div className="mt-4 flex justify-end gap-2">
+        <Button variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button
+          onClick={() => mut.mutate()}
+          disabled={
+            mut.isPending ||
+            !f.first_name ||
+            !f.last_name ||
+            !f.address_1 ||
+            !f.city ||
+            !f.postcode ||
+            f.country.length !== 2
+          }
+        >
+          {mut.isPending ? "Saving…" : "Save address"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function AddressPreview({ title, addr, guestForm, isSignedIn, onEdit }: {
+  title: string;
+  addr: SavedAddress | null;
+  guestForm: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    address_1: string;
+    address_2: string;
+    city: string;
+    state: string;
+    postcode: string;
+    country: string;
+    phone: string;
+  };
+  isSignedIn: boolean;
+  onEdit: () => void;
+}) {
+  const src = isSignedIn && addr ? addr : {
+    id: "guest",
+    first_name: guestForm.first_name,
+    last_name: guestForm.last_name,
+    email: guestForm.email,
+    phone: guestForm.phone,
+    address_1: guestForm.address_1,
+    address_2: guestForm.address_2,
+    city: guestForm.city,
+    state: guestForm.state,
+    postcode: guestForm.postcode,
+    country: guestForm.country,
+  } as SavedAddress;
+  return (
+    <div className="rounded-xl border border-border bg-white p-6">
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold">{title}</h3>
+        <button onClick={onEdit} className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
+          <Pencil className="h-3.5 w-3.5" /> Edit
+        </button>
+      </div>
+      <div className="mt-3 text-sm text-foreground/80">
+        <p className="font-medium text-foreground">{src.first_name} {src.last_name}</p>
+        {src.email && <p className="text-xs text-muted-foreground">{src.email}</p>}
+        {src.phone && <p className="text-xs text-muted-foreground">{src.phone}</p>}
+        <p className="mt-1">{src.address_1}</p>
+        {src.address_2 && <p>{src.address_2}</p>}
+        <p>{src.city}{src.state ? `, ${src.state}` : ""} {src.postcode}</p>
+        <p>{src.country}</p>
+      </div>
+    </div>
+  );
+}
+
+function ShippingStep({
+  billing,
+  shipping,
+  shipToSame,
+  isSignedIn,
+  guestForm,
+  onBack,
+  note,
+  onNoteChange,
+}: {
+  billing: SavedAddress | null;
+  shipping: SavedAddress | null;
+  shipToSame: boolean;
+  isSignedIn: boolean;
+  guestForm: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    address_1: string;
+    address_2: string;
+    city: string;
+    state: string;
+    postcode: string;
+    country: string;
+    phone: string;
+  };
+  onBack: () => void;
+  note: string;
+  onNoteChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+}) {
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-2">
+        <AddressPreview title="Billing address" addr={billing} guestForm={guestForm} isSignedIn={isSignedIn} onEdit={onBack} />
+        <AddressPreview
+          title={shipToSame ? "Shipping (same as billing)" : "Shipping address"}
+          addr={shipToSame ? billing : shipping}
+          guestForm={guestForm}
+          isSignedIn={isSignedIn}
+          onEdit={onBack}
+        />
+      </div>
+
+      <div className="rounded-xl border border-border bg-white p-6">
+        <h2 className="text-lg font-semibold">Shipping method</h2>
+        <div className="mt-4 space-y-3">
+          <label className="flex cursor-pointer items-center justify-between rounded-lg border border-primary bg-primary/5 p-4">
+            <div className="flex items-center gap-3">
+              <input type="radio" name="shipping" defaultChecked className="h-4 w-4 accent-primary" />
+              <div>
+                <p className="font-medium">Standard Shipping</p>
+                <p className="text-xs text-muted-foreground">Calculated with your order — typically 3–7 business days worldwide.</p>
+              </div>
+            </div>
+            <span className="text-sm font-semibold">Calculated at checkout</span>
+          </label>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-border bg-white p-6">
+        <Field label="Order note (optional)">
+          <textarea
+            value={note}
+            onChange={onNoteChange}
+            rows={3}
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+          />
+        </Field>
+      </div>
+
+      <div className="flex justify-between">
+        <Button variant="outline" onClick={onBack}>Back to address</Button>
+      </div>
+    </div>
+  );
+}
+
+function PaymentSummary({
+  billing,
+  shipping,
+  shipToSame,
+  isSignedIn,
+  guestForm,
+  onBack,
+}: {
+  billing: SavedAddress | null;
+  shipping: SavedAddress | null;
+  shipToSame: boolean;
+  isSignedIn: boolean;
+  guestForm: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    address_1: string;
+    address_2: string;
+    city: string;
+    state: string;
+    postcode: string;
+    country: string;
+    phone: string;
+  };
+  onBack: () => void;
+}) {
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-2">
+        <AddressPreview title="Billing address" addr={billing} guestForm={guestForm} isSignedIn={isSignedIn} onEdit={onBack} />
+        <AddressPreview
+          title={shipToSame ? "Shipping (same as billing)" : "Shipping address"}
+          addr={shipToSame ? billing : shipping}
+          guestForm={guestForm}
+          isSignedIn={isSignedIn}
+          onEdit={onBack}
+        />
+      </div>
+      <div className="flex justify-between">
+        <Button variant="outline" onClick={onBack}>Back to shipping</Button>
+      </div>
     </div>
   );
 }
