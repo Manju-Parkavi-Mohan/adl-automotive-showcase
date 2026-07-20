@@ -12,22 +12,14 @@ export function Footer() {
     queryFn: () => listCategories({ data: { perPage: 50, parent: 0, hideEmpty: true } }),
     staleTime: 5 * 60_000,
   });
-  const COLS = [
-    { title: t("footer.colCompany"), links: ["About ADL Automotive", "Our Story", "Partners", "Blog"] },
-    {
-      title: t("footer.colAccount"),
-      links: [
-        { label: "Orders", to: "/{-$lang}/account", search: { tab: "orders" } },
-        { label: "Address", to: "/{-$lang}/account", search: { tab: "addresses" } },
-        { label: "Shopping Cart", to: "/{-$lang}/cart" },
-        { label: "Wishlist", to: "/{-$lang}/account/wishlist" },
-      ],
-    },
-    {
-      title: t("footer.colService"),
-      links: ["Shipping & Returns", "Warranty", "Technical Support", "Terms of Service"],
-    },
+  const companyLinks: string[] = ["About ADL Automotive", "Our Story", "Partners", "Blog"];
+  const accountLinks: Array<{ label: string; to: string; search?: Record<string, string> }> = [
+    { label: "Orders", to: "/{-$lang}/account", search: { tab: "orders" } },
+    { label: "Address", to: "/{-$lang}/account", search: { tab: "addresses" } },
+    { label: "Shopping Cart", to: "/{-$lang}/cart" },
+    { label: "Wishlist", to: "/{-$lang}/account/wishlist" },
   ];
+  const serviceLinks: string[] = ["Shipping & Returns", "Warranty", "Technical Support", "Terms of Service"];
   return (
     <footer className="mt-24 border-t border-border bg-[#0B2742] text-white/80">
       <div className="container-px mx-auto max-w-[1400px] py-16">
@@ -74,10 +66,10 @@ export function Footer() {
           </div>
 
           {/* Company column */}
-          <div key={COLS[0].title}>
-            <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">{COLS[0].title}</h4>
+          <div>
+            <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">{t("footer.colCompany")}</h4>
             <ul className="space-y-2.5 text-sm">
-              {COLS[0].links.map((l) => (
+              {companyLinks.map((l) => (
                 <li key={l}>
                   <a href="#" className="text-white/70 transition-colors hover:text-white">
                     {l}
@@ -112,9 +104,9 @@ export function Footer() {
           <div>
             <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">{t("footer.colAccount")}</h4>
             <ul className="space-y-2.5 text-sm">
-              {COLS[1].links.map((l) => (
+              {accountLinks.map((l) => (
                 <li key={l.label}>
-                  <Link to={l.to} search={l.search} className="text-white/70 transition-colors hover:text-white">
+                  <Link to={l.to} search={l.search ?? {}} className="text-white/70 transition-colors hover:text-white">
                     {l.label}
                   </Link>
                 </li>
@@ -122,10 +114,10 @@ export function Footer() {
             </ul>
           </div>
 
-          <div key={COLS[2].title}>
-            <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">{COLS[2].title}</h4>
+          <div>
+            <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">{t("footer.colService")}</h4>
             <ul className="space-y-2.5 text-sm">
-              {COLS[2].links.map((l) => (
+              {serviceLinks.map((l) => (
                 <li key={l}>
                   <a href="#" className="text-white/70 transition-colors hover:text-white">
                     {l}
