@@ -8,10 +8,10 @@ import { useLocale } from "@/i18n/LocaleProvider";
 export function Footer() {
   const { t } = useLocale();
   const { data: footerCategories, isLoading: categoriesLoading } = useQuery({
-queryKey: ["wc-categories-footer"],
-     queryFn: () => listCategories({ data: { perPage: 50, parent: 0, hideEmpty: true } }),
-     staleTime: 5 * 60_000,
-+   });
+      queryKey: ["wc-categories-footer"],
+      queryFn: () => listCategories({ data: { perPage: 50, parent: 0, hideEmpty: true } }),
+      staleTime: 5 * 60_000,
+   });
   const COLS = [
     { title: t("footer.colCompany"), links: ["About ADL Automotive", "Our Story", "Partners", "Blog"] },
     { title: t("footer.colAccount"), links: ["Orders", "Address", "Shopping Cart", "Wishlist"] },
