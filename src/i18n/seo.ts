@@ -2,10 +2,11 @@ import { SUPPORTED_LOCALES, DEFAULT_LOCALE, type Locale } from "./config";
 
 export const SITE_URL = "https://adl.apaarr.com";
 
-/** Build a language-prefixed absolute URL. Always includes a locale segment (canonical form). */
+/** Build a language-prefixed absolute URL. Default locale is unprefixed. */
 export function langUrl(locale: Locale, cleanPath: string): string {
   const p = cleanPath === "/" ? "" : cleanPath.replace(/\/+$/, "");
-  return `${SITE_URL}/${locale}${p}`;
+  const prefix = locale === DEFAULT_LOCALE ? "" : `/${locale}`;
+  return `${SITE_URL}${prefix}${p}`;
 }
 
 /** hreflang + canonical `<link>` entries for a given clean pathname (no lang prefix). */
