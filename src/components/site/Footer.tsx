@@ -1,22 +1,19 @@
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { listCategories } from "@/lib/woo/categories.functions";
 import { Facebook, Instagram, Linkedin, Youtube, Mail, Phone, MapPin } from "lucide-react";
 import adlLogo from "@/assets/adl-logo-new.png.asset.json";
 import { useLocale } from "@/i18n/LocaleProvider";
 
 export function Footer() {
   const { t } = useLocale();
+  const { data: footerCategories, isLoading: categoriesLoading } = useQuery({
+queryKey: ["wc-categories-footer"],
+     queryFn: () => listCategories({ data: { perPage: 50, parent: 0, hideEmpty: true } }),
+     staleTime: 5 * 60_000,
++   });
   const COLS = [
     { title: t("footer.colCompany"), links: ["About ADL Automotive", "Our Story", "Partners", "Blog"] },
-    {
-      title: t("footer.colCategories"),
-      links: [
-        "Diagnostic Tools",
-        "ECU Programming",
-        "Tuning Software",
-        "Workshop Equipment",
-        "Key Programmers",
-        "OBD Adapters",
-      ],
-    },
     { title: t("footer.colAccount"), links: ["Orders", "Address", "Shopping Cart", "Wishlist"] },
     {
       title: t("footer.colService"),
@@ -68,21 +65,53 @@ export function Footer() {
             </ul>
           </div>
 
-          {COLS.map((col) => (
-            <div key={col.title}>
-              <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">{col.title}</h4>
-              <ul className="space-y-2.5 text-sm">
-                {col.links.map((l) => (
-                  <li key={l}>
-                    <a href="#" className="text-white/70 transition-colors hover:text-white">
-                      {l}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+          {/* Company column */}
+<div key={COLS[0].title}>
+  <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">{COLS[0].title}</h4>
+  <ul className="space-y-2.5 text-sm">
+    {COLS[0].links.map((l) => (
+      <li key={l}>
+        <a href="#" className="text-white/70 transition-colors hover:text-white">{l}</a>
+      </li>
+    ))}
+  </ul>
+</div>
+
+          {/* Categories column — now dynamic */}
+<div>
+  <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">{t("footer.colCategories")}</h4>
+  <ul className="space-y-2.5 text-sm">
+    {categoriesLoading
+      ? Array.from({ length: 5 }).map((_, i) => (
+          <li key={i} className="h-4 w-24 animate-pulse rounded bg-white/10" />
+        ))
+      : (footerCategories ?? []).map((c) => (
+          <li key={c.id}>
+            <Link
+              to="/{-$lang}/products"
+              search={{ category: String(c.id) }}
+              className="text-white/70 transition-colors hover:text-white"
+            >
+              {c.name}
+            </Link>
+          </li>
+        ))}
+  </ul>
+</div>
+
+{/* Account + Service columns unchanged, still static */}
+{COLS.slice(1).map((col) => (
+  <div key={col.title}>
+    <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">{col.title}</h4>
+    <ul className="space-y-2.5 text-sm">
+      {col.links.map((l) => (
+        <li key={l}>
+          <a href="#" className="text-white/70 transition-colors hover:text-white">{l}</a>
+        </li>
+      ))}
+    </ul>
+  </div>
+))}
 
         {/* Bottom bar */}
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-white/60 sm:flex-row">
