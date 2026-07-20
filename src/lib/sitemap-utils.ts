@@ -13,9 +13,6 @@ export async function buildSitemapEntries(): Promise<SitemapEntry[]> {
     { path: "/", changefreq: "daily", priority: "1.0" },
     { path: "/products", changefreq: "daily", priority: "0.9" },
     { path: "/blog", changefreq: "weekly", priority: "0.7" },
-    { path: "/cart", changefreq: "monthly", priority: "0.3" },
-    { path: "/account/login", changefreq: "monthly", priority: "0.3" },
-    { path: "/account/register", changefreq: "monthly", priority: "0.3" },
   ];
   try {
     const products = await listProducts({ data: { perPage: 100 } });

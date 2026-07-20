@@ -80,10 +80,12 @@ export function LocaleProvider({
         if (typeof window !== "undefined") {
           // Navigate to the language-prefixed URL so the locale is reflected in
           // the URL (canonical + shareable). Strip any existing /en or /ar prefix.
+          // Default locale uses unprefixed URLs, matching internal links.
           const path = window.location.pathname.replace(/^\/(en|ar)(?=\/|$)/, "") || "/";
           const search = window.location.search;
           const hash = window.location.hash;
-          window.location.assign(`/${l}${path === "/" ? "" : path}${search}${hash}` || "/");
+          const prefix = l === DEFAULT_LOCALE ? "" : `/${l}`;
+          window.location.assign(`${prefix}${path === "/" ? "" : path}${search}${hash}` || "/");
         }
       },
       setCurrency: (c) => {
