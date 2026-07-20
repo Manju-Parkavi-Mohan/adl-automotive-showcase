@@ -173,18 +173,32 @@ function ProductDetailPage() {
 
   const handleShare = async () => {
     const url = typeof window !== "undefined" ? window.location.href : "";
+    const nav = typeof navigator !== "undefined" ? navigator : undefined;
+    if (nav?.share) {
+      try {
+        await nav.share({ title: product.name, url });
+        return;
+      } catch (err) {
+        if ((err as DOMException)?.name === "AbortError") return;
+        // fall through to clipboard fallback
+      }
+    }
     try {
-      if (typeof navigator !== "undefined" && (navigator as Navigator).share) {
-        await (navigator as Navigator).share({ title: product.name, url });
-        return;
+      if (nav?.clipboard?.writeText) {
+        await nav.clipboard.writeText(url);
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = url;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
       }
-      if (typeof navigator !== "undefined" && navigator.clipboard) {
-        await navigator.clipboard.writeText(url);
-        toast.success("Link copied to clipboard");
-        return;
-      }
+      toast.success("Link copied to clipboard");
     } catch {
-      // user cancelled or failed
+      toast.error("Unable to share link");
     }
   };
 
