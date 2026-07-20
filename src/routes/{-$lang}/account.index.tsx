@@ -71,9 +71,9 @@ function money(value: number | string, currency = "USD") {
 }
 
 function AccountPage() {
+  const navigate = useNavigate();
   const { user, isLoading, setUser } = useAuth();
   const { tab: initialTab } = Route.useSearch();
-  const navigate = useNavigate();
   const [tab, setTab] = useState<TabId>(initialTab ?? "overview");
   const ordersQuery = useQuery({
     queryKey: ["my-orders", user?.customerId],
