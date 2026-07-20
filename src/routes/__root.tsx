@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -181,6 +182,7 @@ function RootComponent() {
       <LocaleProvider locale={locale} currency={currency}>
         <AuthProvider>
           <CartProvider>
+            <ScrollToTop />
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
             <CartDrawer />
@@ -191,4 +193,13 @@ function RootComponent() {
       </LocaleProvider>
     </QueryClientProvider>
   );
+}
+
+function ScrollToTop() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname]);
+  return null;
 }
