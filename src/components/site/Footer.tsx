@@ -55,10 +55,12 @@ export function Footer() {
             <p className="mt-4 text-sm leading-relaxed text-white/70">{t("footer.companyBlurb")}</p>
             <ul className="mt-6 space-y-2.5 text-sm">
               <li className="flex items-start gap-2.5">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent-blue)]" /> Industrial Park 14, Dubai, UAE
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent-blue)]" /> 407A, Al Sajaa Industrial,
+                Sharjah - United Arab Emirates
               </li>
               <li className="flex items-center gap-2.5">
-                <Phone className="h-4 w-4 text-[var(--accent-blue)]" /> +971 4 000 0000
+                <Phone className="h-4 w-4 text-[var(--accent-blue)]" /> +971 6 565 8212 (Office) <br />
+                +971 52 191 4444 (Mobile)
               </li>
               <li className="flex items-center gap-2.5">
                 <Mail className="h-4 w-4 text-[var(--accent-blue)]" /> sales@adl-automotive.com
