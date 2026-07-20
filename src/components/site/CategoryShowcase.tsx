@@ -93,7 +93,7 @@ export function CategoryShowcase() {
           <div
             ref={scrollerRef}
             onScroll={update}
-            className="flex snap-x snap-mandatory justify-start gap-5 overflow-x-auto scroll-smooth md:justify-center [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            className={`flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden ${overflowing ? "justify-start" : "md:justify-center"}`}
           >
             {isLoading
               ? Array.from({ length: 6 }).map((_, i) => (
