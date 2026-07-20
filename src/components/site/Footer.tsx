@@ -5,10 +5,23 @@ import { useLocale } from "@/i18n/LocaleProvider";
 export function Footer() {
   const { t } = useLocale();
   const COLS = [
-    { title: t("footer.colCompany"), links: ["About ADL Automotive", "Our Story", "Careers", "Press", "Partners", "Blog"] },
-    { title: t("footer.colCategories"), links: ["Diagnostic Tools", "ECU Programming", "Tuning Software", "Workshop Equipment", "Key Programmers", "OBD Adapters"] },
-    { title: t("footer.colBrands"), links: ["Autel", "Launch", "Alientech", "Magic Motorsport", "Dimsport", "Xtool", "Foxwell", "Bosch"] },
-    { title: t("footer.colService"), links: ["Help Center", "Shipping & Returns", "Warranty", "Technical Support", "Training & Certification", "Terms of Service"] },
+    { title: t("footer.colCompany"), links: ["About ADL Automotive", "Our Story", "Partners", "Blog"] },
+    {
+      title: t("footer.colCategories"),
+      links: [
+        "Diagnostic Tools",
+        "ECU Programming",
+        "Tuning Software",
+        "Workshop Equipment",
+        "Key Programmers",
+        "OBD Adapters",
+      ],
+    },
+    { title: t("footer.colAccount"), links: ["Orders", "Address", "Shopping Cart", "Wishlist"] },
+    {
+      title: t("footer.colService"),
+      links: ["Shipping & Returns", "Warranty", "Technical Support", "Terms of Service"],
+    },
   ];
   return (
     <footer className="mt-24 border-t border-border bg-[#0B2742] text-white/80">
@@ -39,13 +52,17 @@ export function Footer() {
             <div className="inline-block rounded-md bg-white p-3">
               <img src={adlLogo.url} alt="ADL Automotive" className="h-12 w-auto" />
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-white/70">
-              {t("footer.companyBlurb")}
-            </p>
+            <p className="mt-4 text-sm leading-relaxed text-white/70">{t("footer.companyBlurb")}</p>
             <ul className="mt-6 space-y-2.5 text-sm">
-              <li className="flex items-start gap-2.5"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent-blue)]" /> Industrial Park 14, Dubai, UAE</li>
-              <li className="flex items-center gap-2.5"><Phone className="h-4 w-4 text-[var(--accent-blue)]" /> +971 4 000 0000</li>
-              <li className="flex items-center gap-2.5"><Mail className="h-4 w-4 text-[var(--accent-blue)]" /> sales@adl-automotive.com</li>
+              <li className="flex items-start gap-2.5">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent-blue)]" /> Industrial Park 14, Dubai, UAE
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Phone className="h-4 w-4 text-[var(--accent-blue)]" /> +971 4 000 0000
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Mail className="h-4 w-4 text-[var(--accent-blue)]" /> sales@adl-automotive.com
+              </li>
             </ul>
           </div>
 
@@ -55,7 +72,9 @@ export function Footer() {
               <ul className="space-y-2.5 text-sm">
                 {col.links.map((l) => (
                   <li key={l}>
-                    <a href="#" className="text-white/70 transition-colors hover:text-white">{l}</a>
+                    <a href="#" className="text-white/70 transition-colors hover:text-white">
+                      {l}
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -65,10 +84,16 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-white/60 sm:flex-row">
-          <p>© {new Date().getFullYear()} ADL Automotive. {t("footer.rights")}</p>
+          <p>
+            © {new Date().getFullYear()} ADL Automotive. {t("footer.rights")}
+          </p>
           <div className="flex items-center gap-3">
             {[Facebook, Instagram, Linkedin, Youtube].map((Icon, i) => (
-              <a key={i} href="#" className="grid h-9 w-9 place-items-center rounded-full bg-white/5 transition-colors hover:bg-[var(--accent-blue)] hover:text-white">
+              <a
+                key={i}
+                href="#"
+                className="grid h-9 w-9 place-items-center rounded-full bg-white/5 transition-colors hover:bg-[var(--accent-blue)] hover:text-white"
+              >
                 <Icon className="h-4 w-4" />
               </a>
             ))}
