@@ -14,7 +14,12 @@ export function Footer() {
   });
   const COLS = [
     { title: t("footer.colCompany"), links: ["About ADL Automotive", "Our Story", "Partners", "Blog"] },
-    { title: t("footer.colAccount"), links: ["Orders", "Address", "Shopping Cart", "Wishlist"] },
+    { title: t("footer.colAccount"), links: [
+      { label: "Orders", to: "/{-$lang}/account”, search: { tab: "orders" } }, 
+      { label: "Address", to: "/{-$lang}/account" , search: { tab: "addresses" }}, 
+      { label: "Shopping Cart", to: "/{-$lang}/cart" }, 
+      { label: "Wishlist", to: "/{-$lang}/account/wishlist" },
+  ] },
     {
       title: t("footer.colService"),
       links: ["Shipping & Returns", "Warranty", "Technical Support", "Terms of Service"],
@@ -101,8 +106,21 @@ export function Footer() {
             </ul>
           </div>
 
+          <div>
+  <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">{t("footer.colAccount")}</h4>
+  <ul className="space-y-2.5 text-sm">
+    {accountLinks.map((l) => (
+      <li key={l.label}>
+        <Link to={l.to} className="text-white/70 transition-colors hover:text-white">
+          {l.label}
+        </Link>
+      </li>
+    ))}
+  </ul>
+</div>
+
           {/* Account + Service columns unchanged, still static */}
-          {COLS.slice(1).map((col) => (
+          {COLS[2].map((col) => (
             <div key={col.title}>
               <h4 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">{col.title}</h4>
               <ul className="space-y-2.5 text-sm">

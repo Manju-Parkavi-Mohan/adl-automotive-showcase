@@ -2,8 +2,15 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-  Package, MapPin, Clock, LogOut, User as UserIcon, ShoppingBag,
-  DollarSign, ChevronRight, Eye,
+  Package,
+  MapPin,
+  Clock,
+  LogOut,
+  User as UserIcon,
+  ShoppingBag,
+  DollarSign,
+  ChevronRight,
+  Eye,
 } from "lucide-react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -20,6 +27,14 @@ import { wooToDisplay } from "@/lib/woo/adapter";
 import { seoToMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/{-$lang}/account/")({
+  validateSearch: (search) => {
+    const tabs = ["overview", "orders", "addresses", "viewed"] as const;
+    const t =
+      typeof search.tab === "string" && (tabs as readonly string[]).includes(search.tab)
+        ? (search.tab as (typeof tabs)[number])
+        : undefined;
+    return t ? { tab: t } : {};
+  },
   head: () => ({
     meta: seoToMeta(undefined, {
       title: "My Account — ADL Automotive",
@@ -57,9 +72,9 @@ function money(value: number | string, currency = "USD") {
 
 function AccountPage() {
   const { user, isLoading, setUser } = useAuth();
+  const { tab: initialTab } = Route.useSearch();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<TabId>("overview");
-
+  const [tab, setTab] = useState<TabId>(initialTab ?? "overview");
   const ordersQuery = useQuery({
     queryKey: ["my-orders", user?.customerId],
     queryFn: () => listMyOrders(),
@@ -80,7 +95,9 @@ function AccountPage() {
   const viewedQuery = useQuery({
     queryKey: ["recently-viewed", viewedIds.join(",")],
     queryFn: () =>
-      listProducts({ data: { include: viewedIds, perPage: viewedIds.length, orderby: "date", order: "desc", page: 1 } }),
+      listProducts({
+        data: { include: viewedIds, perPage: viewedIds.length, orderby: "date", order: "desc", page: 1 },
+      }),
     enabled: viewedIds.length > 0,
   });
 
@@ -109,11 +126,16 @@ function AccountPage() {
           </div>
           <h1 className="mt-5 text-2xl font-bold">Customer account access</h1>
           <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-            Sign in to review your WooCommerce orders, saved billing details, recently viewed products, and checkout preferences.
+            Sign in to review your WooCommerce orders, saved billing details, recently viewed products, and checkout
+            preferences.
           </p>
           <div className="mt-6 flex justify-center gap-3">
-            <Button asChild><Link to="/{-$lang}/account/login">Sign in</Link></Button>
-            <Button asChild variant="outline"><Link to="/{-$lang}/account/register">Create account</Link></Button>
+            <Button asChild>
+              <Link to="/{-$lang}/account/login">Sign in</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/{-$lang}/account/register">Create account</Link>
+            </Button>
           </div>
         </div>
       </Shell>
@@ -154,7 +176,11 @@ function AccountPage() {
         </div>
 
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Stat icon={ShoppingBag} label="Orders" value={ordersQuery.isLoading ? "…" : String(customer?.orders_count ?? orders.length)} />
+          <Stat
+            icon={ShoppingBag}
+            label="Orders"
+            value={ordersQuery.isLoading ? "…" : String(customer?.orders_count ?? orders.length)}
+          />
           <Stat icon={DollarSign} label="Total spent" value={money(totalSpent, currency)} />
           <Stat icon={Clock} label="Recently viewed" value={String(viewedIds.length)} />
           <Stat icon={UserIcon} label="Customer ID" value={user.customerId ? `#${user.customerId}` : "Guest"} />
@@ -194,18 +220,17 @@ function AccountPage() {
           )}
           {tab === "orders" && <OrdersPanel orders={orders} loading={ordersQuery.isLoading} />}
           {tab === "addresses" && (
-            <AddressesPanel
-              customer={customer}
-              loading={customerQuery.isLoading}
-              latestOrderId={orders[0]?.id}
-            />
+            <AddressesPanel customer={customer} loading={customerQuery.isLoading} latestOrderId={orders[0]?.id} />
           )}
           {tab === "viewed" && (
             <ViewedPanel
               ids={viewedIds}
               items={viewedQuery.data?.items ?? []}
               loading={viewedQuery.isLoading}
-              onClear={() => { clearRecentlyViewed(); setViewedIds([]); }}
+              onClear={() => {
+                clearRecentlyViewed();
+                setViewedIds([]);
+              }}
             />
           )}
         </section>
@@ -236,7 +261,15 @@ function Stat({ icon: Icon, label, value }: { icon: typeof Package; label: strin
   );
 }
 
-function PanelCard({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
+function PanelCard({
+  title,
+  action,
+  children,
+}: {
+  title: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <div className="rounded-xl border border-border bg-white p-6">
       <div className="mb-4 flex items-center justify-between gap-4">
@@ -282,9 +315,15 @@ function OrdersTable({ orders }: { orders: Awaited<ReturnType<typeof listMyOrder
                 </Link>
               </td>
               <td className="py-3 pe-4 text-muted-foreground">
-                {new Date(o.date_created).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
+                {new Date(o.date_created).toLocaleDateString(undefined, {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
               </td>
-              <td className="py-3 pe-4"><StatusPill status={o.status} /></td>
+              <td className="py-3 pe-4">
+                <StatusPill status={o.status} />
+              </td>
               <td className="py-3 pe-4 text-end font-semibold">
                 <Link
                   to="/{-$lang}/account/orders/$orderId"
@@ -303,7 +342,10 @@ function OrdersTable({ orders }: { orders: Awaited<ReturnType<typeof listMyOrder
 }
 
 function OverviewPanel({
-  orders, loading, onSeeAll, customer,
+  orders,
+  loading,
+  onSeeAll,
+  customer,
 }: {
   orders: Awaited<ReturnType<typeof listMyOrders>>;
   loading: boolean;
@@ -317,7 +359,10 @@ function OverviewPanel({
         title="Recent orders"
         action={
           orders.length > 0 ? (
-            <button onClick={onSeeAll} className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+            <button
+              onClick={onSeeAll}
+              className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+            >
               View all <ChevronRight className="h-4 w-4" />
             </button>
           ) : null
@@ -330,7 +375,13 @@ function OverviewPanel({
             icon={Package}
             title="No orders yet"
             body="When you place an order it will appear here."
-            cta={<Button asChild><Link to="/{-$lang}/products" search={{}}>Browse products</Link></Button>}
+            cta={
+              <Button asChild>
+                <Link to="/{-$lang}/products" search={{}}>
+                  Browse products
+                </Link>
+              </Button>
+            }
           />
         ) : (
           <OrdersTable orders={recent} />
@@ -345,7 +396,11 @@ function OverviewPanel({
             <Field label="Username" value={customer.username} />
             <Field
               label="Member since"
-              value={customer.date_created ? new Date(customer.date_created).toLocaleDateString(undefined, { year: "numeric", month: "long" }) : "—"}
+              value={
+                customer.date_created
+                  ? new Date(customer.date_created).toLocaleDateString(undefined, { year: "numeric", month: "long" })
+                  : "—"
+              }
             />
           </dl>
         </PanelCard>
@@ -364,7 +419,13 @@ function OrdersPanel({ orders, loading }: { orders: Awaited<ReturnType<typeof li
           icon={Package}
           title="No orders yet"
           body="When you place an order it will appear here."
-          cta={<Button asChild><Link to="/{-$lang}/products" search={{}}>Browse products</Link></Button>}
+          cta={
+            <Button asChild>
+              <Link to="/{-$lang}/products" search={{}}>
+                Browse products
+              </Link>
+            </Button>
+          }
         />
       ) : (
         <OrdersTable orders={orders} />
@@ -374,7 +435,9 @@ function OrdersPanel({ orders, loading }: { orders: Awaited<ReturnType<typeof li
 }
 
 function AddressesPanel({
-  customer, loading, latestOrderId,
+  customer,
+  loading,
+  latestOrderId,
 }: {
   customer: Awaited<ReturnType<typeof getMyCustomer>>;
   loading: boolean;
@@ -390,17 +453,17 @@ function AddressesPanel({
   });
 
   if (loading || (shouldFallback && fallbackQuery.isLoading)) {
-    return <PanelCard title="Addresses"><p className="text-sm text-muted-foreground">Loading…</p></PanelCard>;
+    return (
+      <PanelCard title="Addresses">
+        <p className="text-sm text-muted-foreground">Loading…</p>
+      </PanelCard>
+    );
   }
 
   const billing: AnyAddress | Record<string, string> =
-    (customer?.billing?.address_1 ? customer.billing : null) ??
-    fallbackQuery.data?.billing ??
-    null;
+    (customer?.billing?.address_1 ? customer.billing : null) ?? fallbackQuery.data?.billing ?? null;
   const shipping: AnyAddress | Record<string, string> =
-    (customer?.shipping?.address_1 ? customer.shipping : null) ??
-    fallbackQuery.data?.shipping ??
-    null;
+    (customer?.shipping?.address_1 ? customer.shipping : null) ?? fallbackQuery.data?.shipping ?? null;
 
   if (!billing && !shipping) {
     return (
@@ -421,19 +484,22 @@ function AddressesPanel({
   );
 }
 
-type AnyAddress = {
-  first_name?: string;
-  last_name?: string;
-  company?: string;
-  address_1?: string;
-  address_2?: string;
-  city?: string;
-  state?: string;
-  postcode?: string;
-  country?: string;
-  email?: string;
-  phone?: string;
-} | null | undefined;
+type AnyAddress =
+  | {
+      first_name?: string;
+      last_name?: string;
+      company?: string;
+      address_1?: string;
+      address_2?: string;
+      city?: string;
+      state?: string;
+      postcode?: string;
+      country?: string;
+      email?: string;
+      phone?: string;
+    }
+  | null
+  | undefined;
 
 function AddressCard({ title, addr }: { title: string; addr: AnyAddress | Record<string, string> }) {
   const a = (addr ?? {}) as Record<string, string>;
@@ -459,8 +525,16 @@ function AddressCard({ title, addr }: { title: string; addr: AnyAddress | Record
 }
 
 function ViewedPanel({
-  ids, items, loading, onClear,
-}: { ids: number[]; items: Awaited<ReturnType<typeof listProducts>>["items"]; loading: boolean; onClear: () => void }) {
+  ids,
+  items,
+  loading,
+  onClear,
+}: {
+  ids: number[];
+  items: Awaited<ReturnType<typeof listProducts>>["items"];
+  loading: boolean;
+  onClear: () => void;
+}) {
   if (ids.length === 0) {
     return (
       <PanelCard title="Recently viewed">
@@ -468,7 +542,13 @@ function ViewedPanel({
           icon={Eye}
           title="Nothing here yet"
           body="Products you open will show up here so you can find them again easily."
-          cta={<Button asChild><Link to="/{-$lang}/products" search={{}}>Browse products</Link></Button>}
+          cta={
+            <Button asChild>
+              <Link to="/{-$lang}/products" search={{}}>
+                Browse products
+              </Link>
+            </Button>
+          }
         />
       </PanelCard>
     );
@@ -509,8 +589,16 @@ function Field({ label, value }: { label: string; value: string }) {
 }
 
 function EmptyState({
-  icon: Icon, title, body, cta,
-}: { icon: typeof Package; title: string; body: string; cta?: React.ReactNode }) {
+  icon: Icon,
+  title,
+  body,
+  cta,
+}: {
+  icon: typeof Package;
+  title: string;
+  body: string;
+  cta?: React.ReactNode;
+}) {
   return (
     <div className="flex flex-col items-center py-10 text-center">
       <div className="grid h-12 w-12 place-items-center rounded-full bg-secondary text-muted-foreground">
