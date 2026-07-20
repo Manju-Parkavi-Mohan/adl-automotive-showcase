@@ -29,6 +29,7 @@ import { pushRecentlyViewed } from "@/lib/recently-viewed";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
 import { Money, Percent, Num } from "@/components/site/Money";
 import { useLocale } from "@/i18n/LocaleProvider";
+import { useWishlist } from "@/hooks/use-wishlist";
 
 export const Route = createFileRoute("/{-$lang}/products/$productId")({
   loader: ({ params, context }) =>
@@ -124,6 +125,8 @@ function ProductDetailPage() {
   const [imageIndex, setImageIndex] = useState(0);
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<(typeof TAB_IDS)[number]>("features");
+  const [zoomOpen, setZoomOpen] = useState(false);
+  const { has: hasWish, toggle: toggleWish } = useWishlist();
 
   if (productQuery.isLoading) {
     return (
@@ -161,6 +164,29 @@ function ProductDetailPage() {
 
   const related = (relatedQuery.data ?? []).map(wooToDisplay);
   const categoryLabel = woo.categories[0]?.name ?? CATEGORY_META[product.category].label;
+  const wished = hasWish(woo.id);
+
+  const handleWishlist = () => {
+    toggleWish(woo.id);
+    toast.success(wished ? "Removed from wishlist" : "Added to wishlist");
+  };
+
+  const handleShare = async () => {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    try {
+      if (typeof navigator !== "undefined" && (navigator as Navigator).share) {
+        await (navigator as Navigator).share({ title: product.name, url });
+        return;
+      }
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        toast.success("Link copied to clipboard");
+        return;
+      }
+    } catch {
+      // user cancelled or failed
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -214,7 +240,12 @@ function ProductDetailPage() {
                 </button>
               ))}
             </div>
-            <div className="group relative order-1 aspect-square overflow-hidden rounded-xl border border-border bg-secondary sm:order-2">
+            <button
+              type="button"
+              onClick={() => setZoomOpen(true)}
+              aria-label="Zoom image"
+              className="group relative order-1 aspect-square w-full overflow-hidden rounded-xl border border-border bg-secondary sm:order-2 cursor-zoom-in"
+            >
               <img
                 src={gallery[safeIndex]}
                 alt={product.name}
@@ -235,7 +266,7 @@ function ProductDetailPage() {
               <div className="absolute end-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white/95 text-foreground shadow-sm">
                 <ZoomIn className="h-4 w-4" />
               </div>
-            </div>
+            </button>
           </div>
 
           <div className="flex flex-col">
@@ -314,10 +345,19 @@ function ProductDetailPage() {
               </div>
 
               <div className="mt-3 flex flex-wrap gap-2">
-                <button className="inline-flex h-11 flex-1 min-w-[160px] items-center justify-center gap-2 rounded-md border border-border bg-white text-sm font-semibold transition-colors hover:border-primary hover:text-primary">
-                  <Heart className="h-4 w-4" /> {t("product.addToWishlist")}
+                <button
+                  type="button"
+                  onClick={handleWishlist}
+                  className={`inline-flex h-11 flex-1 min-w-[160px] items-center justify-center gap-2 rounded-md border bg-white text-sm font-semibold transition-colors hover:border-primary hover:text-primary ${wished ? "border-primary text-primary" : "border-border"}`}
+                >
+                  <Heart className={`h-4 w-4 ${wished ? "fill-current" : ""}`} />{" "}
+                  {wished ? t("product.addToWishlist") + " ✓" : t("product.addToWishlist")}
                 </button>
-                <button className="inline-flex h-11 flex-1 min-w-[160px] items-center justify-center gap-2 rounded-md border border-border bg-white text-sm font-semibold transition-colors hover:border-primary hover:text-primary">
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  className="inline-flex h-11 flex-1 min-w-[160px] items-center justify-center gap-2 rounded-md border border-border bg-white text-sm font-semibold transition-colors hover:border-primary hover:text-primary"
+                >
                   <Share2 className="h-4 w-4" /> {t("product.share")}
                 </button>
               </div>
