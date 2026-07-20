@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import bannerCustom1 from "@/assets/banner_engine_dance.jpg";
 import bannerCustom2 from "@/assets/banner_flex.jpg";
@@ -68,12 +69,20 @@ export function HeroCarousel() {
             <p className="mt-5 text-base leading-relaxed text-white/90 md:text-lg">{slide.description}</p>
             ...
             <div className="mt-8 flex flex-wrap gap-3">
-              <button className="inline-flex items-center gap-2 rounded-md bg-[var(--accent-blue)] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--accent-blue)]/90">
+              <Link
+                to="/{-$lang}/products"
+                search={{}}
+                className="inline-flex items-center gap-2 rounded-md bg-[var(--accent-blue)] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--accent-blue)]/90"
+              >
                 {slide.cta} <ArrowRight className="h-4 w-4" />
-              </button>
-              <button className="inline-flex items-center gap-2 rounded-md border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20">
+              </Link>
+              <Link
+                to="/{-$lang}/products"
+                search={{}}
+                className="inline-flex items-center gap-2 rounded-md border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+              >
                 {t("hero.viewCatalog")}
-              </button>
+              </Link>
             </div>
           </div>
         </div>
