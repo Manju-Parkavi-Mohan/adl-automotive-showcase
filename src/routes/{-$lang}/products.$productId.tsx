@@ -427,6 +427,29 @@ function ProductDetailPage() {
         </section>
       </main>
       <Footer />
+      {zoomOpen && (
+        <div
+          className="fixed inset-0 z-[100] grid place-items-center bg-black/85 p-4"
+          onClick={() => setZoomOpen(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={() => setZoomOpen(false)}
+            className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-black"
+          >
+            ✕
+          </button>
+          <img
+            src={gallery[safeIndex]}
+            alt={product.name}
+            className="max-h-[90vh] max-w-[95vw] object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }
