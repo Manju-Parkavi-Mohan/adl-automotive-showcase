@@ -78,7 +78,7 @@ function AccountPage() {
   const setTab = (next: TabId) => {
     navigate({
       to: ".",
-      search: (prev) => ({ ...prev, tab: next === "overview" ? undefined : next }),
+      search: { tab: next === "overview" ? undefined : next },
       replace: true,
     }).catch(() => {});
   };
