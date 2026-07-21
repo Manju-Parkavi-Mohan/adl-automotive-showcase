@@ -74,7 +74,14 @@ function AccountPage() {
   const navigate = useNavigate();
   const { user, isLoading, setUser } = useAuth();
   const { tab: initialTab } = Route.useSearch();
-  const [tab, setTab] = useState<TabId>(initialTab ?? "overview");
+  const tab: TabId = initialTab ?? "overview";
+  const setTab = (next: TabId) => {
+    navigate({
+      to: "/{-$lang}/account",
+      search: (prev) => ({ ...prev, tab: next === "overview" ? undefined : next }),
+      replace: true,
+    }).catch(() => {});
+  };
   const ordersQuery = useQuery({
     queryKey: ["my-orders", user?.customerId],
     queryFn: () => listMyOrders(),
