@@ -71,13 +71,13 @@ function money(value: number | string, currency = "USD") {
 }
 
 function AccountPage() {
-  const navigate = useNavigate();
+  const navigate = Route.useNavigate();
   const { user, isLoading, setUser } = useAuth();
   const { tab: initialTab } = Route.useSearch();
   const tab: TabId = initialTab ?? "overview";
   const setTab = (next: TabId) => {
     navigate({
-      to: "/{-$lang}/account",
+      to: ".",
       search: (prev) => ({ ...prev, tab: next === "overview" ? undefined : next }),
       replace: true,
     }).catch(() => {});
