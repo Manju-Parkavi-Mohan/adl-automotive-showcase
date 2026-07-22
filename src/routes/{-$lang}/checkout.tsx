@@ -243,6 +243,8 @@ function CheckoutPage() {
                 guestForm={form}
                 updateGuestForm={(k) => update(k as keyof typeof form)}
                 setGuestCountry={(v) => setForm((f) => ({ ...f, country: v.toUpperCase() }))}
+                setGuestPhone={(v) => setForm((f) => ({ ...f, phone: v }))}
+                defaultCountry={defaultCountry}
                 note={form.note}
                 onNoteChange={update("note")}
               />
@@ -474,6 +476,8 @@ function AddressStep(props: {
   };
   updateGuestForm: (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   setGuestCountry: (v: string) => void;
+  setGuestPhone: (v: string) => void;
+  defaultCountry: string;
   note: string;
   onNoteChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }) {
@@ -496,6 +500,8 @@ function AddressStep(props: {
     guestForm,
     updateGuestForm,
     setGuestCountry,
+    setGuestPhone,
+    defaultCountry,
   } = props;
 
   if (!isSignedIn) {
@@ -517,7 +523,7 @@ function AddressStep(props: {
           <Field label="Phone" required>
             <PhoneField
               value={guestForm.phone}
-              onChange={(v) => setForm((prev) => ({ ...prev, phone: v }))}
+              onChange={setGuestPhone}
               defaultCountry={guestForm.country || defaultCountry}
             />
           </Field>
