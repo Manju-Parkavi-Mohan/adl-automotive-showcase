@@ -514,14 +514,23 @@ function AddressStep(props: {
           <Field label="First name" required><Input required value={guestForm.first_name} onChange={updateGuestForm("first_name")} /></Field>
           <Field label="Last name" required><Input required value={guestForm.last_name} onChange={updateGuestForm("last_name")} /></Field>
           <Field label="Email" required><Input type="email" required value={guestForm.email} onChange={updateGuestForm("email")} /></Field>
-          <Field label="Phone"><Input value={guestForm.phone} onChange={updateGuestForm("phone")} /></Field>
+          <Field label="Phone" required>
+            <PhoneField
+              value={guestForm.phone}
+              onChange={(v) => setForm((prev) => ({ ...prev, phone: v }))}
+              defaultCountry={guestForm.country || defaultCountry}
+            />
+          </Field>
           <Field label="Address" required className="sm:col-span-2"><Input required value={guestForm.address_1} onChange={updateGuestForm("address_1")} /></Field>
           <Field label="Apartment, suite, etc." className="sm:col-span-2"><Input value={guestForm.address_2} onChange={updateGuestForm("address_2")} /></Field>
           <Field label="City" required><Input required value={guestForm.city} onChange={updateGuestForm("city")} /></Field>
           <Field label="State / Region"><Input value={guestForm.state} onChange={updateGuestForm("state")} /></Field>
           <Field label="Postcode" required><Input required value={guestForm.postcode} onChange={updateGuestForm("postcode")} /></Field>
-          <Field label="Country (2-letter)" required>
-            <Input required maxLength={2} value={guestForm.country} onChange={(e) => setGuestCountry(e.target.value)} />
+          <Field label="Country" required>
+            <CountrySelect
+              value={guestForm.country}
+              onChange={(code) => setGuestCountry(code)}
+            />
           </Field>
         </div>
       </div>
