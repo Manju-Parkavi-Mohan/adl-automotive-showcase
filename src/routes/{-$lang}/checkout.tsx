@@ -27,6 +27,8 @@ import { toast } from "sonner";
 import { seoToMeta } from "@/lib/seo";
 import { Money } from "@/components/site/Money";
 import { useLocale } from "@/i18n/LocaleProvider";
+import { CountrySelect } from "@/components/site/CountrySelect";
+import { PhoneField } from "@/components/site/PhoneField";
 
 export const Route = createFileRoute("/{-$lang}/checkout")({
   head: () => ({
@@ -43,7 +45,8 @@ function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { t } = useLocale();
+  const { t, country: detectedCountry } = useLocale();
+  const defaultCountry = (detectedCountry ?? "US").toUpperCase();
   const [ready, setReady] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [step, setStep] = useState<"address" | "shipping" | "payment">("address");
@@ -81,7 +84,7 @@ function CheckoutPage() {
     city: "",
     state: "",
     postcode: "",
-    country: "US",
+    country: defaultCountry,
     phone: "",
     note: "",
   });
@@ -93,6 +96,7 @@ function CheckoutPage() {
     !form.first_name ||
     !form.last_name ||
     !form.email ||
+    !form.phone ||
     !form.address_1 ||
     !form.city ||
     !form.postcode ||
@@ -187,7 +191,18 @@ function CheckoutPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container-px mx-auto max-w-[1400px] py-12">
-        <CheckoutSteps current={stepLabel} />
+        <CheckoutSteps
+          current={stepLabel}
+          onNavigate={(s) => {
+            if (s === "cart") {
+              navigate({ to: "/{-$lang}/cart" }).catch(() => {});
+              return;
+            }
+            if (s === "address" || s === "shipping" || s === "payment") {
+              setStep(s);
+            }
+          }}
+        />
         <h1 className="text-3xl font-bold tracking-tight">{t("checkout.title")}</h1>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
@@ -228,6 +243,8 @@ function CheckoutPage() {
                 guestForm={form}
                 updateGuestForm={(k) => update(k as keyof typeof form)}
                 setGuestCountry={(v) => setForm((f) => ({ ...f, country: v.toUpperCase() }))}
+                setGuestPhone={(v) => setForm((f) => ({ ...f, phone: v }))}
+                defaultCountry={defaultCountry}
                 note={form.note}
                 onNoteChange={update("note")}
               />
@@ -459,6 +476,8 @@ function AddressStep(props: {
   };
   updateGuestForm: (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   setGuestCountry: (v: string) => void;
+  setGuestPhone: (v: string) => void;
+  defaultCountry: string;
   note: string;
   onNoteChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }) {
@@ -481,6 +500,8 @@ function AddressStep(props: {
     guestForm,
     updateGuestForm,
     setGuestCountry,
+    setGuestPhone,
+    defaultCountry,
   } = props;
 
   if (!isSignedIn) {
@@ -499,14 +520,23 @@ function AddressStep(props: {
           <Field label="First name" required><Input required value={guestForm.first_name} onChange={updateGuestForm("first_name")} /></Field>
           <Field label="Last name" required><Input required value={guestForm.last_name} onChange={updateGuestForm("last_name")} /></Field>
           <Field label="Email" required><Input type="email" required value={guestForm.email} onChange={updateGuestForm("email")} /></Field>
-          <Field label="Phone"><Input value={guestForm.phone} onChange={updateGuestForm("phone")} /></Field>
+          <Field label="Phone" required>
+            <PhoneField
+              value={guestForm.phone}
+              onChange={setGuestPhone}
+              defaultCountry={guestForm.country || defaultCountry}
+            />
+          </Field>
           <Field label="Address" required className="sm:col-span-2"><Input required value={guestForm.address_1} onChange={updateGuestForm("address_1")} /></Field>
           <Field label="Apartment, suite, etc." className="sm:col-span-2"><Input value={guestForm.address_2} onChange={updateGuestForm("address_2")} /></Field>
           <Field label="City" required><Input required value={guestForm.city} onChange={updateGuestForm("city")} /></Field>
           <Field label="State / Region"><Input value={guestForm.state} onChange={updateGuestForm("state")} /></Field>
           <Field label="Postcode" required><Input required value={guestForm.postcode} onChange={updateGuestForm("postcode")} /></Field>
-          <Field label="Country (2-letter)" required>
-            <Input required maxLength={2} value={guestForm.country} onChange={(e) => setGuestCountry(e.target.value)} />
+          <Field label="Country" required>
+            <CountrySelect
+              value={guestForm.country}
+              onChange={(code) => setGuestCountry(code)}
+            />
           </Field>
         </div>
       </div>
@@ -578,6 +608,7 @@ function AddressStep(props: {
       {showAddForm && (
         <AddAddressForm
           defaults={defaults}
+          defaultCountry={defaultCountry}
           onCancel={onCloseForm}
           onSaved={onSaved}
         />
@@ -588,10 +619,12 @@ function AddressStep(props: {
 
 function AddAddressForm({
   defaults,
+  defaultCountry,
   onCancel,
   onSaved,
 }: {
   defaults: { first_name: string; last_name: string; email: string };
+  defaultCountry: string;
   onCancel: () => void;
   onSaved: (list: SavedAddress[], newest?: SavedAddress) => void;
 }) {
@@ -606,7 +639,7 @@ function AddAddressForm({
     city: "",
     state: "",
     postcode: "",
-    country: "US",
+    country: (defaultCountry || "US").toUpperCase(),
   });
   const mut = useMutation({
     mutationFn: async () => saveAddress({ data: { address: f } }),
@@ -630,14 +663,25 @@ function AddAddressForm({
         <Field label="Label (optional)" className="sm:col-span-2"><Input placeholder="Home, Office…" value={f.label} onChange={set("label")} /></Field>
         <Field label="First name" required><Input value={f.first_name} onChange={set("first_name")} /></Field>
         <Field label="Last name" required><Input value={f.last_name} onChange={set("last_name")} /></Field>
-        <Field label="Email"><Input type="email" value={f.email} onChange={set("email")} /></Field>
-        <Field label="Phone"><Input value={f.phone} onChange={set("phone")} /></Field>
+        <Field label="Email" required><Input type="email" required value={f.email} onChange={set("email")} /></Field>
+        <Field label="Phone" required>
+          <PhoneField
+            value={f.phone}
+            onChange={(v) => setF((prev) => ({ ...prev, phone: v }))}
+            defaultCountry={f.country || defaultCountry}
+          />
+        </Field>
         <Field label="Address" required className="sm:col-span-2"><Input value={f.address_1} onChange={set("address_1")} /></Field>
         <Field label="Apartment, suite, etc." className="sm:col-span-2"><Input value={f.address_2} onChange={set("address_2")} /></Field>
         <Field label="City" required><Input value={f.city} onChange={set("city")} /></Field>
         <Field label="State / Region"><Input value={f.state} onChange={set("state")} /></Field>
         <Field label="Postcode" required><Input value={f.postcode} onChange={set("postcode")} /></Field>
-        <Field label="Country (2-letter)" required><Input maxLength={2} value={f.country} onChange={set("country")} /></Field>
+        <Field label="Country" required>
+          <CountrySelect
+            value={f.country}
+            onChange={(code) => setF((prev) => ({ ...prev, country: code }))}
+          />
+        </Field>
       </div>
       <div className="mt-4 flex justify-end gap-2">
         <Button variant="outline" onClick={onCancel}>Cancel</Button>
@@ -647,6 +691,8 @@ function AddAddressForm({
             mut.isPending ||
             !f.first_name ||
             !f.last_name ||
+            !f.email ||
+            !f.phone ||
             !f.address_1 ||
             !f.city ||
             !f.postcode ||

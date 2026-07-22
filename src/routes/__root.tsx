@@ -179,7 +179,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LocaleProvider locale={locale} currency={currency}>
+      <LocaleProvider locale={locale} currency={currency} country={data?.country ?? null}>
         <AuthProvider>
           <CartProvider>
             <ScrollToTop />

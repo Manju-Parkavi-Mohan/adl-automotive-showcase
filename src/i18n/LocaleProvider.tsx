@@ -20,6 +20,7 @@ const DICTS: Record<Locale, Record<string, unknown>> = {
 interface LocaleContextValue {
   locale: Locale;
   currency: Currency;
+  country: string | null;
   dir: "ltr" | "rtl";
   t: (path: string, fallbackOrVars?: string | Record<string, string | number>, vars?: Record<string, string | number>) => string;
   formatPrice: (usdAmount: number) => string;
@@ -55,10 +56,12 @@ function writeCookie(name: string, value: string) {
 export function LocaleProvider({
   locale,
   currency,
+  country = null,
   children,
 }: {
   locale: Locale;
   currency: Currency;
+  country?: string | null;
   children: ReactNode;
 }) {
   const value = useMemo<LocaleContextValue>(() => {
@@ -67,6 +70,7 @@ export function LocaleProvider({
     return {
       locale,
       currency,
+      country,
       dir: LOCALE_META[locale].dir,
       t: (path, fbOrVars, vars) => {
         const fb = typeof fbOrVars === "string" ? fbOrVars : undefined;
@@ -93,7 +97,7 @@ export function LocaleProvider({
         if (typeof window !== "undefined") window.location.reload();
       },
     };
-  }, [locale, currency]);
+  }, [locale, currency, country]);
 
   return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 }
@@ -105,6 +109,7 @@ export function useLocale(): LocaleContextValue {
     return {
       locale: DEFAULT_LOCALE,
       currency: DEFAULT_CURRENCY,
+      country: null,
       dir: "ltr",
       t: (p, fbOrVars) => (typeof fbOrVars === "string" ? fbOrVars : p),
       formatPrice: (usd) => fmtPrice(usd, DEFAULT_CURRENCY, DEFAULT_LOCALE),
