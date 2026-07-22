@@ -27,6 +27,8 @@ import { toast } from "sonner";
 import { seoToMeta } from "@/lib/seo";
 import { Money } from "@/components/site/Money";
 import { useLocale } from "@/i18n/LocaleProvider";
+import { CountrySelect } from "@/components/site/CountrySelect";
+import { PhoneField } from "@/components/site/PhoneField";
 
 export const Route = createFileRoute("/{-$lang}/checkout")({
   head: () => ({
@@ -43,7 +45,8 @@ function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { t } = useLocale();
+  const { t, country: detectedCountry } = useLocale();
+  const defaultCountry = (detectedCountry ?? "US").toUpperCase();
   const [ready, setReady] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [step, setStep] = useState<"address" | "shipping" | "payment">("address");
@@ -81,7 +84,7 @@ function CheckoutPage() {
     city: "",
     state: "",
     postcode: "",
-    country: "US",
+    country: defaultCountry,
     phone: "",
     note: "",
   });
@@ -93,6 +96,7 @@ function CheckoutPage() {
     !form.first_name ||
     !form.last_name ||
     !form.email ||
+    !form.phone ||
     !form.address_1 ||
     !form.city ||
     !form.postcode ||
@@ -187,7 +191,18 @@ function CheckoutPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container-px mx-auto max-w-[1400px] py-12">
-        <CheckoutSteps current={stepLabel} />
+        <CheckoutSteps
+          current={stepLabel}
+          onNavigate={(s) => {
+            if (s === "cart") {
+              navigate({ to: "/{-$lang}/cart" }).catch(() => {});
+              return;
+            }
+            if (s === "address" || s === "shipping" || s === "payment") {
+              setStep(s);
+            }
+          }}
+        />
         <h1 className="text-3xl font-bold tracking-tight">{t("checkout.title")}</h1>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
