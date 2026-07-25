@@ -196,21 +196,21 @@ function AccountPage() {
       </div>
 
       {/* Tabs */}
-      <div className="mt-8 grid gap-6 lg:grid-cols-[220px_1fr]">
-        <aside>
-          <nav className="flex gap-2 overflow-x-auto rounded-xl border border-border bg-white p-2 lg:flex-col lg:overflow-visible">
+      <div className="mt-6 grid min-w-0 gap-4 sm:mt-8 sm:gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
+        <aside className="min-w-0">
+          <nav className="grid min-w-0 grid-cols-2 gap-2 rounded-xl border border-border bg-white p-2 sm:grid-cols-4 lg:flex lg:flex-col">
             {TABS.map((t) => {
               const active = tab === t.id;
               return (
                 <button
                   key={t.id}
                   onClick={() => setTab(t.id)}
-                  className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                  className={`flex min-w-0 items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-xs font-medium transition-colors sm:gap-2 sm:text-sm lg:justify-start lg:px-3 ${
                     active ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"
                   }`}
                 >
-                  <t.icon className="h-4 w-4" />
-                  <span>{t.label}</span>
+                  <t.icon className="h-4 w-4 shrink-0" />
+                  <span className="truncate">{t.label}</span>
                 </button>
               );
             })}
@@ -251,7 +251,7 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container-px mx-auto max-w-[1400px] py-10">{children}</main>
+      <main className="container-px mx-auto max-w-[1400px] overflow-x-hidden py-8 sm:py-10">{children}</main>
       <Footer />
     </div>
   );
@@ -279,9 +279,9 @@ function PanelCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-white p-6">
-      <div className="mb-4 flex items-center justify-between gap-4">
-        <h2 className="text-lg font-semibold">{title}</h2>
+    <div className="min-w-0 overflow-hidden rounded-xl border border-border bg-white p-4 sm:p-6">
+      <div className="mb-4 flex min-w-0 items-center justify-between gap-3">
+        <h2 className="min-w-0 truncate text-lg font-semibold">{title}</h2>
         {action}
       </div>
       {children}
@@ -300,7 +300,35 @@ function StatusPill({ status }: { status: string }) {
 
 function OrdersTable({ orders }: { orders: Awaited<ReturnType<typeof listMyOrders>> }) {
   return (
-    <div className="overflow-x-auto">
+    <>
+      <div className="space-y-3 sm:hidden">
+        {orders.map((o) => (
+          <Link
+            key={o.id}
+            to="/{-$lang}/account/orders/$orderId"
+            params={{ orderId: String(o.id) }}
+            className="block rounded-lg border border-border p-3 transition-colors hover:border-primary"
+          >
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+              <div className="min-w-0">
+                <p className="font-semibold text-primary">#{o.number}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {new Date(o.date_created).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </p>
+              </div>
+              <div className="shrink-0 text-end">
+                <StatusPill status={o.status} />
+                <p className="mt-2 text-sm font-semibold">{money(o.total, o.currency || "USD")}</p>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+      <div className="hidden overflow-x-auto sm:block">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border text-start text-xs uppercase tracking-wider text-muted-foreground">
@@ -345,7 +373,8 @@ function OrdersTable({ orders }: { orders: Awaited<ReturnType<typeof listMyOrder
           ))}
         </tbody>
       </table>
-    </div>
+      </div>
+    </>
   );
 }
 
