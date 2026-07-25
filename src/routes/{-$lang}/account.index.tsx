@@ -259,12 +259,12 @@ function Shell({ children }: { children: React.ReactNode }) {
 
 function Stat({ icon: Icon, label, value }: { icon: typeof Package; label: string; value: string }) {
   return (
-    <div className="rounded-xl bg-white/10 p-4 backdrop-blur">
-      <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-white/70">
-        <Icon className="h-3.5 w-3.5" />
-        {label}
+    <div className="min-w-0 rounded-xl bg-white/10 p-3 backdrop-blur sm:p-4">
+      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-white/70 sm:text-xs">
+        <Icon className="h-3.5 w-3.5 shrink-0" />
+        <span className="truncate">{label}</span>
       </div>
-      <p className="mt-2 text-xl font-bold sm:text-2xl">{value}</p>
+      <p className="mt-2 truncate text-base font-bold sm:text-2xl">{value}</p>
     </div>
   );
 }
