@@ -157,28 +157,29 @@ function AccountPage() {
   return (
     <Shell>
       {/* Header band */}
-      <div className="rounded-2xl border border-border bg-gradient-to-br from-primary to-[var(--accent-blue,theme(colors.blue.600))] p-6 text-primary-foreground sm:p-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="grid h-14 w-14 place-items-center rounded-full bg-white/15 text-xl font-bold ring-2 ring-white/30">
+      <div className="rounded-2xl border border-border bg-gradient-to-br from-primary to-[var(--accent-blue,theme(colors.blue.600))] p-5 text-primary-foreground sm:p-8">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:flex sm:flex-wrap sm:justify-between sm:gap-4">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white/15 text-lg font-bold ring-2 ring-white/30 sm:h-14 sm:w-14 sm:text-xl">
               {(user.firstName?.[0] || user.email?.[0] || "U").toUpperCase()}
             </div>
-            <div>
-              <p className="text-xs uppercase tracking-wider text-white/70">Welcome back</p>
-              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-wider text-white/70 sm:text-xs">Welcome back</p>
+              <h1 className="truncate text-lg font-bold tracking-tight sm:text-3xl">
                 {user.displayName || user.firstName || user.email}
               </h1>
-              <p className="text-sm text-white/80">{user.email}</p>
+              <p className="truncate text-xs text-white/80 sm:text-sm">{user.email}</p>
             </div>
           </div>
           <Button
             variant="secondary"
             onClick={() => logoutMutation.mutate()}
             disabled={logoutMutation.isPending}
-            className="gap-2"
+            size="sm"
+            className="shrink-0 gap-2 sm:size-default"
           >
             <LogOut className="h-4 w-4" />
-            {logoutMutation.isPending ? "Signing out…" : "Sign out"}
+            <span className="hidden sm:inline">{logoutMutation.isPending ? "Signing out…" : "Sign out"}</span>
           </Button>
         </div>
 
