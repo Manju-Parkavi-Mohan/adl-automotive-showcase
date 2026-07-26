@@ -326,23 +326,33 @@ function CheckoutPage() {
                     .
                   </span>
                 </label>
-                {!termsAccepted ? (
+                <div className="relative">
+                  <div
+                    className={
+                      !termsAccepted
+                        ? "pointer-events-none select-none opacity-50"
+                        : undefined
+                    }
+                    aria-disabled={!termsAccepted}
+                  >
+                    <PayPalButtons
+                      buildOrder={buildOrderPayload}
+                      total={subtotal}
+                      onCaptured={(res) => {
+                        clear();
+                        navigate({
+                          to: "/{-$lang}/checkout/return",
+                          search: { status: "success", order_id: res.wcOrderId, order_key: "" },
+                        }).catch(() => {});
+                      }}
+                      onReady={() => setReady(true)}
+                    />
+                  </div>
+                </div>
+                {!termsAccepted && (
                   <p className="text-xs text-muted-foreground">
-                    Please accept the Terms &amp; Conditions to continue with payment.
+                    Please accept the Terms &amp; Conditions to enable payment.
                   </p>
-                ) : (
-                  <PayPalButtons
-                    buildOrder={buildOrderPayload}
-                    total={subtotal}
-                    onCaptured={(res) => {
-                      clear();
-                      navigate({
-                        to: "/{-$lang}/checkout/return",
-                        search: { status: "success", order_id: res.wcOrderId, order_key: "" },
-                      }).catch(() => {});
-                    }}
-                    onReady={() => setReady(true)}
-                  />
                 )}
                 {!ready && termsAccepted && (
                   <p className="text-xs text-muted-foreground">Loading PayPal…</p>
