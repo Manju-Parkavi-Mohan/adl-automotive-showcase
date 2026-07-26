@@ -1,14 +1,12 @@
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type CheckoutStep = "cart" | "address" | "shipping" | "payment" | "confirm" | "complete";
+export type CheckoutStep = "cart" | "details" | "payment" | "complete";
 
 const STEPS: { id: CheckoutStep; label: string }[] = [
   { id: "cart", label: "Cart" },
-  { id: "address", label: "Address" },
-  { id: "shipping", label: "Shipping" },
+  { id: "details", label: "Details" },
   { id: "payment", label: "Payment" },
-  { id: "confirm", label: "Confirm" },
   { id: "complete", label: "Complete" },
 ];
 
