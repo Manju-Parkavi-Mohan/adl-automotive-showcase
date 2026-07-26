@@ -49,7 +49,7 @@ function CheckoutPage() {
   const defaultCountry = (detectedCountry ?? "US").toUpperCase();
   const [ready, setReady] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [step, setStep] = useState<"address" | "shipping" | "payment">("address");
+  const [step, setStep] = useState<"details" | "payment">("details");
   const qc = useQueryClient();
   const isSignedIn = !!user?.customerId;
 
@@ -115,8 +115,7 @@ function CheckoutPage() {
     [savedAddresses, selectedShippingId, shipToSame, billingAddr],
   );
 
-  const currentStep: "address" | "shipping" | "payment" = step;
-  const stepLabel = currentStep === "payment" ? "payment" : currentStep;
+  const stepLabel: "details" | "payment" = step;
 
   const addressStepValid = isSignedIn
     ? !!billingAddr && (shipToSame || !!shippingAddr)
@@ -198,7 +197,7 @@ function CheckoutPage() {
               navigate({ to: "/{-$lang}/cart" }).catch(() => {});
               return;
             }
-            if (s === "address" || s === "shipping" || s === "payment") {
+            if (s === "details" || s === "payment") {
               setStep(s);
             }
           }}
@@ -207,7 +206,8 @@ function CheckoutPage() {
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
           <div className="space-y-6">
-            {step === "address" && (
+            {step === "details" && (
+              <>
               <AddressStep
                 isSignedIn={isSignedIn}
                 loading={loadingAddresses}
@@ -248,19 +248,29 @@ function CheckoutPage() {
                 note={form.note}
                 onNoteChange={update("note")}
               />
-            )}
-
-            {step === "shipping" && (
-              <ShippingStep
-                billing={billingAddr}
-                shipping={shippingAddr}
-                shipToSame={shipToSame}
-                isSignedIn={isSignedIn}
-                guestForm={form}
-                onBack={() => setStep("address")}
-                note={form.note}
-                onNoteChange={update("note")}
-              />
+              <div className="rounded-xl border border-border bg-white p-6">
+                <h2 className="text-lg font-semibold">Shipping method</h2>
+                <div className="mt-4">
+                  <div className="flex items-center justify-between rounded-lg border border-primary bg-primary/5 p-4">
+                    <div>
+                      <p className="font-medium">Standard Shipping</p>
+                      <p className="text-xs text-muted-foreground">Typically 3–7 business days worldwide.</p>
+                    </div>
+                    <span className="text-sm font-semibold">Calculated at checkout</span>
+                  </div>
+                </div>
+              </div>
+              <div className="rounded-xl border border-border bg-white p-6">
+                <Field label="Order note (optional)">
+                  <textarea
+                    value={form.note}
+                    onChange={update("note")}
+                    rows={3}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+                  />
+                </Field>
+              </div>
+              </>
             )}
 
             {step === "payment" && (
@@ -270,7 +280,7 @@ function CheckoutPage() {
                 shipToSame={shipToSame}
                 isSignedIn={isSignedIn}
                 guestForm={form}
-                onBack={() => setStep("shipping")}
+                onBack={() => setStep("details")}
               />
             )}
           </div>
@@ -289,18 +299,12 @@ function CheckoutPage() {
             <div className="flex justify-between text-sm"><span className="text-muted-foreground">{t("cart.subtotal")}</span><Money usd={subtotal} className="font-medium" /></div>
             <div className="flex justify-between text-base font-bold"><span>{t("cart.total")}</span><Money usd={subtotal} /></div>
 
-            {step === "address" && (
+            {step === "details" && (
               <Button
                 className="mt-2 w-full"
                 disabled={!addressStepValid}
-                onClick={() => setStep("shipping")}
+                onClick={() => setStep("payment")}
               >
-                Continue to Shipping
-              </Button>
-            )}
-
-            {step === "shipping" && (
-              <Button className="mt-2 w-full" onClick={() => setStep("payment")}>
                 Continue to Payment
               </Button>
             )}
