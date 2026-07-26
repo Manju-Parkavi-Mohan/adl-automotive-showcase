@@ -1,51 +1,44 @@
-# Multi-step Checkout with Saved Addresses
+# Simplify Checkout to 2 Steps
 
-## Goals
+## Why
+Today checkout is a 3-screen flow (`Address → Shipping → Payment`) inside a 6-step breadcrumb (`Cart › Address › Shipping › Payment › Confirm › Complete`). The Shipping screen only re-displays the address the user just picked plus a single non-selectable "Standard Shipping" line — no real choice happens, so it feels like a duplicate of Address and adds a click for nothing.
 
-1. Let signed-in users save multiple billing/shipping addresses on their profile and reuse them at checkout instead of re-typing.
-2. Split checkout into three steps: **Address → Shipping → Payment** (still one page, state-driven).
-3. "Ship to same address" toggle; when off, pick a different saved address for shipping (no separate form to retype).
-4. Breadcrumb renders on a single line on mobile.
+## New flow
 
-## Data Storage
+```text
+Cart  ›  Details  ›  Payment  ›  Complete
+         (address +      (PayPal +
+          shipping        T&Cs)
+          summary)
+```
 
-Addresses are stored on the WooCommerce customer via `meta_data` under a single key `adl_addresses` whose value is a JSON-serialised array of address objects, each with a stable `id` (uuid). This lets us keep multiple addresses without touching Woo's built-in single `billing`/`shipping` slots (those still get written on order creation for compatibility).
+Two in-page steps instead of three; four breadcrumb nodes instead of six.
 
-On first load, if the meta key is empty but the customer has default `billing` populated, we seed the list with that entry so the address book is never blank.
+### Step 1 — Details (was Address)
+- Same UI as today's Address step: address book cards for signed-in users, guest form otherwise, "Ship to same address" toggle, "+ Add new address".
+- Add a small inline "Shipping method" block at the bottom of this step showing the single Standard Shipping line (free / calculated later) — informational only, no radio needed since there's one option. Keeps the info visible without a dedicated screen.
+- Order-note textarea stays here.
+- Sidebar CTA becomes **Continue to Payment** (skips the old Shipping screen).
 
-## Server Functions (new `src/lib/woo/addresses.functions.ts`)
+### Step 2 — Payment
+- Unchanged: order summary recap of chosen billing/shipping, T&C checkbox, PayPal buttons.
+- "Back" returns to Details.
 
-- `listMyAddresses()` — returns `SavedAddress[]` for the current session's customer.
-- `saveAddress({ address })` — upserts (id present) or appends (no id); returns updated list.
-- `deleteAddress({ id })` — removes; returns updated list.
+### Breadcrumb
+- Update `CheckoutStep` union in `src/components/site/CheckoutSteps.tsx` from
+  `cart | address | shipping | payment | confirm | complete`
+  to
+  `cart | details | payment | complete`,
+  and the `STEPS` array accordingly.
+- `Confirm` is dropped from the breadcrumb — the Payment step already is the confirm-and-pay screen (T&Cs + PayPal), so a separate "Confirm" node is misleading. `Complete` is still rendered by the post-payment return route.
 
-All read/write to `/customers/:id` `meta_data` and require an authenticated session.
+## Files touched
 
-## UI Changes
+- `src/components/site/CheckoutSteps.tsx` — shrink the step list + type.
+- `src/routes/{-$lang}/checkout.tsx` — drop the `"shipping"` branch of `step` state, fold the shipping summary block into `AddressStep` (or render it inline under it), update sidebar CTA labels, update `onNavigate` mapping, remove the `ShippingStep` component (or keep the file but stop rendering it).
+- `src/routes/{-$lang}/checkout_.return.tsx` — if it passes `current="complete"` to `CheckoutSteps`, keep as-is; if it references `"confirm"`, change to `"complete"`.
 
-### `src/components/site/CheckoutSteps.tsx`
-- Replace `flex-wrap` with `flex-nowrap overflow-x-auto` + `whitespace-nowrap` and shrink text/gap on mobile so all six steps fit one line (with hidden scrollbar).
-
-### `src/routes/{-$lang}/checkout.tsx`
-- Introduce `step` state: `"address" | "shipping" | "payment"`.
-- **Address step**:
-  - Query `listMyAddresses` (only for signed-in users; guests fall back to the current single form).
-  - Render address cards in a 2-col grid with a "+" card to add new.
-  - Selected billing highlighted with primary ring; "Ship to same address" toggle; when off, second card grid to pick shipping.
-  - "Add new address" opens an inline dialog/section with the existing field set; on save calls `saveAddress`.
-  - `Continue to Shipping` disabled until billing (and shipping if separate) selected.
-- **Shipping step**:
-  - Shows chosen addresses (edit link → back to address step) plus a single "Standard Shipping" radio (free / calculated). Free-form since WC shipping-zone selection is out of scope for this iteration.
-  - Back / `Continue to Payment` buttons.
-- **Payment step**:
-  - Existing PayPal buttons; `buildOrder` now uses the selected saved addresses.
-- Guests (not signed in) see the existing single billing form on the address step — no address book.
-
-## Breadcrumb Reference
-
-Preserve current wording (`Cart › Address › Shipping › Payment › Confirm › Complete`); adjust styles only.
-
-## Out of Scope
-
-- Real WooCommerce shipping-zone/rate integration (kept as single flat option).
-- Editing an existing saved address inline (delete + add-new covers it for this pass).
+## Out of scope
+- Real shipping-zone/rate selection (still a single flat option).
+- Any change to PayPal, address book storage, or order creation logic.
+- Guest vs. signed-in behavior differences beyond what already exists.
