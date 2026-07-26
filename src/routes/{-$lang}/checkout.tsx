@@ -904,6 +904,7 @@ type PayPalNamespace = {
     onApprove: (data: { orderID: string }) => Promise<void>;
     onCancel?: () => void;
     onError?: (err: unknown) => void;
+    onClick?: () => void;
   }) => { render: (el: HTMLElement) => Promise<void>; close?: () => Promise<void> };
   FUNDING?: Record<string, unknown>;
   Applepay?: () => {
