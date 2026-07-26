@@ -878,7 +878,7 @@ function PaymentSummary({
         />
       </div>
       <div className="flex justify-between">
-        <Button variant="outline" onClick={onBack}>Back to shipping</Button>
+        <Button variant="outline" onClick={onBack}>Back to details</Button>
       </div>
     </div>
   );
