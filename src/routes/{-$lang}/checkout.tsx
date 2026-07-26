@@ -326,23 +326,33 @@ function CheckoutPage() {
                     .
                   </span>
                 </label>
-                {!termsAccepted ? (
+                <div className="relative">
+                  <div
+                    className={
+                      !termsAccepted
+                        ? "pointer-events-none select-none opacity-50"
+                        : undefined
+                    }
+                    aria-disabled={!termsAccepted}
+                  >
+                    <PayPalButtons
+                      buildOrder={buildOrderPayload}
+                      total={subtotal}
+                      onCaptured={(res) => {
+                        clear();
+                        navigate({
+                          to: "/{-$lang}/checkout/return",
+                          search: { status: "success", order_id: res.wcOrderId, order_key: "" },
+                        }).catch(() => {});
+                      }}
+                      onReady={() => setReady(true)}
+                    />
+                  </div>
+                </div>
+                {!termsAccepted && (
                   <p className="text-xs text-muted-foreground">
-                    Please accept the Terms &amp; Conditions to continue with payment.
+                    Please accept the Terms &amp; Conditions to enable payment.
                   </p>
-                ) : (
-                  <PayPalButtons
-                    buildOrder={buildOrderPayload}
-                    total={subtotal}
-                    onCaptured={(res) => {
-                      clear();
-                      navigate({
-                        to: "/{-$lang}/checkout/return",
-                        search: { status: "success", order_id: res.wcOrderId, order_key: "" },
-                      }).catch(() => {});
-                    }}
-                    onReady={() => setReady(true)}
-                  />
                 )}
                 {!ready && termsAccepted && (
                   <p className="text-xs text-muted-foreground">Loading PayPal…</p>
@@ -894,6 +904,7 @@ type PayPalNamespace = {
     onApprove: (data: { orderID: string }) => Promise<void>;
     onCancel?: () => void;
     onError?: (err: unknown) => void;
+    onClick?: () => void;
   }) => { render: (el: HTMLElement) => Promise<void>; close?: () => Promise<void> };
   FUNDING?: Record<string, unknown>;
   Applepay?: () => {
@@ -1039,6 +1050,7 @@ function PayPalButtons({
   const [error, setError] = useState<string | null>(null);
   const [applePayEligible, setApplePayEligible] = useState(false);
   const [googlePayEligible, setGooglePayEligible] = useState(false);
+  const [processing, setProcessing] = useState(false);
   const buildOrderRef = useRef(buildOrder);
   buildOrderRef.current = buildOrder;
   const totalRef = useRef(total);
@@ -1057,12 +1069,15 @@ function PayPalButtons({
 
         const createOrder = async () => {
           setError(null);
+          setProcessing(true);
           const res = await createPaymentOrder({ data: buildOrderRef.current() });
           return res.paypalOrderId;
         };
         const doCapture = async (paypalOrderId: string) => {
+          setProcessing(true);
           const res = await captureOrder({ data: { paypalOrderId } });
           if (!res.ok) {
+            setProcessing(false);
             setError(res.error);
             toast.error(res.error);
             return;
@@ -1070,6 +1085,7 @@ function PayPalButtons({
           onCaptured({ wcOrderId: res.wcOrderId, paypalOrderId: res.paypalOrderId });
         };
         const handleError = (err: unknown) => {
+          setProcessing(false);
           const msg = err instanceof Error ? err.message : "Payment failed. Please try again.";
           setError(msg);
           toast.error(msg);
@@ -1079,9 +1095,15 @@ function PayPalButtons({
         if (paypalRef.current) {
           const b = paypal.Buttons({
             style: { layout: "vertical", shape: "rect", label: "paypal" },
+            onClick: () => {
+              setProcessing(true);
+            },
             createOrder,
             onApprove: async (data) => doCapture(data.orderID),
-            onCancel: () => toast.message("Payment cancelled. You can try again when you're ready."),
+            onCancel: () => {
+              setProcessing(false);
+              toast.message("Payment cancelled. You can try again when you're ready.");
+            },
             onError: handleError,
           });
           await b.render(paypalRef.current);
@@ -1109,6 +1131,7 @@ function PayPalButtons({
               "-webkit-appearance:-apple-pay-button;-apple-pay-button-type:pay;-apple-pay-button-style:black;width:100%;height:44px;border-radius:6px;border:0;cursor:pointer;";
             btn.addEventListener("click", async () => {
               try {
+                setProcessing(true);
                 const orderId = await createOrder();
                 const billing = buildOrderRef.current().billing;
                 const paymentRequest = {
@@ -1148,8 +1171,10 @@ function PayPalButtons({
                     handleError(err);
                   }
                 };
-                session.oncancel = () =>
+                session.oncancel = () => {
+                  setProcessing(false);
                   toast.message("Payment cancelled. You can try again when you're ready.");
+                };
                 session.begin();
               } catch (err) {
                 handleError(err);
@@ -1246,10 +1271,20 @@ function PayPalButtons({
   }, []);
 
   return (
-    <div className="space-y-3">
+    <div className="relative space-y-3">
       <div ref={paypalRef} />
       <div ref={applePayRef} style={{ display: applePayEligible ? "block" : "none" }} />
       <div ref={googlePayRef} style={{ display: googlePayEligible ? "block" : "none" }} />
+      {processing && (
+        <div
+          className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-md bg-white/80 backdrop-blur-sm"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <p className="text-xs font-medium text-foreground">Connecting to payment provider…</p>
+        </div>
+      )}
       {error && (
         <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
           {error}
