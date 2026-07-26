@@ -1271,10 +1271,20 @@ function PayPalButtons({
   }, []);
 
   return (
-    <div className="space-y-3">
+    <div className="relative space-y-3">
       <div ref={paypalRef} />
       <div ref={applePayRef} style={{ display: applePayEligible ? "block" : "none" }} />
       <div ref={googlePayRef} style={{ display: googlePayEligible ? "block" : "none" }} />
+      {processing && (
+        <div
+          className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-md bg-white/80 backdrop-blur-sm"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <p className="text-xs font-medium text-foreground">Connecting to payment provider…</p>
+        </div>
+      )}
       {error && (
         <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
           {error}
