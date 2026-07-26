@@ -1170,10 +1170,10 @@ function PayPalButtons({
                     handleError(err);
                   }
                 };
-                session.oncancel = () =>
-                  (setProcessing(false),
+                session.oncancel = () => {
+                  setProcessing(false);
                   toast.message("Payment cancelled. You can try again when you're ready.");
-                  );
+                };
                 session.begin();
               } catch (err) {
                 handleError(err);
