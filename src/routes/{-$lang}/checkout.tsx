@@ -1049,6 +1049,7 @@ function PayPalButtons({
   const [error, setError] = useState<string | null>(null);
   const [applePayEligible, setApplePayEligible] = useState(false);
   const [googlePayEligible, setGooglePayEligible] = useState(false);
+  const [processing, setProcessing] = useState(false);
   const buildOrderRef = useRef(buildOrder);
   buildOrderRef.current = buildOrder;
   const totalRef = useRef(total);
@@ -1067,12 +1068,15 @@ function PayPalButtons({
 
         const createOrder = async () => {
           setError(null);
+          setProcessing(true);
           const res = await createPaymentOrder({ data: buildOrderRef.current() });
           return res.paypalOrderId;
         };
         const doCapture = async (paypalOrderId: string) => {
+          setProcessing(true);
           const res = await captureOrder({ data: { paypalOrderId } });
           if (!res.ok) {
+            setProcessing(false);
             setError(res.error);
             toast.error(res.error);
             return;
@@ -1080,6 +1084,7 @@ function PayPalButtons({
           onCaptured({ wcOrderId: res.wcOrderId, paypalOrderId: res.paypalOrderId });
         };
         const handleError = (err: unknown) => {
+          setProcessing(false);
           const msg = err instanceof Error ? err.message : "Payment failed. Please try again.";
           setError(msg);
           toast.error(msg);
@@ -1089,9 +1094,15 @@ function PayPalButtons({
         if (paypalRef.current) {
           const b = paypal.Buttons({
             style: { layout: "vertical", shape: "rect", label: "paypal" },
+            onClick: () => {
+              setProcessing(true);
+            },
             createOrder,
             onApprove: async (data) => doCapture(data.orderID),
-            onCancel: () => toast.message("Payment cancelled. You can try again when you're ready."),
+            onCancel: () => {
+              setProcessing(false);
+              toast.message("Payment cancelled. You can try again when you're ready.");
+            },
             onError: handleError,
           });
           await b.render(paypalRef.current);
@@ -1119,6 +1130,7 @@ function PayPalButtons({
               "-webkit-appearance:-apple-pay-button;-apple-pay-button-type:pay;-apple-pay-button-style:black;width:100%;height:44px;border-radius:6px;border:0;cursor:pointer;";
             btn.addEventListener("click", async () => {
               try {
+                setProcessing(true);
                 const orderId = await createOrder();
                 const billing = buildOrderRef.current().billing;
                 const paymentRequest = {
@@ -1159,7 +1171,9 @@ function PayPalButtons({
                   }
                 };
                 session.oncancel = () =>
+                  (setProcessing(false),
                   toast.message("Payment cancelled. You can try again when you're ready.");
+                  );
                 session.begin();
               } catch (err) {
                 handleError(err);
