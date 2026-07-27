@@ -408,22 +408,22 @@ function ProductsPage() {
           <div>
             {productsQuery.isLoading ? (
               <div className="grid place-items-center rounded-xl border border-dashed border-border bg-secondary py-24 text-center">
-                <p className="text-sm text-muted-foreground">Loading products…</p>
+                <p className="text-sm text-muted-foreground">{t("products.loading", "Loading products…")}</p>
               </div>
             ) : productsQuery.isError ? (
               <div className="grid place-items-center rounded-xl border border-dashed border-destructive/40 bg-destructive/5 py-16 text-center">
-                <p className="text-sm font-semibold text-destructive">Couldn&apos;t load products.</p>
+                <p className="text-sm font-semibold text-destructive">{t("products.loadError", "Couldn't load products.")}</p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {productsQuery.error instanceof Error ? productsQuery.error.message : "Unknown error"}
+                  {productsQuery.error instanceof Error ? productsQuery.error.message : t("products.unknownError", "Unknown error")}
                 </p>
               </div>
             ) : pageItems.length === 0 ? (
               <div className="grid place-items-center rounded-xl border border-dashed border-border bg-secondary py-24 text-center">
                 <p className="text-base font-semibold">
-                  {isSearching ? `No products found for "${searchParam}"` : "No products match your filters"}
+                  {isSearching ? t("products.noSearchResults", `No products found for "${searchParam}"`, { q: searchParam ?? "" }) : t("products.noResults", "No products match your filters")}
                 </p>
                 <button onClick={resetAll} className="mt-3 text-sm font-semibold text-primary hover:underline">
-                  {isSearching ? "Clear search & filters" : "Reset filters"}
+                  {isSearching ? t("products.clearSearchFilters", "Clear search & filters") : t("products.resetFilters", "Reset filters")}
                 </button>
               </div>
             ) : view === "grid" ? (
@@ -477,18 +477,19 @@ function FiltersPanel(props: {
   setMinRating: (v: number) => void;
   onReset: () => void;
 }) {
+  const t = useT();
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-bold">Filters</h2>
+        <h2 className="text-base font-bold">{t("common.filters", "Filters")}</h2>
         <button onClick={props.onReset} className="text-xs font-semibold text-primary hover:underline">
-          Reset all
+          {t("common.reset", "Reset all")}
         </button>
       </div>
 
       {props.searchParam && (
         <div className="rounded-lg bg-primary/5 p-3">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Search</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("products.searchLabel", "Search")}</p>
           <div className="mt-1.5 flex items-center justify-between">
             <span className="text-sm font-medium text-foreground">{props.searchParam}</span>
             <button onClick={props.onClearSearch} className="text-muted-foreground hover:text-destructive">
@@ -498,9 +499,9 @@ function FiltersPanel(props: {
         </div>
       )}
 
-      <FilterGroup title="Categories">
+      <FilterGroup title={t("products.filterCategories", "Categories")}>
         {props.categoryTree.length === 0 ? (
-          <p className="px-2 text-xs text-muted-foreground">Loading…</p>
+          <p className="px-2 text-xs text-muted-foreground">{t("products.searchLoading", "Loading…")}</p>
         ) : (
           props.categoryTree.map((c) => (
             <div key={c.value}>
@@ -528,9 +529,9 @@ function FiltersPanel(props: {
         )}
       </FilterGroup>
 
-      <FilterGroup title="Brands">
+      <FilterGroup title={t("products.filterBrands", "Brands")}>
         <div className="max-h-56 space-y-1 overflow-y-auto pe-1">
-          {props.allBrands.length === 0 && <p className="px-2 text-xs text-muted-foreground">Loading..</p>}
+          {props.allBrands.length === 0 && <p className="px-2 text-xs text-muted-foreground">{t("products.searchLoading", "Loading…")}</p>}
           {props.allBrands.map((b) => (
             <Checkbox
               key={b.value}
@@ -543,24 +544,24 @@ function FiltersPanel(props: {
         </div>
       </FilterGroup>
 
-      <FilterGroup title="Price Range">
+      <FilterGroup title={t("products.filterPrice", "Price Range")}>
         {PRICE_RANGES.map((r) => (
           <Checkbox
             key={r.id}
-            label={r.label}
+            label={t(r.key, r.fallback)}
             checked={props.priceIds.includes(r.id)}
             onChange={() => props.onTogglePrice(r.id)}
           />
         ))}
       </FilterGroup>
 
-      <FilterGroup title="Availability">
+      <FilterGroup title={t("products.filterAvailability", "Availability")}>
         <Checkbox
-          label="In stock"
+          label={t("products.inStockOnly", "In stock")}
           checked={props.inStockOnly}
           onChange={() => props.setInStockOnly(!props.inStockOnly)}
         />
-        <Checkbox label="On sale" checked={props.onSaleOnly} onChange={() => props.setOnSaleOnly(!props.onSaleOnly)} />
+        <Checkbox label={t("products.onSaleOnly", "On sale")} checked={props.onSaleOnly} onChange={() => props.setOnSaleOnly(!props.onSaleOnly)} />
       </FilterGroup>
     </div>
   );
@@ -609,15 +610,16 @@ function Checkbox({
 }
 
 function Pagination({ page, total, onChange }: { page: number; total: number; onChange: (p: number) => void }) {
+  const t = useT();
   const pages = Array.from({ length: total }, (_, i) => i + 1);
   return (
-    <nav aria-label="Pagination" className="mt-12 flex flex-wrap items-center justify-center gap-2">
+    <nav aria-label={t("common.pagination", "Pagination")} className="mt-12 flex flex-wrap items-center justify-center gap-2">
       <button
         disabled={page === 1}
         onClick={() => onChange(page - 1)}
         className="h-10 rounded-md border border-border px-4 text-sm font-medium transition-colors hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
       >
-        Previous
+        {t("common.previous", "Previous")}
       </button>
       {pages.map((p) => (
         <button
@@ -637,7 +639,7 @@ function Pagination({ page, total, onChange }: { page: number; total: number; on
         onClick={() => onChange(page + 1)}
         className="h-10 rounded-md border border-border px-4 text-sm font-medium transition-colors hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
       >
-        Next
+        {t("common.next", "Next")}
       </button>
     </nav>
   );
