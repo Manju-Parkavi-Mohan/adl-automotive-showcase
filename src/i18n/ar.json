@@ -251,7 +251,15 @@
     "gridViewLabel": "عرض شبكي",
     "listViewLabel": "عرض قائمة",
     "clearSearchAria": "مسح البحث",
-    "searchLoading": "جارٍ التحميل…"
+    "searchLoading": "جارٍ التحميل…",
+    "priceUnder500": "أقل من $500",
+    "price500to1500": "$500 – $1,500",
+    "price1500to3000": "$1,500 – $3,000",
+    "priceOver3000": "أكثر من $3,000",
+    "all": "الكل",
+    "filterSubcategory": "تصفية الفئات الفرعية",
+    "scrollLeft": "التمرير لليسار",
+    "scrollRight": "التمرير لليمين"
   },
   "account": {
     "welcome": "مرحباً بعودتك",

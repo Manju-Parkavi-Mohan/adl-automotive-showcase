@@ -251,7 +251,15 @@
     "gridViewLabel": "Grid view",
     "listViewLabel": "List view",
     "clearSearchAria": "Clear search",
-    "searchLoading": "Loading…"
+    "searchLoading": "Loading…",
+    "priceUnder500": "Under $500",
+    "price500to1500": "$500 – $1,500",
+    "price1500to3000": "$1,500 – $3,000",
+    "priceOver3000": "Over $3,000",
+    "all": "All",
+    "filterSubcategory": "Filter subcategory",
+    "scrollLeft": "Scroll left",
+    "scrollRight": "Scroll right"
   },
   "account": {
     "welcome": "Welcome back",
