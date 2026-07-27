@@ -201,7 +201,8 @@
     "shippingAddressSame": "Shipping (same as billing)",
     "shippingAddress": "Shipping address",
     "emailLabel": "Email",
-    "acceptTermsAria": "Accept terms and conditions"
+    "acceptTermsAria": "Accept terms and conditions",
+    "countryField": "Country"
   },
   "products": {
     "title": "All Products",
@@ -445,7 +446,23 @@
   },
   "terms": {
     "title": "Terms & Conditions",
-    "lastUpdated": "Last updated: {year}"
+    "lastUpdated": "Last updated: {year}",
+    "s1Title": "1. Introduction",
+    "s1Body": "These Terms & Conditions govern your use of the ADL Automotive website and the purchase of products and services offered through it. By placing an order, you agree to these terms.",
+    "s2Title": "2. Orders & Payment",
+    "s2Body": "All orders are subject to availability and confirmation of the order price. Payment is processed securely through our authorised payment providers. We reserve the right to cancel any order in case of pricing errors, fraud, or stock unavailability.",
+    "s3Title": "3. Shipping & Delivery",
+    "s3Body": "Shipping times and costs are provided at checkout. Delivery timeframes are estimates and not guaranteed. Risk of loss passes to you upon delivery.",
+    "s4Title": "4. Returns & Warranty",
+    "s4Body": "Products may be returned within the timeframe stated on the product page, subject to being unused and in original packaging. Software licences, activations, and digital downloads are non-refundable once delivered.",
+    "s5Title": "5. Privacy & Cookies",
+    "s5Body": "We use cookies to operate the site, remember your preferences, and improve your experience. Personal information provided at checkout is used solely to process your order and provide support.",
+    "s6Title": "6. Intellectual Property",
+    "s6Body": "All content on this website, including text, images, logos, and software, is the property of ADL Automotive or its licensors and is protected by applicable intellectual property laws.",
+    "s7Title": "7. Limitation of Liability",
+    "s7Body": "To the fullest extent permitted by law, ADL Automotive shall not be liable for any indirect, incidental, or consequential damages arising from the use of our products or services.",
+    "s8Title": "8. Contact",
+    "s8Body": "For any questions about these terms, please contact our support team."
   },
   "checkoutReturn": {
     "confirmedTitle": "Payment confirmed",

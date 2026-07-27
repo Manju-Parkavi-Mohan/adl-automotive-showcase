@@ -6,6 +6,7 @@ import { Footer } from "@/components/site/Footer";
 import { listPosts } from "@/lib/wp/posts.functions";
 import { getYoastForUrl } from "@/lib/wp/yoast.functions";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
+import { useT } from "@/i18n/LocaleProvider";
 
 export const Route = createFileRoute("/{-$lang}/blog/")({
   loader: ({ context }) =>
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/{-$lang}/blog/")({
 });
 
 function BlogIndex() {
+  const t = useT();
   const [page, setPage] = useState(1);
   const query = useQuery({
     queryKey: ["wp-posts", page],
@@ -43,22 +45,22 @@ function BlogIndex() {
       <Header />
       <main className="container-px mx-auto max-w-[1400px] py-12">
         <header className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[var(--accent-blue)]">From the workshop</p>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight">Blog & Insights</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[var(--accent-blue)]">{t("blog.eyebrow")}</p>
+          <h1 className="mt-3 text-4xl font-bold tracking-tight">{t("blog.title")}</h1>
           <p className="mt-2 text-base text-muted-foreground">
-            Diagnostic walkthroughs, ECU tuning insights and product announcements.
+            {t("blog.subtitle")}
           </p>
         </header>
 
         <div className="mt-10">
           {query.isLoading ? (
-            <p className="text-sm text-muted-foreground">Loading posts…</p>
+            <p className="text-sm text-muted-foreground">{t("blog.loading")}</p>
           ) : query.isError ? (
             <p className="text-sm text-destructive">
-              Couldn't load posts. {query.error instanceof Error ? query.error.message : ""}
+              {t("blog.loadError")} {query.error instanceof Error ? query.error.message : ""}
             </p>
           ) : posts.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No posts yet.</p>
+            <p className="text-sm text-muted-foreground">{t("blog.noPosts")}</p>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {posts.map((p) => (
@@ -72,7 +74,7 @@ function BlogIndex() {
                     {p.featuredImage ? (
                       <img src={p.featuredImage} alt="" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                     ) : (
-                      <div className="grid h-full w-full place-items-center text-muted-foreground">No image</div>
+                      <div className="grid h-full w-full place-items-center text-muted-foreground">{t("blog.noImage")}</div>
                     )}
                   </div>
                   <div className="flex flex-1 flex-col gap-2 p-5">
@@ -98,17 +100,17 @@ function BlogIndex() {
                 onClick={() => setPage((p) => p - 1)}
                 className="h-10 rounded-md border border-border px-4 text-sm font-medium disabled:opacity-40"
               >
-                Previous
+                {t("common.previous")}
               </button>
               <span className="text-sm text-muted-foreground">
-                Page {page} of {query.data.totalPages}
+                {t("blog.page", "Page {page} of {total}").replace("{page}", String(page)).replace("{total}", String(query.data.totalPages))}
               </span>
               <button
                 disabled={page >= (query.data.totalPages ?? 1)}
                 onClick={() => setPage((p) => p + 1)}
                 className="h-10 rounded-md border border-border px-4 text-sm font-medium disabled:opacity-40"
               >
-                Next
+                {t("common.next")}
               </button>
             </div>
           )}

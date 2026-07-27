@@ -26,7 +26,7 @@ import {
 import { toast } from "sonner";
 import { seoToMeta } from "@/lib/seo";
 import { Money } from "@/components/site/Money";
-import { useLocale } from "@/i18n/LocaleProvider";
+import { useLocale, useT } from "@/i18n/LocaleProvider";
 import { CountrySelect } from "@/components/site/CountrySelect";
 import { PhoneField } from "@/components/site/PhoneField";
 
@@ -249,19 +249,19 @@ function CheckoutPage() {
                 onNoteChange={update("note")}
               />
               <div className="rounded-xl border border-border bg-white p-6">
-                <h2 className="text-lg font-semibold">Shipping method</h2>
+                <h2 className="text-lg font-semibold">{t("checkout.shippingMethod")}</h2>
                 <div className="mt-4">
                   <div className="flex items-center justify-between rounded-lg border border-primary bg-primary/5 p-4">
                     <div>
-                      <p className="font-medium">Standard Shipping</p>
-                      <p className="text-xs text-muted-foreground">Typically 3–7 business days worldwide.</p>
+                      <p className="font-medium">{t("checkout.standardShipping")}</p>
+                      <p className="text-xs text-muted-foreground">{t("checkout.standardShippingDesc")}</p>
                     </div>
-                    <span className="text-sm font-semibold">Calculated at checkout</span>
+                    <span className="text-sm font-semibold">{t("checkout.calculatedAtCheckout")}</span>
                   </div>
                 </div>
               </div>
               <div className="rounded-xl border border-border bg-white p-6">
-                <Field label="Order note (optional)">
+                <Field label={t("checkout.orderNoteOptional")}>
                   <textarea
                     value={form.note}
                     onChange={update("note")}
@@ -305,7 +305,7 @@ function CheckoutPage() {
                 disabled={!addressStepValid}
                 onClick={() => setStep("payment")}
               >
-                Continue to Payment
+                {t("checkout.continueToPayment")}
               </Button>
             )}
 
@@ -316,12 +316,12 @@ function CheckoutPage() {
                     checked={termsAccepted}
                     onCheckedChange={(v) => setTermsAccepted(v === true)}
                     className="mt-0.5"
-                    aria-label="Accept terms and conditions"
+                    aria-label={t("checkout.acceptTermsAria")}
                   />
                   <span>
-                    I have read and agree to the{" "}
+                    {t("checkout.acceptTerms")}{" "}
                     <Link to="/{-$lang}/terms" target="_blank" className="font-medium text-primary underline underline-offset-2">
-                      Terms &amp; Conditions
+                      {t("checkout.termsAndConditions")}
                     </Link>
                     .
                   </span>
@@ -351,11 +351,11 @@ function CheckoutPage() {
                 </div>
                 {!termsAccepted && (
                   <p className="text-xs text-muted-foreground">
-                    Please accept the Terms &amp; Conditions to enable payment.
+                    {t("checkout.acceptTermsPrompt")}
                   </p>
                 )}
                 {!ready && termsAccepted && (
-                  <p className="text-xs text-muted-foreground">Loading PayPal…</p>
+                  <p className="text-xs text-muted-foreground">{t("checkout.loadingPaypal")}</p>
                 )}
               </>
             )}
@@ -393,12 +393,13 @@ function AddressCard({
   onDelete: () => void;
   disabled?: boolean;
 }) {
+  const t = useT();
   return (
     <button
       type="button"
       onClick={onSelect}
       className={
-        "relative rounded-lg border p-4 text-left transition " +
+        "relative rounded-lg border p-4 text-start transition " +
         (selected
           ? "border-primary ring-2 ring-primary/40 bg-primary/5"
           : "border-border bg-white hover:border-primary/60")
@@ -425,15 +426,15 @@ function AddressCard({
       <span
         role="button"
         tabIndex={0}
-        aria-label="Delete address"
+        aria-label={t("checkout.deleteAddress")}
         onClick={(e) => {
           e.stopPropagation();
-          if (confirm("Delete this address?")) onDelete();
+          if (confirm(t("checkout.deleteAddressConfirm"))) onDelete();
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.stopPropagation();
-            if (confirm("Delete this address?")) onDelete();
+            if (confirm(t("checkout.deleteAddressConfirm"))) onDelete();
           }
         }}
         className="absolute bottom-3 end-3 inline-flex cursor-pointer items-center rounded-md p-1.5 text-muted-foreground hover:bg-secondary hover:text-destructive"
@@ -445,6 +446,7 @@ function AddressCard({
 }
 
 function AddButtonCard({ onClick }: { onClick: () => void }) {
+  const t = useT();
   return (
     <button
       type="button"
@@ -453,7 +455,7 @@ function AddButtonCard({ onClick }: { onClick: () => void }) {
     >
       <div className="flex flex-col items-center gap-1">
         <Plus className="h-6 w-6" />
-        <span className="text-sm font-medium">Add new address</span>
+        <span className="text-sm font-medium">{t("checkout.addNewAddress")}</span>
       </div>
     </button>
   );
@@ -517,36 +519,37 @@ function AddressStep(props: {
     setGuestPhone,
     defaultCountry,
   } = props;
+  const t = useT();
 
   if (!isSignedIn) {
     return (
       <div className="space-y-6 rounded-xl border border-border bg-white p-6">
         <div>
-          <h2 className="text-lg font-semibold">Billing details</h2>
+          <h2 className="text-lg font-semibold">{t("checkout.billing")}</h2>
           <p className="mt-1 text-xs text-muted-foreground">
             <Link to="/{-$lang}/account/login" className="text-primary underline underline-offset-2">
-              Sign in
+              {t("common.signIn")}
             </Link>{" "}
-            to save this address to your profile for next time.
+            {t("checkout.billingDetailsSignInHint")}
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="First name" required><Input required value={guestForm.first_name} onChange={updateGuestForm("first_name")} /></Field>
-          <Field label="Last name" required><Input required value={guestForm.last_name} onChange={updateGuestForm("last_name")} /></Field>
-          <Field label="Email" required><Input type="email" required value={guestForm.email} onChange={updateGuestForm("email")} /></Field>
-          <Field label="Phone" required>
+          <Field label={t("checkout.firstName")} required><Input required value={guestForm.first_name} onChange={updateGuestForm("first_name")} /></Field>
+          <Field label={t("checkout.lastName")} required><Input required value={guestForm.last_name} onChange={updateGuestForm("last_name")} /></Field>
+          <Field label={t("checkout.emailLabel")} required><Input type="email" required value={guestForm.email} onChange={updateGuestForm("email")} /></Field>
+          <Field label={t("checkout.phone")} required>
             <PhoneField
               value={guestForm.phone}
               onChange={setGuestPhone}
               defaultCountry={guestForm.country || defaultCountry}
             />
           </Field>
-          <Field label="Address" required className="sm:col-span-2"><Input required value={guestForm.address_1} onChange={updateGuestForm("address_1")} /></Field>
-          <Field label="Apartment, suite, etc." className="sm:col-span-2"><Input value={guestForm.address_2} onChange={updateGuestForm("address_2")} /></Field>
-          <Field label="City" required><Input required value={guestForm.city} onChange={updateGuestForm("city")} /></Field>
-          <Field label="State / Region"><Input value={guestForm.state} onChange={updateGuestForm("state")} /></Field>
-          <Field label="Postcode" required><Input required value={guestForm.postcode} onChange={updateGuestForm("postcode")} /></Field>
-          <Field label="Country" required>
+          <Field label={t("checkout.address")} required className="sm:col-span-2"><Input required value={guestForm.address_1} onChange={updateGuestForm("address_1")} /></Field>
+          <Field label={t("checkout.apartment")} className="sm:col-span-2"><Input value={guestForm.address_2} onChange={updateGuestForm("address_2")} /></Field>
+          <Field label={t("checkout.city")} required><Input required value={guestForm.city} onChange={updateGuestForm("city")} /></Field>
+          <Field label={t("checkout.state")} required={false}><Input value={guestForm.state} onChange={updateGuestForm("state")} /></Field>
+          <Field label={t("checkout.postcode")} required><Input required value={guestForm.postcode} onChange={updateGuestForm("postcode")} /></Field>
+          <Field label={t("checkout.countryField")} required>
             <CountrySelect
               value={guestForm.country}
               onChange={(code) => setGuestCountry(code)}
@@ -561,15 +564,15 @@ function AddressStep(props: {
     <div className="space-y-6">
       <div className="rounded-xl border border-border bg-white p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold">Select billing address</h2>
+          <h2 className="text-lg font-semibold">{t("checkout.selectBillingAddress")}</h2>
           <label className="flex items-center gap-2 text-sm font-medium">
-            Ship to same address
+            {t("checkout.shipToSame")}
             <Switch checked={shipToSame} onCheckedChange={setShipToSame} />
           </label>
         </div>
 
         {loading ? (
-          <p className="mt-4 text-sm text-muted-foreground">Loading your addresses…</p>
+          <p className="mt-4 text-sm text-muted-foreground">{t("checkout.loadingAddresses")}</p>
         ) : (
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {addresses.map((a) => (
@@ -582,9 +585,9 @@ function AddressStep(props: {
                   try {
                     const list = await deleteAddress({ data: { id: a.id } });
                     onDeleted(list);
-                    toast.success("Address removed");
+                    toast.success(t("checkout.addressRemoved"));
                   } catch (err) {
-                    toast.error(err instanceof Error ? err.message : "Failed to delete");
+                    toast.error(err instanceof Error ? err.message : t("checkout.failedToDelete"));
                   }
                 }}
               />
@@ -596,7 +599,7 @@ function AddressStep(props: {
 
       {!shipToSame && (
         <div className="rounded-xl border border-border bg-white p-6">
-          <h2 className="text-lg font-semibold">Select shipping address</h2>
+          <h2 className="text-lg font-semibold">{t("checkout.selectShippingAddress")}</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {addresses.map((a) => (
               <AddressCard
@@ -609,7 +612,7 @@ function AddressStep(props: {
                     const list = await deleteAddress({ data: { id: a.id } });
                     onDeleted(list);
                   } catch (err) {
-                    toast.error(err instanceof Error ? err.message : "Failed to delete");
+                    toast.error(err instanceof Error ? err.message : t("checkout.failedToDelete"));
                   }
                 }}
               />
@@ -642,6 +645,7 @@ function AddAddressForm({
   onCancel: () => void;
   onSaved: (list: SavedAddress[], newest?: SavedAddress) => void;
 }) {
+  const t = useT();
   const [f, setF] = useState({
     label: "",
     first_name: defaults.first_name || "",
@@ -659,10 +663,10 @@ function AddAddressForm({
     mutationFn: async () => saveAddress({ data: { address: f } }),
     onSuccess: (list) => {
       const newest = list[list.length - 1];
-      toast.success("Address saved");
+      toast.success(t("checkout.addressSaved"));
       onSaved(list, newest);
     },
-    onError: (err) => toast.error(err instanceof Error ? err.message : "Failed to save"),
+    onError: (err) => toast.error(err instanceof Error ? err.message : t("checkout.failedToSave")),
   });
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setF((prev) => ({ ...prev, [k]: k === "country" ? e.target.value.toUpperCase() : e.target.value }));
@@ -670,27 +674,27 @@ function AddAddressForm({
   return (
     <div className="rounded-xl border border-border bg-white p-6">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold">Add new address</h3>
-        <Button size="sm" variant="ghost" onClick={onCancel}>Cancel</Button>
+        <h3 className="font-semibold">{t("checkout.addNewAddress")}</h3>
+        <Button size="sm" variant="ghost" onClick={onCancel}>{t("common.cancel")}</Button>
       </div>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        <Field label="Label (optional)" className="sm:col-span-2"><Input placeholder="Home, Office…" value={f.label} onChange={set("label")} /></Field>
-        <Field label="First name" required><Input value={f.first_name} onChange={set("first_name")} /></Field>
-        <Field label="Last name" required><Input value={f.last_name} onChange={set("last_name")} /></Field>
-        <Field label="Email" required><Input type="email" required value={f.email} onChange={set("email")} /></Field>
-        <Field label="Phone" required>
+        <Field label={t("checkout.label")} className="sm:col-span-2"><Input placeholder={t("checkout.labelPlaceholder")} value={f.label} onChange={set("label")} /></Field>
+        <Field label={t("checkout.firstName")} required><Input value={f.first_name} onChange={set("first_name")} /></Field>
+        <Field label={t("checkout.lastName")} required><Input value={f.last_name} onChange={set("last_name")} /></Field>
+        <Field label={t("checkout.emailLabel")} required><Input type="email" required value={f.email} onChange={set("email")} /></Field>
+        <Field label={t("checkout.phone")} required>
           <PhoneField
             value={f.phone}
             onChange={(v) => setF((prev) => ({ ...prev, phone: v }))}
             defaultCountry={f.country || defaultCountry}
           />
         </Field>
-        <Field label="Address" required className="sm:col-span-2"><Input value={f.address_1} onChange={set("address_1")} /></Field>
-        <Field label="Apartment, suite, etc." className="sm:col-span-2"><Input value={f.address_2} onChange={set("address_2")} /></Field>
-        <Field label="City" required><Input value={f.city} onChange={set("city")} /></Field>
-        <Field label="State / Region"><Input value={f.state} onChange={set("state")} /></Field>
-        <Field label="Postcode" required><Input value={f.postcode} onChange={set("postcode")} /></Field>
-        <Field label="Country" required>
+        <Field label={t("checkout.address")} required className="sm:col-span-2"><Input value={f.address_1} onChange={set("address_1")} /></Field>
+        <Field label={t("checkout.apartment")} className="sm:col-span-2"><Input value={f.address_2} onChange={set("address_2")} /></Field>
+        <Field label={t("checkout.city")} required><Input value={f.city} onChange={set("city")} /></Field>
+        <Field label={t("checkout.state")}><Input value={f.state} onChange={set("state")} /></Field>
+        <Field label={t("checkout.postcode")} required><Input value={f.postcode} onChange={set("postcode")} /></Field>
+        <Field label={t("checkout.countryField")} required>
           <CountrySelect
             value={f.country}
             onChange={(code) => setF((prev) => ({ ...prev, country: code }))}
@@ -698,7 +702,7 @@ function AddAddressForm({
         </Field>
       </div>
       <div className="mt-4 flex justify-end gap-2">
-        <Button variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button variant="outline" onClick={onCancel}>{t("common.cancel")}</Button>
         <Button
           onClick={() => mut.mutate()}
           disabled={
@@ -713,7 +717,7 @@ function AddAddressForm({
             f.country.length !== 2
           }
         >
-          {mut.isPending ? "Saving…" : "Save address"}
+          {mut.isPending ? t("checkout.savingAddress") : t("checkout.saveAddress")}
         </Button>
       </div>
     </div>
@@ -738,6 +742,7 @@ function AddressPreview({ title, addr, guestForm, isSignedIn, onEdit }: {
   isSignedIn: boolean;
   onEdit: () => void;
 }) {
+  const t = useT();
   const src = isSignedIn && addr ? addr : {
     id: "guest",
     first_name: guestForm.first_name,
@@ -756,7 +761,7 @@ function AddressPreview({ title, addr, guestForm, isSignedIn, onEdit }: {
       <div className="flex items-center justify-between">
         <h3 className="font-semibold">{title}</h3>
         <button onClick={onEdit} className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
-          <Pencil className="h-3.5 w-3.5" /> Edit
+          <Pencil className="h-3.5 w-3.5" /> {t("common.edit")}
         </button>
       </div>
       <div className="mt-3 text-sm text-foreground/80">
@@ -802,12 +807,13 @@ function ShippingStep({
   note: string;
   onNoteChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }) {
+  const t = useT();
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2">
-        <AddressPreview title="Billing address" addr={billing} guestForm={guestForm} isSignedIn={isSignedIn} onEdit={onBack} />
+        <AddressPreview title={t("checkout.billingAddress")} addr={billing} guestForm={guestForm} isSignedIn={isSignedIn} onEdit={onBack} />
         <AddressPreview
-          title={shipToSame ? "Shipping (same as billing)" : "Shipping address"}
+          title={shipToSame ? t("checkout.shippingAddressSame") : t("checkout.shippingAddress")}
           addr={shipToSame ? billing : shipping}
           guestForm={guestForm}
           isSignedIn={isSignedIn}
@@ -816,23 +822,23 @@ function ShippingStep({
       </div>
 
       <div className="rounded-xl border border-border bg-white p-6">
-        <h2 className="text-lg font-semibold">Shipping method</h2>
+        <h2 className="text-lg font-semibold">{t("checkout.shippingMethod")}</h2>
         <div className="mt-4 space-y-3">
           <label className="flex cursor-pointer items-center justify-between rounded-lg border border-primary bg-primary/5 p-4">
             <div className="flex items-center gap-3">
               <input type="radio" name="shipping" defaultChecked className="h-4 w-4 accent-primary" />
               <div>
-                <p className="font-medium">Standard Shipping</p>
-                <p className="text-xs text-muted-foreground">Calculated with your order — typically 3–7 business days worldwide.</p>
+                <p className="font-medium">{t("checkout.standardShipping")}</p>
+                <p className="text-xs text-muted-foreground">{t("checkout.standardShippingDescLong")}</p>
               </div>
             </div>
-            <span className="text-sm font-semibold">Calculated at checkout</span>
+            <span className="text-sm font-semibold">{t("checkout.calculatedAtCheckout")}</span>
           </label>
         </div>
       </div>
 
       <div className="rounded-xl border border-border bg-white p-6">
-        <Field label="Order note (optional)">
+        <Field label={t("checkout.orderNoteOptional")}>
           <textarea
             value={note}
             onChange={onNoteChange}
@@ -843,7 +849,7 @@ function ShippingStep({
       </div>
 
       <div className="flex justify-between">
-        <Button variant="outline" onClick={onBack}>Back to address</Button>
+        <Button variant="outline" onClick={onBack}>{t("checkout.backToAddress")}</Button>
       </div>
     </div>
   );
@@ -875,12 +881,13 @@ function PaymentSummary({
   };
   onBack: () => void;
 }) {
+  const t = useT();
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2">
-        <AddressPreview title="Billing address" addr={billing} guestForm={guestForm} isSignedIn={isSignedIn} onEdit={onBack} />
+        <AddressPreview title={t("checkout.billingAddress")} addr={billing} guestForm={guestForm} isSignedIn={isSignedIn} onEdit={onBack} />
         <AddressPreview
-          title={shipToSame ? "Shipping (same as billing)" : "Shipping address"}
+          title={shipToSame ? t("checkout.shippingAddressSame") : t("checkout.shippingAddress")}
           addr={shipToSame ? billing : shipping}
           guestForm={guestForm}
           isSignedIn={isSignedIn}
@@ -888,7 +895,7 @@ function PaymentSummary({
         />
       </div>
       <div className="flex justify-between">
-        <Button variant="outline" onClick={onBack}>Back to details</Button>
+        <Button variant="outline" onClick={onBack}>{t("checkout.backToDetails")}</Button>
       </div>
     </div>
   );
@@ -1044,6 +1051,7 @@ function PayPalButtons({
   onCaptured: (res: { wcOrderId: number; paypalOrderId: string }) => void;
   onReady: () => void;
 }) {
+  const t = useT();
   const paypalRef = useRef<HTMLDivElement | null>(null);
   const applePayRef = useRef<HTMLDivElement | null>(null);
   const googlePayRef = useRef<HTMLDivElement | null>(null);
@@ -1102,7 +1110,7 @@ function PayPalButtons({
             onApprove: async (data) => doCapture(data.orderID),
             onCancel: () => {
               setProcessing(false);
-              toast.message("Payment cancelled. You can try again when you're ready.");
+              toast.message(t("checkout.paymentCancelled"));
             },
             onError: handleError,
           });
@@ -1173,7 +1181,7 @@ function PayPalButtons({
                 };
                 session.oncancel = () => {
                   setProcessing(false);
-                  toast.message("Payment cancelled. You can try again when you're ready.");
+                  toast.message(t("checkout.paymentCancelled"));
                 };
                 session.begin();
               } catch (err) {
@@ -1239,7 +1247,7 @@ function PayPalButtons({
                 } catch (err) {
                   const anyErr = err as { statusCode?: string };
                   if (anyErr && anyErr.statusCode === "CANCELED") {
-                    toast.message("Payment cancelled.");
+                    toast.message(t("checkout.paymentCancelledShort"));
                     return;
                   }
                   handleError(err);
@@ -1282,7 +1290,7 @@ function PayPalButtons({
           aria-live="polite"
         >
           <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <p className="text-xs font-medium text-foreground">Connecting to payment provider…</p>
+          <p className="text-xs font-medium text-foreground">{t("checkout.connectingPayment")}</p>
         </div>
       )}
       {error && (
