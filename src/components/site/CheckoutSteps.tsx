@@ -1,14 +1,8 @@
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useT } from "@/i18n/LocaleProvider";
 
 export type CheckoutStep = "cart" | "details" | "payment" | "complete";
-
-const STEPS: { id: CheckoutStep; label: string }[] = [
-  { id: "cart", label: "Cart" },
-  { id: "details", label: "Details" },
-  { id: "payment", label: "Payment" },
-  { id: "complete", label: "Complete" },
-];
 
 export function CheckoutSteps({
   current,
@@ -17,10 +11,17 @@ export function CheckoutSteps({
   current: CheckoutStep;
   onNavigate?: (step: CheckoutStep) => void;
 }) {
+  const t = useT();
+  const STEPS: { id: CheckoutStep; label: string }[] = [
+    { id: "cart", label: t("checkoutSteps.cart", "Cart") },
+    { id: "details", label: t("checkoutSteps.details", "Details") },
+    { id: "payment", label: t("checkoutSteps.payment", "Payment") },
+    { id: "complete", label: t("checkoutSteps.complete", "Complete") },
+  ];
   const currentIdx = STEPS.findIndex((s) => s.id === current);
   return (
     <nav
-      aria-label="Checkout progress"
+      aria-label={t("checkoutSteps.aria", "Checkout progress")}
       className="mb-6 rounded-xl border border-border bg-white px-3 py-2.5 shadow-sm sm:px-4 sm:py-3"
     >
       <ol className="flex flex-nowrap items-center gap-x-1.5 overflow-x-auto whitespace-nowrap text-[11px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-x-2 sm:text-sm">

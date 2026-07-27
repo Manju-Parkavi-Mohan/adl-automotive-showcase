@@ -11,6 +11,7 @@ import { listCategories } from "@/lib/woo/categories.functions";
 import { wooToDisplay } from "@/lib/woo/adapter";
 import { getYoastForUrl } from "@/lib/wp/yoast.functions";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
+import { useLocale, useT } from "@/i18n/LocaleProvider";
 
 export const Route = createFileRoute("/{-$lang}/products/")({
   validateSearch: (search) => {
@@ -45,17 +46,17 @@ export const Route = createFileRoute("/{-$lang}/products/")({
 });
 
 const SORT_OPTIONS = [
-  { id: "featured", label: "Featured" },
-  { id: "price-asc", label: "Price: Low to High" },
-  { id: "price-desc", label: "Price: High to Low" },
-  { id: "newest", label: "Newest" },
+  { id: "featured", label: "Featured", key: "products.sort.featured", fallback: "Featured" },
+  { id: "price-asc", label: "Price: Low to High", key: "products.sort.priceAsc", fallback: "Price: Low to High" },
+  { id: "price-desc", label: "Price: High to Low", key: "products.sort.priceDesc", fallback: "Price: High to Low" },
+  { id: "newest", label: "Newest", key: "products.sort.newest", fallback: "Newest" },
 ] as const;
 
 const PRICE_RANGES = [
-  { id: "0-500", label: "Under $500", min: 0, max: 500 },
-  { id: "500-1500", label: "$500 – $1,500", min: 500, max: 1500 },
-  { id: "1500-3000", label: "$1,500 – $3,000", min: 1500, max: 3000 },
-  { id: "3000-9999", label: "Over $3,000", min: 3000, max: 999999 },
+  { id: "0-500", label: "Under $500", key: "products.priceUnder500", fallback: "Under $500", min: 0, max: 500 },
+  { id: "500-1500", label: "$500 – $1,500", key: "products.price500to1500", fallback: "$500 – $1,500", min: 500, max: 1500 },
+  { id: "1500-3000", label: "$1,500 – $3,000", key: "products.price1500to3000", fallback: "$1,500 – $3,000", min: 1500, max: 3000 },
+  { id: "3000-9999", label: "Over $3,000", key: "products.priceOver3000", fallback: "Over $3,000", min: 3000, max: 999999 },
 ];
 
 const PER_PAGE = 12;
@@ -77,6 +78,7 @@ function sortToWoo(id: (typeof SORT_OPTIONS)[number]["id"]) {
 function ProductsPage() {
   const { search: searchParam, category: categoryParam } = Route.useSearch();
   const navigate = Route.useNavigate();
+  const { t } = useLocale();
   const [view, setView] = useState<"grid" | "list">("grid");
   const [sort, setSort] = useState<(typeof SORT_OPTIONS)[number]["id"]>("featured");
   const [page, setPage] = useState(1);
@@ -206,11 +208,11 @@ function ProductsPage() {
       {/* Page header */}
       <section className="border-b border-border bg-secondary">
         <div className="container-px mx-auto max-w-[1400px] py-10">
-          <nav aria-label="Breadcrumb" className="mb-5">
+          <nav aria-label={t("common.breadcrumb", "Breadcrumb")} className="mb-5">
             <ol className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <li>
                 <Link to="/{-$lang}" className="hover:text-primary">
-                  Home
+                  {t("products.breadcrumbHome", "Home")}
                 </Link>
               </li>
               <li>
@@ -218,7 +220,7 @@ function ProductsPage() {
               </li>
               <li>
                 <Link to="/{-$lang}/products" search={{}} className="hover:text-primary">
-                  Shop
+                  {t("products.breadcrumbShop", "Shop")}
                 </Link>
               </li>
               {isSearching && (
@@ -226,7 +228,7 @@ function ProductsPage() {
                   <li>
                     <ChevronRight className="h-3.5 w-3.5" />
                   </li>
-                  <li className="font-medium text-foreground">Search</li>
+                  <li className="font-medium text-foreground">{t("products.breadcrumbSearch", "Search")}</li>
                 </>
               )}
             </ol>
@@ -234,18 +236,18 @@ function ProductsPage() {
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
               <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-                {isSearching ? `Search: "${searchParam}"` : "All Products"}
+                {isSearching ? t("products.searchResults", `Search: "${searchParam}"`, { q: searchParam ?? "" }) : t("products.title", "All Products")}
               </h1>
               <p className="mt-2 text-base text-muted-foreground">
                 {isSearching
-                  ? `Showing results for "${searchParam}" across our catalog.`
-                  : "Dealer-grade diagnostic platforms, ECU programmers and calibration software trusted by professional workshops worldwide."}
+                  ? t("products.showingResults", `Showing results for "${searchParam}" across our catalog.`, { q: searchParam ?? "" })
+                  : t("products.subtitle", "Dealer-grade diagnostic platforms, ECU programmers and calibration software trusted by professional workshops worldwide.")}
               </p>
             </div>
             <p className="text-sm text-muted-foreground">
-              Showing <span className="font-semibold text-foreground">{pageItems.length}</span> of{" "}
-              <span className="font-semibold text-foreground">{totalCount}</span> products
-              {productsQuery.isFetching && <span className="ml-2 text-primary">Updating…</span>}
+              {t("products.showing", "Showing")} <span className="font-semibold text-foreground">{pageItems.length}</span> {t("products.of", "of")}{" "}
+              <span className="font-semibold text-foreground">{totalCount}</span> {t("products.productsWord", "products")}
+              {productsQuery.isFetching && <span className="ms-2 text-primary">{t("products.updating", "Updating…")}</span>}
             </p>
           </div>
         </div>
@@ -259,7 +261,7 @@ function ProductsPage() {
             className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium lg:hidden"
           >
             <SlidersHorizontal className="h-4 w-4" />
-            Filters{" "}
+            {t("common.filters", "Filters")}{" "}
             {activeCount > 0 && (
               <span className="rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
                 {activeCount}
@@ -270,18 +272,20 @@ function ProductsPage() {
           <div className="hidden flex-wrap items-center gap-2 text-sm text-muted-foreground lg:flex">
             {isSearching && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                Search: {searchParam}
-                <button onClick={clearSearch} aria-label="Clear search" className="hover:text-destructive">
+                {t("products.searchLabel", "Search")}: {searchParam}
+                <button onClick={clearSearch} aria-label={t("products.clearSearchAria", "Clear search")} className="hover:text-destructive">
                   <X className="h-3.5 w-3.5" />
                 </button>
               </span>
             )}
             {activeCount > 0 ? (
               <button onClick={resetAll} className="font-semibold text-primary hover:underline">
-                Clear {activeCount} filter{activeCount > 1 ? "s" : ""}
+                {activeCount > 1
+                  ? t("products.clearFiltersMany", `Clear ${activeCount} filters`, { n: activeCount })
+                  : t("products.clearFiltersOne", `Clear ${activeCount} filter`, { n: activeCount })}
               </button>
             ) : (
-              "No filters applied"
+              t("products.noFilters", "No filters applied")
             )}
           </div>
 
@@ -294,26 +298,26 @@ function ProductsPage() {
                   setPage(1);
                 }}
                 className="h-10 appearance-none rounded-md border border-border bg-white ps-3 pe-9 text-sm font-medium outline-none focus:border-primary"
-                aria-label="Sort by"
+                aria-label={t("products.sortLabel", "Sort by")}
               >
                 {SORT_OPTIONS.map((o) => (
                   <option key={o.id} value={o.id}>
-                    Sort: {o.label}
+                    {t("products.sortPrefix", "Sort:")} {t(o.key, o.fallback)}
                   </option>
                 ))}
               </select>
-              <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <ChevronDown className="pointer-events-none absolute end-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             </div>
             <div className="hidden items-center gap-1 rounded-md border border-border p-1 sm:flex">
               <button
-                aria-label="Grid view"
+                aria-label={t("products.gridViewLabel", "Grid view")}
                 onClick={() => setView("grid")}
                 className={`grid h-8 w-8 place-items-center rounded ${view === "grid" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-primary"}`}
               >
                 <LayoutGrid className="h-4 w-4" />
               </button>
               <button
-                aria-label="List view"
+                aria-label={t("products.listViewLabel", "List view")}
                 onClick={() => setView("list")}
                 className={`grid h-8 w-8 place-items-center rounded ${view === "list" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-primary"}`}
               >
@@ -406,22 +410,22 @@ function ProductsPage() {
           <div>
             {productsQuery.isLoading ? (
               <div className="grid place-items-center rounded-xl border border-dashed border-border bg-secondary py-24 text-center">
-                <p className="text-sm text-muted-foreground">Loading products…</p>
+                <p className="text-sm text-muted-foreground">{t("products.loading", "Loading products…")}</p>
               </div>
             ) : productsQuery.isError ? (
               <div className="grid place-items-center rounded-xl border border-dashed border-destructive/40 bg-destructive/5 py-16 text-center">
-                <p className="text-sm font-semibold text-destructive">Couldn&apos;t load products.</p>
+                <p className="text-sm font-semibold text-destructive">{t("products.loadError", "Couldn't load products.")}</p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {productsQuery.error instanceof Error ? productsQuery.error.message : "Unknown error"}
+                  {productsQuery.error instanceof Error ? productsQuery.error.message : t("products.unknownError", "Unknown error")}
                 </p>
               </div>
             ) : pageItems.length === 0 ? (
               <div className="grid place-items-center rounded-xl border border-dashed border-border bg-secondary py-24 text-center">
                 <p className="text-base font-semibold">
-                  {isSearching ? `No products found for "${searchParam}"` : "No products match your filters"}
+                  {isSearching ? t("products.noSearchResults", `No products found for "${searchParam}"`, { q: searchParam ?? "" }) : t("products.noResults", "No products match your filters")}
                 </p>
                 <button onClick={resetAll} className="mt-3 text-sm font-semibold text-primary hover:underline">
-                  {isSearching ? "Clear search & filters" : "Reset filters"}
+                  {isSearching ? t("products.clearSearchFilters", "Clear search & filters") : t("products.resetFilters", "Reset filters")}
                 </button>
               </div>
             ) : view === "grid" ? (
@@ -475,18 +479,19 @@ function FiltersPanel(props: {
   setMinRating: (v: number) => void;
   onReset: () => void;
 }) {
+  const t = useT();
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-bold">Filters</h2>
+        <h2 className="text-base font-bold">{t("common.filters", "Filters")}</h2>
         <button onClick={props.onReset} className="text-xs font-semibold text-primary hover:underline">
-          Reset all
+          {t("common.reset", "Reset all")}
         </button>
       </div>
 
       {props.searchParam && (
         <div className="rounded-lg bg-primary/5 p-3">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Search</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("products.searchLabel", "Search")}</p>
           <div className="mt-1.5 flex items-center justify-between">
             <span className="text-sm font-medium text-foreground">{props.searchParam}</span>
             <button onClick={props.onClearSearch} className="text-muted-foreground hover:text-destructive">
@@ -496,9 +501,9 @@ function FiltersPanel(props: {
         </div>
       )}
 
-      <FilterGroup title="Categories">
+      <FilterGroup title={t("products.filterCategories", "Categories")}>
         {props.categoryTree.length === 0 ? (
-          <p className="px-2 text-xs text-muted-foreground">Loading…</p>
+          <p className="px-2 text-xs text-muted-foreground">{t("products.searchLoading", "Loading…")}</p>
         ) : (
           props.categoryTree.map((c) => (
             <div key={c.value}>
@@ -526,9 +531,9 @@ function FiltersPanel(props: {
         )}
       </FilterGroup>
 
-      <FilterGroup title="Brands">
+      <FilterGroup title={t("products.filterBrands", "Brands")}>
         <div className="max-h-56 space-y-1 overflow-y-auto pe-1">
-          {props.allBrands.length === 0 && <p className="px-2 text-xs text-muted-foreground">Loading..</p>}
+          {props.allBrands.length === 0 && <p className="px-2 text-xs text-muted-foreground">{t("products.searchLoading", "Loading…")}</p>}
           {props.allBrands.map((b) => (
             <Checkbox
               key={b.value}
@@ -541,24 +546,24 @@ function FiltersPanel(props: {
         </div>
       </FilterGroup>
 
-      <FilterGroup title="Price Range">
+      <FilterGroup title={t("products.filterPrice", "Price Range")}>
         {PRICE_RANGES.map((r) => (
           <Checkbox
             key={r.id}
-            label={r.label}
+            label={t(r.key, r.fallback)}
             checked={props.priceIds.includes(r.id)}
             onChange={() => props.onTogglePrice(r.id)}
           />
         ))}
       </FilterGroup>
 
-      <FilterGroup title="Availability">
+      <FilterGroup title={t("products.filterAvailability", "Availability")}>
         <Checkbox
-          label="In stock"
+          label={t("products.inStockOnly", "In stock")}
           checked={props.inStockOnly}
           onChange={() => props.setInStockOnly(!props.inStockOnly)}
         />
-        <Checkbox label="On sale" checked={props.onSaleOnly} onChange={() => props.setOnSaleOnly(!props.onSaleOnly)} />
+        <Checkbox label={t("products.onSaleOnly", "On sale")} checked={props.onSaleOnly} onChange={() => props.setOnSaleOnly(!props.onSaleOnly)} />
       </FilterGroup>
     </div>
   );
@@ -607,15 +612,16 @@ function Checkbox({
 }
 
 function Pagination({ page, total, onChange }: { page: number; total: number; onChange: (p: number) => void }) {
+  const t = useT();
   const pages = Array.from({ length: total }, (_, i) => i + 1);
   return (
-    <nav aria-label="Pagination" className="mt-12 flex flex-wrap items-center justify-center gap-2">
+    <nav aria-label={t("common.pagination", "Pagination")} className="mt-12 flex flex-wrap items-center justify-center gap-2">
       <button
         disabled={page === 1}
         onClick={() => onChange(page - 1)}
         className="h-10 rounded-md border border-border px-4 text-sm font-medium transition-colors hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
       >
-        Previous
+        {t("common.previous", "Previous")}
       </button>
       {pages.map((p) => (
         <button
@@ -635,7 +641,7 @@ function Pagination({ page, total, onChange }: { page: number; total: number; on
         onClick={() => onChange(page + 1)}
         className="h-10 rounded-md border border-border px-4 text-sm font-medium transition-colors hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
       >
-        Next
+        {t("common.next", "Next")}
       </button>
     </nav>
   );

@@ -120,7 +120,7 @@ export function Header() {
           {/* Search */}
           <div className="hidden min-w-0 lg:block">
             <form onSubmit={handleSearch} className="relative mx-auto max-w-2xl">
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="pointer-events-none absolute start-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="search"
                 value={searchQuery}
@@ -131,7 +131,7 @@ export function Header() {
               />
               <button
                 type="submit"
-                className="absolute right-1.5 top-1.5 h-8 rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                className="absolute end-1.5 top-1.5 h-8 rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
               >
                 {t("common.search")}
               </button>
@@ -167,7 +167,7 @@ export function Header() {
                 <ChevronDown className="h-3 w-3" />
               </button>
               {langOpen && (
-                <div className="absolute right-0 top-full z-40 mt-1 w-40 overflow-hidden rounded-md border border-border bg-white shadow-lg">
+                <div className="absolute end-0 top-full z-40 mt-1 w-40 overflow-hidden rounded-md border border-border bg-white shadow-lg">
                   {SUPPORTED_LOCALES.map((l) => (
                     <button
                       key={l}
@@ -198,7 +198,7 @@ export function Header() {
                 <ChevronDown className="h-3 w-3" />
               </button>
               {curOpen && (
-                <div className="absolute right-0 top-full z-40 mt-1 w-32 overflow-hidden rounded-md border border-border bg-white shadow-lg">
+                <div className="absolute end-0 top-full z-40 mt-1 w-32 overflow-hidden rounded-md border border-border bg-white shadow-lg">
                   {SUPPORTED_CURRENCIES.map((c) => (
                     <button
                       key={c}
@@ -221,7 +221,7 @@ export function Header() {
             >
               <Heart className="h-[18px] w-[18px] sm:h-5 sm:w-5" />
               {wishlistCount > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-blue)] px-1 text-[10px] font-bold text-white">
+                <span className="absolute -end-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-blue)] px-1 text-[10px] font-bold text-white">
                   {wishlistCount}
                 </span>
               )}
@@ -233,7 +233,7 @@ export function Header() {
             >
               <ShoppingCart className="h-[18px] w-[18px] sm:h-5 sm:w-5" />
               {count > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-blue)] px-1 text-[10px] font-bold text-white">
+                <span className="absolute -end-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-blue)] px-1 text-[10px] font-bold text-white">
                   {count}
                 </span>
               )}
@@ -251,7 +251,7 @@ export function Header() {
         {/* Mobile search */}
         <div className="pb-2 lg:hidden">
           <form onSubmit={handleSearch} className="relative">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Search className="pointer-events-none absolute start-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <input
               type="search"
               value={searchQuery}
@@ -280,7 +280,7 @@ export function Header() {
             {catOpen && (
               <div
                 onMouseLeave={() => setCatOpen(false)}
-                className="absolute left-0 top-full z-40 mt-1 flex rounded-lg border border-border bg-white shadow-[var(--shadow-card)]"
+                className="absolute start-0 top-full z-40 mt-1 flex rounded-lg border border-border bg-white shadow-[var(--shadow-card)]"
               >
                 <div className="max-h-96 w-72 overflow-y-auto">
                   {topCategories.length === 0 ? (
@@ -363,7 +363,7 @@ export function Header() {
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
-          <div className="absolute left-0 top-0 h-full w-72 max-w-[80vw] overflow-y-auto bg-white p-5 shadow-xl">
+          <div className="absolute start-0 top-0 h-full w-72 max-w-[80vw] overflow-y-auto bg-white p-5 shadow-xl">
             <div className="flex items-center justify-between">
               <span className="text-base font-extrabold uppercase tracking-wide text-primary">{t("common.menu")}</span>
               <button aria-label={t("common.close")} onClick={() => setMobileOpen(false)}>
@@ -474,7 +474,7 @@ export function Header() {
       {/* Mobile fixed bottom nav */}
       <nav
         aria-label="Mobile quick actions"
-        className="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-4 border-t border-border bg-white shadow-[0_-4px_16px_-4px_rgba(0,0,0,0.08)] lg:hidden"
+        className="fixed bottom-0 start-0 end-0 z-40 grid grid-cols-4 border-t border-border bg-white shadow-[0_-4px_16px_-4px_rgba(0,0,0,0.08)] lg:hidden"
       >
         <Link
           to="/{-$lang}/account/wishlist"
@@ -484,7 +484,7 @@ export function Header() {
           <span className="relative">
             <Heart className="h-5 w-5" />
             {wishlistCount > 0 && (
-              <span className="absolute -right-2 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-blue)] px-1 text-[10px] font-bold text-white">
+              <span className="absolute -end-2 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-blue)] px-1 text-[10px] font-bold text-white">
                 {wishlistCount}
               </span>
             )}
@@ -514,7 +514,7 @@ export function Header() {
           <ShoppingCart className="h-5 w-5" />
           <span>{t("common.cart")}</span>
           {count > 0 && (
-            <span className="absolute right-4 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-blue)] px-1 text-[10px] font-bold text-white">
+            <span className="absolute end-4 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-blue)] px-1 text-[10px] font-bold text-white">
               {count}
             </span>
           )}
@@ -540,7 +540,7 @@ function IconButton({
     >
       <Icon className="h-5 w-5" />
       {count != null && (
-        <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-blue)] px-1 text-[10px] font-bold text-white">
+        <span className="absolute -end-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-blue)] px-1 text-[10px] font-bold text-white">
           {count}
         </span>
       )}

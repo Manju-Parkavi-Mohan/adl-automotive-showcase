@@ -6,6 +6,7 @@ import { Footer } from "@/components/site/Footer";
 import { getPostBySlug } from "@/lib/wp/posts.functions";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
 import type { WPPost } from "@/lib/woo/types";
+import { useT } from "@/i18n/LocaleProvider";
 
 export const Route = createFileRoute("/{-$lang}/blog/$slug")({
   loader: ({ params, context }) =>
@@ -33,6 +34,7 @@ export const Route = createFileRoute("/{-$lang}/blog/$slug")({
 });
 
 function BlogPostPage() {
+  const t = useT();
   const { slug } = Route.useParams();
   const query = useQuery({
     queryKey: ["wp-post", slug],
@@ -46,11 +48,11 @@ function BlogPostPage() {
       <Header />
       <div className="border-b border-border bg-secondary">
         <div className="container-px mx-auto max-w-[1400px] py-4">
-          <nav aria-label="Breadcrumb">
+          <nav aria-label={t("common.breadcrumb")}>
             <ol className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
-              <li><Link to="/{-$lang}" className="hover:text-primary">Home</Link></li>
+              <li><Link to="/{-$lang}" className="hover:text-primary">{t("blog.breadcrumbHome")}</Link></li>
               <li><ChevronRight className="h-3.5 w-3.5" /></li>
-              <li><Link to="/{-$lang}/blog" className="hover:text-primary">Blog</Link></li>
+              <li><Link to="/{-$lang}/blog" className="hover:text-primary">{t("blog.breadcrumbBlog")}</Link></li>
               <li><ChevronRight className="h-3.5 w-3.5" /></li>
               <li className="line-clamp-1 max-w-xs font-medium text-foreground">
                 {post ? <span dangerouslySetInnerHTML={{ __html: post.title }} /> : slug}
@@ -62,12 +64,12 @@ function BlogPostPage() {
 
       <main className="container-px mx-auto max-w-3xl py-12">
         {query.isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading…</p>
+          <p className="text-sm text-muted-foreground">{t("blog.loadingPost")}</p>
         ) : !post ? (
           <div className="rounded-xl border border-dashed border-border bg-secondary p-10 text-center">
-            <p className="font-semibold">Post not found</p>
+            <p className="font-semibold">{t("blog.postNotFound")}</p>
             <Link to="/{-$lang}/blog" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
-              Back to blog
+              {t("blog.backToBlog")}
             </Link>
           </div>
         ) : (

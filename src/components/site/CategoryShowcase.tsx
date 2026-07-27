@@ -84,7 +84,7 @@ export function CategoryShowcase() {
               aria-label="Scroll left"
               onClick={() => scrollBy(-1)}
               disabled={!canLeft}
-              className="absolute left-0 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30"
+              className="absolute start-0 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -133,7 +133,7 @@ export function CategoryShowcase() {
               aria-label="Scroll right"
               onClick={() => scrollBy(1)}
               disabled={!canRight}
-              className="absolute right-0 top-1/2 z-10 translate-x-1/2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30"
+              className="absolute end-0 top-1/2 z-10 translate-x-1/2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
