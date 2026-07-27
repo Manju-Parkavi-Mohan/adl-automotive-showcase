@@ -12,11 +12,12 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { getOrderedCountries, findCountry } from "@/lib/countries";
+import { useT } from "@/i18n/LocaleProvider";
 
 export function CountrySelect({
   value,
   onChange,
-  placeholder = "Select country",
+  placeholder,
   className,
 }: {
   value: string;
@@ -24,6 +25,7 @@ export function CountrySelect({
   placeholder?: string;
   className?: string;
 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const countries = useMemo(() => getOrderedCountries(), []);
   const selected = findCountry(value);
@@ -44,7 +46,7 @@ export function CountrySelect({
               <span>{selected.name}</span>
             </span>
           ) : (
-            <span className="text-muted-foreground">{placeholder}</span>
+            <span className="text-muted-foreground">{placeholder ?? t("common.selectCountry", "Select country")}</span>
           )}
           <ChevronsUpDown className="ms-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -58,9 +60,9 @@ export function CountrySelect({
             return itemValue.toLowerCase().includes(q) ? 1 : 0;
           }}
         >
-          <CommandInput placeholder="Search country…" />
+          <CommandInput placeholder={t("common.searchCountry", "Search country…")} />
           <CommandList>
-            <CommandEmpty>No country found.</CommandEmpty>
+            <CommandEmpty>{t("common.noCountryFound", "No country found.")}</CommandEmpty>
             <CommandGroup>
               {countries.map((c) => (
                 <CommandItem

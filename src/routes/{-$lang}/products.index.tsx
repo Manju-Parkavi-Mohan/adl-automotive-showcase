@@ -206,11 +206,11 @@ function ProductsPage() {
       {/* Page header */}
       <section className="border-b border-border bg-secondary">
         <div className="container-px mx-auto max-w-[1400px] py-10">
-          <nav aria-label="Breadcrumb" className="mb-5">
+          <nav aria-label={t("common.breadcrumb", "Breadcrumb")} className="mb-5">
             <ol className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <li>
                 <Link to="/{-$lang}" className="hover:text-primary">
-                  Home
+                  {t("products.breadcrumbHome", "Home")}
                 </Link>
               </li>
               <li>
@@ -218,7 +218,7 @@ function ProductsPage() {
               </li>
               <li>
                 <Link to="/{-$lang}/products" search={{}} className="hover:text-primary">
-                  Shop
+                  {t("products.breadcrumbShop", "Shop")}
                 </Link>
               </li>
               {isSearching && (
@@ -226,7 +226,7 @@ function ProductsPage() {
                   <li>
                     <ChevronRight className="h-3.5 w-3.5" />
                   </li>
-                  <li className="font-medium text-foreground">Search</li>
+                  <li className="font-medium text-foreground">{t("products.breadcrumbSearch", "Search")}</li>
                 </>
               )}
             </ol>
@@ -234,18 +234,18 @@ function ProductsPage() {
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
               <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-                {isSearching ? `Search: "${searchParam}"` : "All Products"}
+                {isSearching ? t("products.searchResults", `Search: "${searchParam}"`, { q: searchParam ?? "" }) : t("products.title", "All Products")}
               </h1>
               <p className="mt-2 text-base text-muted-foreground">
                 {isSearching
-                  ? `Showing results for "${searchParam}" across our catalog.`
-                  : "Dealer-grade diagnostic platforms, ECU programmers and calibration software trusted by professional workshops worldwide."}
+                  ? t("products.showingResults", `Showing results for "${searchParam}" across our catalog.`, { q: searchParam ?? "" })
+                  : t("products.subtitle", "Dealer-grade diagnostic platforms, ECU programmers and calibration software trusted by professional workshops worldwide.")}
               </p>
             </div>
             <p className="text-sm text-muted-foreground">
-              Showing <span className="font-semibold text-foreground">{pageItems.length}</span> of{" "}
-              <span className="font-semibold text-foreground">{totalCount}</span> products
-              {productsQuery.isFetching && <span className="ml-2 text-primary">Updating…</span>}
+              {t("products.showing", "Showing")} <span className="font-semibold text-foreground">{pageItems.length}</span> {t("products.of", "of")}{" "}
+              <span className="font-semibold text-foreground">{totalCount}</span> {t("products.productsWord", "products")}
+              {productsQuery.isFetching && <span className="ms-2 text-primary">{t("products.updating", "Updating…")}</span>}
             </p>
           </div>
         </div>
@@ -259,7 +259,7 @@ function ProductsPage() {
             className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium lg:hidden"
           >
             <SlidersHorizontal className="h-4 w-4" />
-            Filters{" "}
+            {t("common.filters", "Filters")}{" "}
             {activeCount > 0 && (
               <span className="rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
                 {activeCount}
@@ -270,18 +270,20 @@ function ProductsPage() {
           <div className="hidden flex-wrap items-center gap-2 text-sm text-muted-foreground lg:flex">
             {isSearching && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                Search: {searchParam}
-                <button onClick={clearSearch} aria-label="Clear search" className="hover:text-destructive">
+                {t("products.searchLabel", "Search")}: {searchParam}
+                <button onClick={clearSearch} aria-label={t("products.clearSearchAria", "Clear search")} className="hover:text-destructive">
                   <X className="h-3.5 w-3.5" />
                 </button>
               </span>
             )}
             {activeCount > 0 ? (
               <button onClick={resetAll} className="font-semibold text-primary hover:underline">
-                Clear {activeCount} filter{activeCount > 1 ? "s" : ""}
+                {activeCount > 1
+                  ? t("products.clearFiltersMany", `Clear ${activeCount} filters`, { n: activeCount })
+                  : t("products.clearFiltersOne", `Clear ${activeCount} filter`, { n: activeCount })}
               </button>
             ) : (
-              "No filters applied"
+              t("products.noFilters", "No filters applied")
             )}
           </div>
 
@@ -294,26 +296,26 @@ function ProductsPage() {
                   setPage(1);
                 }}
                 className="h-10 appearance-none rounded-md border border-border bg-white ps-3 pe-9 text-sm font-medium outline-none focus:border-primary"
-                aria-label="Sort by"
+                aria-label={t("products.sortLabel", "Sort by")}
               >
                 {SORT_OPTIONS.map((o) => (
                   <option key={o.id} value={o.id}>
-                    Sort: {o.label}
+                    {t("products.sortPrefix", "Sort:")} {t(o.key, o.fallback)}
                   </option>
                 ))}
               </select>
-              <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <ChevronDown className="pointer-events-none absolute end-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             </div>
             <div className="hidden items-center gap-1 rounded-md border border-border p-1 sm:flex">
               <button
-                aria-label="Grid view"
+                aria-label={t("products.gridViewLabel", "Grid view")}
                 onClick={() => setView("grid")}
                 className={`grid h-8 w-8 place-items-center rounded ${view === "grid" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-primary"}`}
               >
                 <LayoutGrid className="h-4 w-4" />
               </button>
               <button
-                aria-label="List view"
+                aria-label={t("products.listViewLabel", "List view")}
                 onClick={() => setView("list")}
                 className={`grid h-8 w-8 place-items-center rounded ${view === "list" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-primary"}`}
               >

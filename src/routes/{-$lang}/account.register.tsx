@@ -13,6 +13,7 @@ import { register } from "@/lib/auth/wp-auth.functions";
 import { useAuth } from "@/components/site/AuthProvider";
 import { toast } from "sonner";
 import { seoToMeta } from "@/lib/seo";
+import { useLocale } from "@/i18n/LocaleProvider";
 
 export const Route = createFileRoute("/{-$lang}/account/register")({
   head: () => ({
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/{-$lang}/account/register")({
 function RegisterPage() {
   const navigate = useNavigate();
   const { setUser } = useAuth();
+  const { t } = useLocale();
   const [form, setForm] = useState({ firstName: "", lastName: "", email: "", password: "" });
   const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
 
@@ -69,8 +71,8 @@ function RegisterPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container-px mx-auto flex max-w-md flex-col py-16">
-        <h1 className="text-3xl font-bold tracking-tight">Create account</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Join ADL Automotive to track orders and check out faster.</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t("auth.createAccountTitle")}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t("auth.createAccountSubtitle")}</p>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -91,52 +93,52 @@ function RegisterPage() {
         >
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">First name</Label>
+              <Label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("auth.firstName")}</Label>
               <Input value={form.firstName} onChange={update("firstName")} aria-invalid={!!errors.firstName} />
               {errors.firstName && <p className="mt-1 text-xs text-destructive">{errors.firstName}</p>}
             </div>
             <div>
-              <Label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Last name</Label>
+              <Label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("auth.lastName")}</Label>
               <Input value={form.lastName} onChange={update("lastName")} aria-invalid={!!errors.lastName} />
               {errors.lastName && <p className="mt-1 text-xs text-destructive">{errors.lastName}</p>}
             </div>
           </div>
           <div>
-            <Label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Email</Label>
+            <Label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("auth.email")}</Label>
             <Input type="email" value={form.email} onChange={update("email")} autoComplete="email" aria-invalid={!!errors.email} />
             {errors.email && <p className="mt-1 text-xs text-destructive">{errors.email}</p>}
           </div>
           <div>
-            <Label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Password</Label>
+            <Label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("auth.password")}</Label>
             <Input type="password" value={form.password} onChange={update("password")} autoComplete="new-password" aria-invalid={!!errors.password} />
             {errors.password ? (
               <p className="mt-1 text-xs text-destructive">{errors.password}</p>
             ) : (
-              <p className="mt-1 text-xs text-muted-foreground">At least 8 characters, including a letter and a number.</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("auth.passwordHint")}</p>
             )}
           </div>
           {errorMsg && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>{emailExists ? "Email already in use" : "Couldn't create account"}</AlertTitle>
+              <AlertTitle>{emailExists ? t("auth.emailInUseTitle") : t("auth.createAccountFailedTitle")}</AlertTitle>
               <AlertDescription>
                 {errorMsg}
                 {emailExists && (
                   <>
                     {" "}
-                    <Link to="/{-$lang}/account/login" className="font-semibold underline">Sign in</Link>
+                    <Link to="/{-$lang}/account/login" className="font-semibold underline">{t("auth.signIn")}</Link>
                     {" · "}
-                    <Link to="/{-$lang}/account/forgot-password" className="font-semibold underline">Reset password</Link>
+                    <Link to="/{-$lang}/account/forgot-password" className="font-semibold underline">{t("auth.resetPassword")}</Link>
                   </>
                 )}
               </AlertDescription>
             </Alert>
           )}
           <Button type="submit" className="w-full" disabled={mutation.isPending}>
-            {mutation.isPending ? "Creating account…" : "Create account"}
+            {mutation.isPending ? t("auth.creatingAccount") : t("auth.createAnAccount")}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            Already have an account? <Link to="/{-$lang}/account/login" className="font-semibold text-primary hover:underline">Sign in</Link>
+            {t("auth.alreadyHaveAccount")} <Link to="/{-$lang}/account/login" className="font-semibold text-primary hover:underline">{t("auth.signIn")}</Link>
           </p>
         </form>
       </main>

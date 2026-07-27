@@ -59,7 +59,7 @@ export function ProductCard({ product }: { product: Product }) {
           loading="lazy"
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        <div className="absolute left-3 top-3 flex flex-col gap-1">
+        <div className="absolute start-3 top-3 flex flex-col gap-1">
           {product.badge === "new" && (
             <span className="rounded-full bg-[var(--accent-blue)] px-2.5 py-0.5 text-xs font-semibold text-white">
                 {t("product.new")}
@@ -76,7 +76,7 @@ export function ProductCard({ product }: { product: Product }) {
             </span>
           )}
         </div>
-        <div className="absolute right-3 top-3 flex flex-col gap-2">
+        <div className="absolute end-3 top-3 flex flex-col gap-2">
           <button
             onClick={handleWishlist}
             aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}

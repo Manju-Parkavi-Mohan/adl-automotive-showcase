@@ -7,6 +7,7 @@ import { listProducts } from "@/lib/woo/products.functions";
 import { wooToDisplay } from "@/lib/woo/adapter";
 import { ProductCard } from "./ProductCard";
 import type { WooCategory } from "@/lib/woo/types";
+import { useT } from "@/i18n/LocaleProvider";
 import catBgA from "@/assets/cat-bg-a.png.asset.json";
 import catBgB from "@/assets/cat-bg-b.png.asset.json";
 
@@ -37,6 +38,7 @@ export function CategoryProductsSections() {
 }
 
 function CategoryProductsRow({ category, alt, tileImage }: { category: WooCategory; alt: boolean; tileImage: string }) {
+  const t = useT();
   const { data: subCats } = useQuery({
     queryKey: ["wc-subcats", category.id],
     queryFn: () => listCategories({ data: { perPage: 20, parent: category.id, hideEmpty: true } }),
@@ -109,7 +111,7 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
         <div className="mb-4 flex items-center justify-between md:hidden">
           <h2 className="text-xl font-extrabold uppercase tracking-tight text-black">{category.name}</h2>
           <Link to="/{-$lang}/products" search={{}} className="text-xs font-semibold text-primary">
-            View all →
+            {t("common.viewAllArrow", "View all →")}
           </Link>
         </div>
 
@@ -145,9 +147,9 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
                   setActiveTabId(e.target.value === "all" ? "all" : Number(e.target.value))
                 }
                 className="w-full rounded-full bg-white px-4 py-2 text-sm font-bold uppercase tracking-wide text-black ring-1 ring-black/10"
-                aria-label="Filter subcategory"
+                aria-label={t("products.filterSubcategory", "Filter subcategory")}
               >
-                <option value="all">All</option>
+                <option value="all">{t("products.all", "All")}</option>
                 {tabs.map((tb) => (
                   <option key={tb.id} value={tb.id}>
                     {tb.name}
@@ -158,7 +160,7 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
             {/* Desktop: right-aligned tabs */}
             <div className="mb-4 hidden h-10 items-center justify-end gap-2 overflow-x-auto md:flex [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               <TabButton active={activeTabId === "all"} onClick={() => setActiveTabId("all")}>
-                All
+                {t("products.all", "All")}
               </TabButton>
               {tabs.map((tb) => (
                 <TabButton
@@ -173,7 +175,7 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
 
             <button
               type="button"
-              aria-label="Scroll left"
+              aria-label={t("products.scrollLeft", "Scroll left")}
               onClick={() => stepScroll(-1)}
               disabled={!canLeft}
               className="absolute left-1 top-[55%] z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:h-10 sm:w-10"
@@ -212,7 +214,7 @@ function CategoryProductsRow({ category, alt, tileImage }: { category: WooCatego
 
             <button
               type="button"
-              aria-label="Scroll right"
+              aria-label={t("products.scrollRight", "Scroll right")}
               onClick={() => stepScroll(1)}
               disabled={!canRight}
               className="absolute right-1 top-[55%] z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white shadow-md transition-opacity hover:bg-black hover:text-white disabled:opacity-30 sm:h-10 sm:w-10"

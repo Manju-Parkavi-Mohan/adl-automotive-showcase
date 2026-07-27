@@ -11,6 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { requestPasswordReset } from "@/lib/auth/wp-auth.functions";
 import { CheckCircle2 } from "lucide-react";
 import { seoToMeta } from "@/lib/seo";
+import { useLocale } from "@/i18n/LocaleProvider";
 
 export const Route = createFileRoute("/{-$lang}/account/forgot-password")({
   head: () => ({
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/{-$lang}/account/forgot-password")({
 });
 
 function ForgotPasswordPage() {
+  const { t } = useLocale();
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const schema = z.object({
@@ -39,17 +41,17 @@ function ForgotPasswordPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container-px mx-auto flex max-w-md flex-col py-16">
-        <h1 className="text-3xl font-bold tracking-tight">Reset password</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t("auth.resetPasswordTitle")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Enter the email linked to your account and we'll send you a link to set a new password.
+          {t("auth.resetPasswordSubtitle")}
         </p>
 
         {mutation.isSuccess ? (
           <Alert className="mt-8">
             <CheckCircle2 className="h-4 w-4" />
-            <AlertTitle>Check your inbox</AlertTitle>
+            <AlertTitle>{t("auth.checkInboxTitle")}</AlertTitle>
             <AlertDescription>
-              If an account exists for <strong>{email}</strong>, we've sent a password reset link. It may take a couple of minutes to arrive — check your spam folder too.
+              {t("auth.checkInboxBody", { email })}
             </AlertDescription>
           </Alert>
         ) : (
@@ -80,12 +82,12 @@ function ForgotPasswordPage() {
               {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
             </div>
             <Button type="submit" className="w-full" disabled={mutation.isPending}>
-              {mutation.isPending ? "Sending…" : "Send reset link"}
+              {mutation.isPending ? t("auth.sending") : t("auth.sendResetLink")}
             </Button>
             <p className="text-center text-sm text-muted-foreground">
-              Remembered it?{" "}
+              {t("auth.rememberedIt")}{" "}
               <Link to="/{-$lang}/account/login" className="font-semibold text-primary hover:underline">
-                Back to sign in
+                {t("auth.backToSignIn")}
               </Link>
             </p>
           </form>
