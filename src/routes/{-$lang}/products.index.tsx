@@ -11,6 +11,7 @@ import { listCategories } from "@/lib/woo/categories.functions";
 import { wooToDisplay } from "@/lib/woo/adapter";
 import { getYoastForUrl } from "@/lib/wp/yoast.functions";
 import { seoToMeta, seoToLinks, seoToScripts } from "@/lib/seo";
+import { useLocale, useT } from "@/i18n/LocaleProvider";
 
 export const Route = createFileRoute("/{-$lang}/products/")({
   validateSearch: (search) => {
@@ -45,17 +46,17 @@ export const Route = createFileRoute("/{-$lang}/products/")({
 });
 
 const SORT_OPTIONS = [
-  { id: "featured", label: "Featured" },
-  { id: "price-asc", label: "Price: Low to High" },
-  { id: "price-desc", label: "Price: High to Low" },
-  { id: "newest", label: "Newest" },
+  { id: "featured", label: "Featured", key: "products.sort.featured", fallback: "Featured" },
+  { id: "price-asc", label: "Price: Low to High", key: "products.sort.priceAsc", fallback: "Price: Low to High" },
+  { id: "price-desc", label: "Price: High to Low", key: "products.sort.priceDesc", fallback: "Price: High to Low" },
+  { id: "newest", label: "Newest", key: "products.sort.newest", fallback: "Newest" },
 ] as const;
 
 const PRICE_RANGES = [
-  { id: "0-500", label: "Under $500", min: 0, max: 500 },
-  { id: "500-1500", label: "$500 – $1,500", min: 500, max: 1500 },
-  { id: "1500-3000", label: "$1,500 – $3,000", min: 1500, max: 3000 },
-  { id: "3000-9999", label: "Over $3,000", min: 3000, max: 999999 },
+  { id: "0-500", label: "Under $500", key: "products.priceUnder500", fallback: "Under $500", min: 0, max: 500 },
+  { id: "500-1500", label: "$500 – $1,500", key: "products.price500to1500", fallback: "$500 – $1,500", min: 500, max: 1500 },
+  { id: "1500-3000", label: "$1,500 – $3,000", key: "products.price1500to3000", fallback: "$1,500 – $3,000", min: 1500, max: 3000 },
+  { id: "3000-9999", label: "Over $3,000", key: "products.priceOver3000", fallback: "Over $3,000", min: 3000, max: 999999 },
 ];
 
 const PER_PAGE = 12;
@@ -77,6 +78,7 @@ function sortToWoo(id: (typeof SORT_OPTIONS)[number]["id"]) {
 function ProductsPage() {
   const { search: searchParam, category: categoryParam } = Route.useSearch();
   const navigate = Route.useNavigate();
+  const { t } = useLocale();
   const [view, setView] = useState<"grid" | "list">("grid");
   const [sort, setSort] = useState<(typeof SORT_OPTIONS)[number]["id"]>("featured");
   const [page, setPage] = useState(1);
