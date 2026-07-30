@@ -374,6 +374,13 @@ function ProductDetailPage() {
                 >
                   <Share2 className="h-4 w-4" /> {t("product.share")}
                 </button>
+                <Link
+                  to="/{-$lang}/contact"
+                  search={{ product: product.name, sku: product.sku || undefined }}
+                  className="inline-flex h-11 flex-1 min-w-[160px] items-center justify-center gap-2 rounded-md border border-border bg-white text-sm font-semibold transition-colors hover:border-primary hover:text-primary"
+                >
+                  <MessageSquare className="h-4 w-4" /> {t("product.enquire", "Enquire")}
+                </Link>
               </div>
             </div>
 
