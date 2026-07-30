@@ -7,6 +7,7 @@ import {
   Minus,
   Plus,
   Share2,
+  MessageSquare,
   ShoppingCart,
   Check,
   ZoomIn,
