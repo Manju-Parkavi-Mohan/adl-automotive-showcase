@@ -501,18 +501,20 @@
     "subject": "Subject",
     "message": "Message",
     "send": "Send enquiry",
-    "copy": "Copy details",
-    "note": "Your enquiry is sent to our sales team at sales@adlautomotive.com.",
+    "sending": "Sending…",
+    "note": "Your enquiry goes straight to our sales team.",
     "fixErrors": "Please complete the required fields.",
-    "opening": "Opening your email app to send the enquiry…",
-    "copied": "Enquiry details copied to clipboard",
-    "copyFailed": "Could not copy. Please email us directly."
+    "sent": "Your enquiry has been sent to our sales team.",
+    "sentTitle": "Enquiry sent",
+    "sentBody": "Thank you! Your enquiry has been emailed to our sales team and they will get back to you shortly.",
+    "sendFailed": "We couldn't send your enquiry. Please try again shortly."
   },
   "validation": {
     "nameRequired": "Please enter your name",
     "emailInvalid": "Enter a valid email address",
     "phoneRequired": "Enter a valid phone number",
     "subjectRequired": "Please enter a subject",
-    "messageRequired": "Message is too short"
+    "messageRequired": "Message is too short",
+    "invalidCharacters": "Please remove line breaks and special characters"
   }
 }
