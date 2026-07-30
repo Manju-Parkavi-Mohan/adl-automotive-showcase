@@ -35,7 +35,7 @@ const NAV_LINKS = [
   { key: "products", to: "/{-$lang}/products" as const },
   { key: "blog", to: "/{-$lang}/blog" as const },
   { key: "about", to: "/{-$lang}" as const },
-  { key: "contact", to: "/{-$lang}" as const },
+  { key: "contact", to: "/{-$lang}/contact" as const },
 ];
 
 const EXTRA_LINKS = [

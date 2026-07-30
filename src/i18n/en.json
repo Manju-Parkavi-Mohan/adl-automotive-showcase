@@ -107,7 +107,8 @@
       "returns": "30-day returns",
       "support": "Expert tech support"
     },
-    "notFoundTitle": "Product not found"
+    "notFoundTitle": "Product not found",
+    "enquire": "Enquire"
   },
   "reviews": {
     "title": "Customer reviews",
@@ -489,5 +490,29 @@
     "payment": "Payment",
     "complete": "Complete",
     "aria": "Checkout progress"
+  },
+  "contact": {
+    "title": "Contact Sales",
+    "subtitle": "Tell us what you need and our team will get back to you shortly.",
+    "name": "Full name",
+    "email": "Email",
+    "phone": "Phone",
+    "company": "Company (optional)",
+    "subject": "Subject",
+    "message": "Message",
+    "send": "Send enquiry",
+    "copy": "Copy details",
+    "note": "Your enquiry is sent to our sales team at sales@adlautomotive.com.",
+    "fixErrors": "Please complete the required fields.",
+    "opening": "Opening your email app to send the enquiry…",
+    "copied": "Enquiry details copied to clipboard",
+    "copyFailed": "Could not copy. Please email us directly."
+  },
+  "validation": {
+    "nameRequired": "Please enter your name",
+    "emailInvalid": "Enter a valid email address",
+    "phoneRequired": "Enter a valid phone number",
+    "subjectRequired": "Please enter a subject",
+    "messageRequired": "Message is too short"
   }
 }

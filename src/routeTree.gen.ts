@@ -16,6 +16,7 @@ import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as Char123LangChar125IndexRouteImport } from './routes/{-$lang}/index'
 import { Route as Char123LangChar125TermsRouteImport } from './routes/{-$lang}/terms'
 import { Route as Char123LangChar125ProductsRouteImport } from './routes/{-$lang}/products'
+import { Route as Char123LangChar125ContactRouteImport } from './routes/{-$lang}/contact'
 import { Route as Char123LangChar125CheckoutRouteImport } from './routes/{-$lang}/checkout'
 import { Route as Char123LangChar125CartRouteImport } from './routes/{-$lang}/cart'
 import { Route as Char123LangChar125BlogRouteImport } from './routes/{-$lang}/blog'
@@ -67,6 +68,12 @@ const Char123LangChar125ProductsRoute =
   Char123LangChar125ProductsRouteImport.update({
     id: '/{-$lang}/products',
     path: '/{-$lang}/products',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char123LangChar125ContactRoute =
+  Char123LangChar125ContactRouteImport.update({
+    id: '/{-$lang}/contact',
+    path: '/{-$lang}/contact',
     getParentRoute: () => rootRouteImport,
   } as any)
 const Char123LangChar125CheckoutRoute =
@@ -172,6 +179,7 @@ export interface FileRoutesByFullPath {
   '/{-$lang}/blog': typeof Char123LangChar125BlogRouteWithChildren
   '/{-$lang}/cart': typeof Char123LangChar125CartRoute
   '/{-$lang}/checkout': typeof Char123LangChar125CheckoutRoute
+  '/{-$lang}/contact': typeof Char123LangChar125ContactRoute
   '/{-$lang}/products': typeof Char123LangChar125ProductsRouteWithChildren
   '/{-$lang}/terms': typeof Char123LangChar125TermsRoute
   '/{-$lang}/': typeof Char123LangChar125IndexRoute
@@ -195,6 +203,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/{-$lang}/cart': typeof Char123LangChar125CartRoute
   '/{-$lang}/checkout': typeof Char123LangChar125CheckoutRoute
+  '/{-$lang}/contact': typeof Char123LangChar125ContactRoute
   '/{-$lang}/terms': typeof Char123LangChar125TermsRoute
   '/{-$lang}': typeof Char123LangChar125IndexRoute
   '/{-$lang}/account/forgot-password': typeof Char123LangChar125AccountForgotPasswordRoute
@@ -220,6 +229,7 @@ export interface FileRoutesById {
   '/{-$lang}/blog': typeof Char123LangChar125BlogRouteWithChildren
   '/{-$lang}/cart': typeof Char123LangChar125CartRoute
   '/{-$lang}/checkout': typeof Char123LangChar125CheckoutRoute
+  '/{-$lang}/contact': typeof Char123LangChar125ContactRoute
   '/{-$lang}/products': typeof Char123LangChar125ProductsRouteWithChildren
   '/{-$lang}/terms': typeof Char123LangChar125TermsRoute
   '/{-$lang}/': typeof Char123LangChar125IndexRoute
@@ -247,6 +257,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/blog'
     | '/{-$lang}/cart'
     | '/{-$lang}/checkout'
+    | '/{-$lang}/contact'
     | '/{-$lang}/products'
     | '/{-$lang}/terms'
     | '/{-$lang}/'
@@ -270,6 +281,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/{-$lang}/cart'
     | '/{-$lang}/checkout'
+    | '/{-$lang}/contact'
     | '/{-$lang}/terms'
     | '/{-$lang}'
     | '/{-$lang}/account/forgot-password'
@@ -294,6 +306,7 @@ export interface FileRouteTypes {
     | '/{-$lang}/blog'
     | '/{-$lang}/cart'
     | '/{-$lang}/checkout'
+    | '/{-$lang}/contact'
     | '/{-$lang}/products'
     | '/{-$lang}/terms'
     | '/{-$lang}/'
@@ -320,6 +333,7 @@ export interface RootRouteChildren {
   Char123LangChar125BlogRoute: typeof Char123LangChar125BlogRouteWithChildren
   Char123LangChar125CartRoute: typeof Char123LangChar125CartRoute
   Char123LangChar125CheckoutRoute: typeof Char123LangChar125CheckoutRoute
+  Char123LangChar125ContactRoute: typeof Char123LangChar125ContactRoute
   Char123LangChar125ProductsRoute: typeof Char123LangChar125ProductsRouteWithChildren
   Char123LangChar125TermsRoute: typeof Char123LangChar125TermsRoute
   Char123LangChar125IndexRoute: typeof Char123LangChar125IndexRoute
@@ -376,6 +390,13 @@ declare module '@tanstack/react-router' {
       path: '/{-$lang}/products'
       fullPath: '/{-$lang}/products'
       preLoaderRoute: typeof Char123LangChar125ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/{-$lang}/contact': {
+      id: '/{-$lang}/contact'
+      path: '/{-$lang}/contact'
+      fullPath: '/{-$lang}/contact'
+      preLoaderRoute: typeof Char123LangChar125ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/{-$lang}/checkout': {
@@ -563,6 +584,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char123LangChar125BlogRoute: Char123LangChar125BlogRouteWithChildren,
   Char123LangChar125CartRoute: Char123LangChar125CartRoute,
   Char123LangChar125CheckoutRoute: Char123LangChar125CheckoutRoute,
+  Char123LangChar125ContactRoute: Char123LangChar125ContactRoute,
   Char123LangChar125ProductsRoute: Char123LangChar125ProductsRouteWithChildren,
   Char123LangChar125TermsRoute: Char123LangChar125TermsRoute,
   Char123LangChar125IndexRoute: Char123LangChar125IndexRoute,
@@ -572,13 +594,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -1,4 +1,4 @@
-import { Heart, ShoppingCart, Eye } from "lucide-react";
+import { Heart, ShoppingCart, MessageSquare } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import type { Product } from "@/data/products";
 import { Button } from "@/components/ui/button";
@@ -89,12 +89,15 @@ export function ProductCard({ product }: { product: Product }) {
           >
             <Heart className={`h-4 w-4 ${inWishlist ? "fill-current" : ""}`} />
           </button>
-          <button
-            aria-label="Quick view"
+          <Link
+            to="/{-$lang}/contact"
+            search={{ product: product.name, sku: product.sku || undefined }}
+            onClick={(e) => e.stopPropagation()}
+            aria-label={t("product.enquire", "Enquire about this product")}
             className="grid h-9 w-9 place-items-center rounded-full bg-white/95 text-foreground opacity-0 shadow-sm transition-opacity group-hover:opacity-100 hover:bg-white hover:text-primary"
           >
-            <Eye className="h-4 w-4" />
-          </button>
+            <MessageSquare className="h-4 w-4" />
+          </Link>
         </div>
       </Link>
 
