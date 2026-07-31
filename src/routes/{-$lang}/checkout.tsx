@@ -1078,8 +1078,14 @@ function PayPalButtons({
         const createOrder = async () => {
           setError(null);
           setProcessing(true);
-          const res = await createPaymentOrder({ data: buildOrderRef.current() });
-          return res.paypalOrderId;
+          try {
+            const res = await createPaymentOrder({ data: buildOrderRef.current() });
+            return res.paypalOrderId;
+          } finally {
+            // PayPal may show an inline debit/credit-card form after the order
+            // is created. Release our overlay so that form remains usable.
+            setProcessing(false);
+          }
         };
         const doCapture = async (paypalOrderId: string) => {
           setProcessing(true);
@@ -1103,9 +1109,6 @@ function PayPalButtons({
         if (paypalRef.current) {
           const b = paypal.Buttons({
             style: { layout: "vertical", shape: "rect", label: "paypal" },
-            onClick: () => {
-              setProcessing(true);
-            },
             createOrder,
             onApprove: async (data) => doCapture(data.orderID),
             onCancel: () => {
