@@ -1280,17 +1280,19 @@ function PayPalButtons({
 
   return (
     <div className="relative space-y-3">
-      <div ref={paypalRef} />
-      <div ref={applePayRef} style={{ display: applePayEligible ? "block" : "none" }} />
-      <div ref={googlePayRef} style={{ display: googlePayEligible ? "block" : "none" }} />
+      <div ref={paypalRef} className="relative z-0" />
+      <div ref={applePayRef} style={{ display: applePayEligible ? "block" : "none" }} className="relative z-0" />
+      <div ref={googlePayRef} style={{ display: googlePayEligible ? "block" : "none" }} className="relative z-0" />
       {processing && (
         <div
-          className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-md bg-white/80 backdrop-blur-sm"
+          className="absolute inset-0 z-50 flex flex-col items-center justify-center rounded-md bg-white/95 p-3 backdrop-blur-sm"
           role="status"
           aria-live="polite"
         >
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <p className="text-xs font-medium text-foreground">{t("checkout.connectingPayment")}</p>
+          <div className="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 text-primary-foreground shadow-sm">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+            <span className="text-sm font-medium">{t("checkout.connectingPayment")}</span>
+          </div>
         </div>
       )}
       {error && (
