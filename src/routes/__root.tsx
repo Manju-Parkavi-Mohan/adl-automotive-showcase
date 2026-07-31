@@ -196,10 +196,22 @@ function RootComponent() {
 }
 
 function ScrollToTop() {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const href = useRouterState({ select: (s) => s.location.href });
+  const isLoading = useRouterState({ select: (s) => s.status === "pending" });
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-  }, [pathname]);
+    if (typeof window === "undefined" || isLoading) return;
+    const scrollTop = () => {
+      window.scrollTo(0, 0);
+      if (document.documentElement) document.documentElement.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    };
+    scrollTop();
+    const raf = requestAnimationFrame(scrollTop);
+    const timer = window.setTimeout(scrollTop, 60);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.clearTimeout(timer);
+    };
+  }, [href, isLoading]);
   return null;
 }
