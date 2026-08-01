@@ -50,6 +50,10 @@ function CheckoutPage() {
   const [ready, setReady] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [step, setStep] = useState<"details" | "payment">("details");
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [step]);
   const qc = useQueryClient();
   const isSignedIn = !!user?.customerId;
 
